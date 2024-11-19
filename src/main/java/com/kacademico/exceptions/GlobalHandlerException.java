@@ -2,6 +2,8 @@ package com.kacademico.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -36,6 +38,24 @@ public class GlobalHandlerException {
     public ResponseEntity<ApiErrorResponse> handleConstraintViolation(ConstraintViolationException e) {
         ApiErrorResponse response = new ApiErrorResponse(extractError(e.getMessage()), "CONSTRAINT_VIOLATION");
         return new ResponseEntity<>(response, HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    @ExceptionHandler(LengthException.class)
+    public ResponseEntity<ApiErrorResponse> handleLengthException(LengthException e) {
+        ApiErrorResponse response = new ApiErrorResponse(e.getMessage(), "LENGTH_VIOLATION");
+        return new ResponseEntity<>(response, HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiErrorResponse> handleInvalidArgException(MethodArgumentNotValidException e) {
+        
+        StringBuilder errorMessage = new StringBuilder();
+
+        for (FieldError fieldError : e.getBindingResult().getFieldErrors()) errorMessage.append(fieldError.getDefaultMessage());
+        
+        ApiErrorResponse response = new ApiErrorResponse(errorMessage.toString(), "PASSWORD_VIOLATION");
+        
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     private String extractError(String message) {

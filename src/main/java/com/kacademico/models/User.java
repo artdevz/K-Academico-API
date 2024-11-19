@@ -14,7 +14,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,11 +30,7 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
-    private UUID id;
-
-    @NotEmpty
-    @Size(max=12, min=12, message="Matrícula deve conter 12 dígitos.")
-    private String enrollment; // 12 Numbers Year+xxxxxxxx
+    private UUID id;    
 
     @NotBlank(message="Nome não deve está em branco.")
     @Size(min=3, max=48, message="Nome deve conter entre 3 a 48 caractéres.")
@@ -43,12 +38,11 @@ public class User implements UserDetails {
 
     @Email
     private String email;
-
+    
     @NotBlank
     private String password;
 
-    public User(String enrollment, String name, String email, String password) {
-        this.enrollment = enrollment;
+    public User(String name, String email, String password) {
         this.name = name;
         this.email = email;
         this.password = password;
@@ -66,7 +60,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.enrollment;
+        return this.email;
     }
     
 }

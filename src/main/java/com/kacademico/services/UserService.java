@@ -1,8 +1,6 @@
 package com.kacademico.services;
 
 import java.lang.reflect.Field;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -25,9 +23,7 @@ import com.kacademico.repositories.UserRepository;
 public class UserService {
     
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-    
-    // private static int enrollmentId = 1000000; // BUG: Não pode desligar o servidor
-   
+
     private final UserRepository userR;    
 
     public UserService(UserRepository userR) {
@@ -38,8 +34,7 @@ public class UserService {
          
         validateEmail(data.email());
 
-        User user = new User(
-            generateEnrollment(),
+        User user = new User(            
             data.name(),
             data.email(),
             passwordEncoder.encode(data.password())
@@ -53,8 +48,7 @@ public class UserService {
 
         return userR.findAll().stream()
             .map(user -> new UserResponseDTO(
-                user.getId(),
-                user.getEnrollment(),
+                user.getId(),                
                 user.getName(),
                 user.getEmail()
             ))
@@ -67,8 +61,7 @@ public class UserService {
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         
         return new UserResponseDTO(
-            user.getId(),
-            user.getEnrollment(),
+            user.getId(),            
             user.getName(),
             user.getEmail()
         );
@@ -91,7 +84,6 @@ public class UserService {
 
                     case "password":
                         String password = (String) value;
-                        // validatePassword(password);
                         user.setPassword(passwordEncoder.encode(password));
                         break;  
 
@@ -119,7 +111,7 @@ public class UserService {
         userR.deleteById(id);
 
     }
-
+    /* 
     // Enrollment:
     private String generateEnrollment() {
         // 2024 + 1 ou 2 + 0000000
@@ -145,7 +137,7 @@ public class UserService {
         return "0000000"; //String.valueOf(++enrollmentId);
 
     }
-
+    */
     // Email:
 
     private void validateEmail(String email) {

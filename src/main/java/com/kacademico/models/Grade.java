@@ -1,6 +1,7 @@
 package com.kacademico.models;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.UUID;
 
 import jakarta.persistence.Column;
@@ -9,8 +10,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,9 +17,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "students")
+@Table(name = "grades")
 @Entity
-public class Student implements Serializable {
+public class Grade implements Serializable {
     
     private static final long serialVersionUID = 1L;
     @Id
@@ -28,12 +27,14 @@ public class Student implements Serializable {
     @Column(name = "id")
     private UUID id;
 
-    @NotEmpty
-    @Size(max=12, min=12, message="Matrícula deve conter 12 dígitos.")
-    private String enrollment; // 12 Numbers Year+xxxxxxxx
+    private Subject subject;
 
-    private Course course;
+    private Professor professor;
 
-    private Transcript transcript;
+    private int capacity;
+
+    private LocalDate timetable;
+
+    private String locate;
 
 }

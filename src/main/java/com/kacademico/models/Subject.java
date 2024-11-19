@@ -16,17 +16,15 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name="modules")
+@Table(name="subjecties")
 @Entity
-public class Module implements Serializable {
+public class Subject implements Serializable {
     
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
-    private UUID id;
-
-    private Professor professor;
+    private UUID id;    
 
     private Course course;
 
@@ -34,10 +32,6 @@ public class Module implements Serializable {
 
     private int duration;
 
-    private int capacity;
-
     private String description;
-
-    private String timetable; // String?
 
 }
