@@ -34,10 +34,11 @@ public class User implements UserDetails {
     private UUID id;
 
     @NotEmpty
-    @Size(max=12, min=12)
+    @Size(max=12, min=12, message="Matrícula deve conter 12 dígitos.")
     private String enrollment; // 12 Numbers Year+xxxxxxxx
 
-    @NotBlank
+    @NotBlank(message="Nome não deve está em branco.")
+    @Size(min=3, max=48, message="Nome deve conter entre 3 a 48 caractéres.")
     private String name;
 
     @Email

@@ -16,9 +16,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name="classes")
+@Table(name="modules")
 @Entity
-public class Clazz implements Serializable {
+public class Module implements Serializable {
     
     private static final long serialVersionUID = 1L;
     @Id

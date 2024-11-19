@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
@@ -18,6 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.kacademico.dtos.user.UserRequestDTO;
 import com.kacademico.dtos.user.UserResponseDTO;
+import com.kacademico.exceptions.DuplicateValueException;
 import com.kacademico.models.User;
 import com.kacademico.repositories.UserRepository;
 
@@ -25,7 +25,9 @@ import com.kacademico.repositories.UserRepository;
 public class UserService {
     
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-       
+    
+    // private static int enrollmentId = 1000000; // BUG: Não pode desligar o servidor
+   
     private final UserRepository userR;    
 
     public UserService(UserRepository userR) {
@@ -33,10 +35,8 @@ public class UserService {
     }
 
     public void create(UserRequestDTO data) {
-        /* 
-        validateEmail();
-        validateName();
-        validatePassword();*/
+         
+        validateEmail(data.email());
 
         User user = new User(
             generateEnrollment(),
@@ -86,7 +86,6 @@ public class UserService {
 
                     case "name":
                         String name = (String) value;
-                        // validateName(name);
                         user.setName(name);
                         break;
 
@@ -121,6 +120,7 @@ public class UserService {
 
     }
 
+    // Enrollment:
     private String generateEnrollment() {
         // 2024 + 1 ou 2 + 0000000
         return getYear() + getSemester() + getRandomNumber();
@@ -142,8 +142,16 @@ public class UserService {
     
     private String getRandomNumber() {
 
-        final int MAX_VALUE = 10000000;
-        return String.valueOf(ThreadLocalRandom.current().nextInt(MAX_VALUE));
+        return "0000000"; //String.valueOf(++enrollmentId);
+
+    }
+
+    // Email:
+
+    private void validateEmail(String email) {
+
+        if (userR.findByEmail(email) != null)
+            throw new DuplicateValueException("Email já está sendo utilizado.");
 
     }
 

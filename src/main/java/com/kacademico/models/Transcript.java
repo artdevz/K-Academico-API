@@ -16,7 +16,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "students")
+@Table(name = "transcripts")
 @Entity
 public class Transcript implements Serializable {
     
