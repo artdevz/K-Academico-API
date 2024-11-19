@@ -1,4 +1,6 @@
-package com.kacademico.utils;
+package com.kacademico.validators;
+
+import com.kacademico.utils.Password;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

@@ -18,6 +18,7 @@ import com.kacademico.dtos.user.UserResponseDTO;
 import com.kacademico.exceptions.DuplicateValueException;
 import com.kacademico.models.User;
 import com.kacademico.repositories.UserRepository;
+import com.kacademico.validators.PasswordValidator;
 
 @Service
 public class UserService {
@@ -73,6 +74,7 @@ public class UserService {
     
         if (existingUser.isPresent()) {
             User user = existingUser.get();
+            PasswordValidator passwordValidator = new PasswordValidator();
     
             fields.forEach((key, value) -> {
                 switch (key) {
@@ -84,6 +86,10 @@ public class UserService {
 
                     case "password":
                         String password = (String) value;
+                        
+                        if (!passwordValidator.isValid(password, null)) 
+                            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A senha deve conter pelo menos uma letra minúscula, uma letra maiúscula, um número, um caractere especial e ter entre 8 e 32 caracteres.");
+                        
                         user.setPassword(passwordEncoder.encode(password));
                         break;  
 
@@ -100,14 +106,14 @@ public class UserService {
             return userR.save(user);
         } 
         
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado.");
         
     }
 
     public void delete(UUID id) {
 
         if (!userR.findById(id).isPresent()) 
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado.");
         userR.deleteById(id);
 
     }
@@ -137,8 +143,7 @@ public class UserService {
         return "0000000"; //String.valueOf(++enrollmentId);
 
     }
-    */
-    // Email:
+    */    
 
     private void validateEmail(String email) {
 
