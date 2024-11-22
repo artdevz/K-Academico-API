@@ -31,6 +31,7 @@ public class CourseService {
          
         Course course = new Course(
             data.name(),
+            data.code(),
             data.duration(),
             data.description()
         );
@@ -45,6 +46,7 @@ public class CourseService {
             .map(course -> new CourseResponseDTO(
                 course.getId(),                
                 course.getName(),
+                course.getCode(),
                 course.getDuration(),
                 course.getDescription()
             ))
@@ -59,6 +61,7 @@ public class CourseService {
         return new CourseResponseDTO(
             course.getId(),                
             course.getName(),
+            course.getCode(),
             course.getDuration(),
             course.getDescription()
         );

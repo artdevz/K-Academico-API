@@ -1,4 +1,4 @@
-/* package com.kacademico.controllers;
+package com.kacademico.controllers;
 
 import java.util.List;
 import java.util.Map;
@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.kacademico.dtos.user.StudentRequestDTO;
-import com.kacademico.dtos.user.StudentResponseDTO;
+import com.kacademico.dtos.student.StudentRequestDTO;
+import com.kacademico.dtos.student.StudentResponseDTO;
 import com.kacademico.services.StudentService;
 
 import jakarta.validation.Valid;
@@ -72,4 +72,4 @@ public class StudentController {
            
     }
     
-}*/
+}

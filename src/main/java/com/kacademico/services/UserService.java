@@ -59,7 +59,7 @@ public class UserService {
     public UserResponseDTO readById(UUID id) {
 
         User user = userR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado."));
         
         return new UserResponseDTO(
             user.getId(),            
@@ -117,34 +117,7 @@ public class UserService {
         userR.deleteById(id);
 
     }
-    /* 
-    // Enrollment:
-    private String generateEnrollment() {
-        // 2024 + 1 ou 2 + 0000000
-        return getYear() + getSemester() + getRandomNumber();
-
-    }
-
-    private String getYear() {
-
-        return LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy"));
-
-    }
-
-    private String getSemester() {
-
-        final int MID_OF_YEAR = 6;
-        return (LocalDate.now().getMonthValue() <= MID_OF_YEAR) ? "1" : "2";
-
-    }
     
-    private String getRandomNumber() {
-
-        return "0000000"; //String.valueOf(++enrollmentId);
-
-    }
-    */    
-
     private void validateEmail(String email) {
 
         if (userR.findByEmail(email) != null)
