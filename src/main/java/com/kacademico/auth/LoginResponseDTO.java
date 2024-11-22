@@ -1,5 +1,3 @@
 package com.kacademico.auth;
 
-public record LoginResponseDTO() {
-    
-}
+public record LoginResponseDTO(String token) {}
