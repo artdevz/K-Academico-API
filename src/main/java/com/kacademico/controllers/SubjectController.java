@@ -32,7 +32,7 @@ public class SubjectController {
     }
 
     @PostMapping
-    public ResponseEntity<String> createSubject(@RequestBody @Valid SubjectRequestDTO request) {
+    public ResponseEntity<String> create(@RequestBody @Valid SubjectRequestDTO request) {
 
         subjectS.create(request);
 
@@ -41,14 +41,14 @@ public class SubjectController {
     }
     
     @GetMapping    
-    public ResponseEntity<List<SubjectResponseDTO>> readAllSubject() {
+    public ResponseEntity<List<SubjectResponseDTO>> readAll() {
 
         return new ResponseEntity<>(subjectS.readAll(), HttpStatus.OK);
 
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<SubjectResponseDTO> findSubjectById(@PathVariable UUID id) {
+    public ResponseEntity<SubjectResponseDTO> readById(@PathVariable UUID id) {
 
         SubjectResponseDTO response = subjectS.readById(id);
 
@@ -57,7 +57,7 @@ public class SubjectController {
     }    
     
     @PatchMapping("/{id}")
-    public ResponseEntity<String> updateSubject(@RequestBody Map<String, Object> fields, @PathVariable UUID id) {
+    public ResponseEntity<String> update(@RequestBody Map<String, Object> fields, @PathVariable UUID id) {
         
         subjectS.update(id, fields);
         return new ResponseEntity<>("Updated Subject", HttpStatus.OK);
@@ -65,7 +65,7 @@ public class SubjectController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteSubject(@PathVariable UUID id) {
+    public ResponseEntity<String> delete(@PathVariable UUID id) {
         
         subjectS.delete(id);
         return new ResponseEntity<>("Deleted Subject", HttpStatus.OK);

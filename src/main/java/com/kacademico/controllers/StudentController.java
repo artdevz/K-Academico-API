@@ -32,7 +32,7 @@ public class StudentController {
     }
     
     @PostMapping
-    public ResponseEntity<String> createStudent(@RequestBody @Valid StudentRequestDTO request) {
+    public ResponseEntity<String> create(@RequestBody @Valid StudentRequestDTO request) {
 
         studentS.create(request);
 
@@ -41,14 +41,14 @@ public class StudentController {
     }
     
     @GetMapping    
-    public ResponseEntity<List<StudentResponseDTO>> readAllStudent() {
+    public ResponseEntity<List<StudentResponseDTO>> readAll() {
 
         return new ResponseEntity<>(studentS.readAll(), HttpStatus.OK);
 
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<StudentResponseDTO> findStudentById(@PathVariable UUID id) {
+    public ResponseEntity<StudentResponseDTO> readById(@PathVariable UUID id) {
 
         StudentResponseDTO response = studentS.readById(id);
 
@@ -57,7 +57,7 @@ public class StudentController {
     }    
     
     @PatchMapping("/{id}")
-    public ResponseEntity<String> updateStudent(@RequestBody Map<String, Object> fields, @PathVariable UUID id) {
+    public ResponseEntity<String> update(@RequestBody Map<String, Object> fields, @PathVariable UUID id) {
         
         studentS.update(id, fields);
         return new ResponseEntity<>("Updated Student", HttpStatus.OK);
@@ -65,7 +65,7 @@ public class StudentController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteStudent(@PathVariable UUID id) {
+    public ResponseEntity<String> delete(@PathVariable UUID id) {
         
         studentS.delete(id);
         return new ResponseEntity<>("Deleted Student", HttpStatus.OK);

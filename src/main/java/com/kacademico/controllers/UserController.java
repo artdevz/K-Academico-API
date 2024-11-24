@@ -32,7 +32,7 @@ public class UserController {
     }
     
     @PostMapping
-    public ResponseEntity<String> createUser(@RequestBody @Valid UserRequestDTO request) {
+    public ResponseEntity<String> create(@RequestBody @Valid UserRequestDTO request) {
 
         userS.create(request);
 
@@ -41,14 +41,14 @@ public class UserController {
     }
     
     @GetMapping    
-    public ResponseEntity<List<UserResponseDTO>> readAllUsers() {
+    public ResponseEntity<List<UserResponseDTO>> readAll() {
 
         return new ResponseEntity<>(userS.readAll(), HttpStatus.OK);
 
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> findUserById(@PathVariable UUID id) {
+    public ResponseEntity<UserResponseDTO> readById(@PathVariable UUID id) {
 
         UserResponseDTO response = userS.readById(id);
 
@@ -57,7 +57,7 @@ public class UserController {
     }    
     
     @PatchMapping("/{id}")
-    public ResponseEntity<String> updateUser(@RequestBody Map<String, Object> fields, @PathVariable UUID id) {
+    public ResponseEntity<String> update(@RequestBody Map<String, Object> fields, @PathVariable UUID id) {
         
         userS.update(id, fields);
         return new ResponseEntity<>("Updated User", HttpStatus.OK);
@@ -65,7 +65,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable UUID id) {
+    public ResponseEntity<String> delete(@PathVariable UUID id) {
         
         userS.delete(id);
         return new ResponseEntity<>("Deleted User", HttpStatus.OK);

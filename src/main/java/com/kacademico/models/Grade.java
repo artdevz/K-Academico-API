@@ -9,7 +9,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Min;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -29,12 +32,22 @@ public class Grade implements Serializable {
 
     private Subject subject;
 
+    @ManyToOne
+    @JoinColumn(name = "professor_id", nullable = false)
     private Professor professor;
 
+    @Min(1)
     private int capacity;
 
     private LocalDate timetable;
 
     private String locate;
+
+    public Grade(Subject subject, int capacity, LocalDate timetable, String locate) {
+        this.subject = subject;
+        this.capacity = capacity;
+        this.timetable = timetable;
+        this.locate = locate;
+    }    
 
 }

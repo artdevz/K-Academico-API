@@ -32,7 +32,7 @@ public class CourseController {
     }
 
     @PostMapping
-    public ResponseEntity<String> createCourse(@RequestBody @Valid CourseRequestDTO request) {
+    public ResponseEntity<String> create(@RequestBody @Valid CourseRequestDTO request) {
 
         courseS.create(request);
 
@@ -41,14 +41,14 @@ public class CourseController {
     }
     
     @GetMapping    
-    public ResponseEntity<List<CourseResponseDTO>> readAllCourse() {
+    public ResponseEntity<List<CourseResponseDTO>> readAll() {
 
         return new ResponseEntity<>(courseS.readAll(), HttpStatus.OK);
 
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CourseResponseDTO> findCourseById(@PathVariable UUID id) {
+    public ResponseEntity<CourseResponseDTO> readById(@PathVariable UUID id) {
 
         CourseResponseDTO response = courseS.readById(id);
 
@@ -57,7 +57,7 @@ public class CourseController {
     }    
     
     @PatchMapping("/{id}")
-    public ResponseEntity<String> updateCourse(@RequestBody Map<String, Object> fields, @PathVariable UUID id) {
+    public ResponseEntity<String> update(@RequestBody Map<String, Object> fields, @PathVariable UUID id) {
         
         courseS.update(id, fields);
         return new ResponseEntity<>("Updated Course", HttpStatus.OK);
@@ -65,7 +65,7 @@ public class CourseController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteCourse(@PathVariable UUID id) {
+    public ResponseEntity<String> delete(@PathVariable UUID id) {
         
         courseS.delete(id);
         return new ResponseEntity<>("Deleted Course", HttpStatus.OK);
