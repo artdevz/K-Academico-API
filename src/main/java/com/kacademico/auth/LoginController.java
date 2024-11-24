@@ -21,10 +21,10 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody @Valid LoginRequestDTO data) {
+    public ResponseEntity<String> login(@RequestBody @Valid LoginRequestDTO request) {
 
         try {
-            return ResponseEntity.ok(loginS.login(data));
+            return ResponseEntity.ok(loginS.login(request));
         } 
         
         catch (AuthenticationException e) {

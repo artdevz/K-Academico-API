@@ -13,7 +13,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -41,12 +40,14 @@ public class Course implements Serializable {
     @Pattern(regexp = "^\\d+$", message = "O Código do Curso deve ser composto apenas por números.")
     @Size(min=2, max=2, message="O Código do Curso deve conter apenas 2 caractéres.")
     private String code;
-
-    @Min(40)
+    
     private int duration; // In Hours.
 
     @Size(max=256)
     private String description;
+
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = false)
+    private List<Subject> subjecties = new ArrayList<>();
     
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = false)
     private List<Student> students = new ArrayList<>();

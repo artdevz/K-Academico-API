@@ -32,9 +32,9 @@ public class UserController {
     }
     
     @PostMapping
-    public ResponseEntity<String> createUser(@RequestBody @Valid UserRequestDTO data) {
+    public ResponseEntity<String> createUser(@RequestBody @Valid UserRequestDTO request) {
 
-        userS.create(data);
+        userS.create(request);
 
         return new ResponseEntity<>("Created User.", HttpStatus.CREATED);
 
@@ -50,9 +50,9 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDTO> findUserById(@PathVariable UUID id) {
 
-        UserResponseDTO user = userS.readById(id);
+        UserResponseDTO response = userS.readById(id);
 
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
 
     }    
     

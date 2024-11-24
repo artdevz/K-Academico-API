@@ -32,9 +32,9 @@ public class CourseController {
     }
 
     @PostMapping
-    public ResponseEntity<String> createCourse(@RequestBody @Valid CourseRequestDTO data) {
+    public ResponseEntity<String> createCourse(@RequestBody @Valid CourseRequestDTO request) {
 
-        courseS.create(data);
+        courseS.create(request);
 
         return new ResponseEntity<>("Created Course.", HttpStatus.CREATED);
 
@@ -50,9 +50,9 @@ public class CourseController {
     @GetMapping("/{id}")
     public ResponseEntity<CourseResponseDTO> findCourseById(@PathVariable UUID id) {
 
-        CourseResponseDTO course = courseS.readById(id);
+        CourseResponseDTO response = courseS.readById(id);
 
-        return new ResponseEntity<>(course, HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
 
     }    
     

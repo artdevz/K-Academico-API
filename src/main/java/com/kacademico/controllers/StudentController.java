@@ -32,9 +32,9 @@ public class StudentController {
     }
     
     @PostMapping
-    public ResponseEntity<String> createStudent(@RequestBody @Valid StudentRequestDTO data) {
+    public ResponseEntity<String> createStudent(@RequestBody @Valid StudentRequestDTO request) {
 
-        studentS.create(data);
+        studentS.create(request);
 
         return new ResponseEntity<>("Created Student.", HttpStatus.CREATED);
 
@@ -50,9 +50,9 @@ public class StudentController {
     @GetMapping("/{id}")
     public ResponseEntity<StudentResponseDTO> findStudentById(@PathVariable UUID id) {
 
-        StudentResponseDTO student = studentS.readById(id);
+        StudentResponseDTO response = studentS.readById(id);
 
-        return new ResponseEntity<>(student, HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
 
     }    
     
