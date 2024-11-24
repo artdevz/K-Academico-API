@@ -30,16 +30,6 @@ public class SubjectService {
     }    
 
     public void create(SubjectRequestDTO data) {        
-        
-        List<Subject> prerequisites = data.prerequisites().stream()
-            .map(mapS::findSubjectById)
-            .collect(Collectors.toList());
-        
-        data.prerequisites().forEach(prerequisite -> {
-
-            prerequisites.add(mapS.findSubjectById(prerequisite));
-
-        });
 
         Subject subject = new Subject(
             mapS.findCourseById(data.course()),
@@ -47,7 +37,7 @@ public class SubjectService {
             data.description(),
             data.duration(),
             data.semester(),
-            prerequisites
+            data.prerequisites()
         );
         
         subject.getCourse().setDuration(subject.getCourse().getDuration()+data.duration()); // Adiciona no Curso as Horas dessa Disciplina.
@@ -130,28 +120,5 @@ public class SubjectService {
         subjectR.deleteById(id);
 
     }
-
-    // private void validatePrerequisities(List<UUID> prerequisities) {
-
-    //     findPrerequisitieRoot(, );
-    // }
-
-    // private boolean findPrerequisitieRoot(Subject subject, UUID original) {
-
-    //     if (subject.getPrerequisites().isEmpty()) return true;
-        
-    //     List<UUID> prerequisities = subject.getPrerequisites();
-    //     prerequisities.stream().forEach(prerequisitie -> {
-
-    //         if (prerequisitie.equals(original)) return;
-            
-
-    //         findPrerequisitieRoot(mapS.findSubjectById( prerequisitie ), original);  
-
-    //     });        
-
-    //     return false;
-
-    // }
 
 }

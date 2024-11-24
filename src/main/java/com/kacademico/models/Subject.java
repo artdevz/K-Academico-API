@@ -50,11 +50,11 @@ public class Subject implements Serializable {
     @Min(1)
     private int semester;
 
-    private List<Subject> prerequisites;
+    private List<UUID> prerequisites;
 
     // private List<Subject> corequisites;
 
-    public Subject(Course course, String name, String description, int duration, int semester, List<Subject> prerequisites) {
+    public Subject(Course course, String name, String description, int duration, int semester, List<UUID> prerequisites) {
         this.course = course;
         this.name = name;
         this.description = description;
