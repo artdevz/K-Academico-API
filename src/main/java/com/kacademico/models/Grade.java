@@ -1,10 +1,14 @@
 package com.kacademico.models;
 
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
+import com.kacademico.utils.Timetable;
+
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -30,6 +34,8 @@ public class Grade implements Serializable {
     @Column(name = "id")
     private UUID id;
 
+    @ManyToOne
+    @JoinColumn(name = "subject_id", nullable = false)
     private Subject subject;
 
     @ManyToOne
@@ -39,14 +45,17 @@ public class Grade implements Serializable {
     @Min(1)
     private int capacity;
 
-    private LocalDate timetable;
+    @ElementCollection
+    @CollectionTable(name = "grade_timetables", joinColumns = @JoinColumn(name = "grade_id"))
+    private List<Timetable> timetables;
 
     private String locate;
 
-    public Grade(Subject subject, int capacity, LocalDate timetable, String locate) {
+    public Grade(Subject subject, Professor professor, int capacity, List<Timetable> timetables, String locate) {
         this.subject = subject;
+        this.professor = professor;
         this.capacity = capacity;
-        this.timetable = timetable;
+        this.timetables = timetables;
         this.locate = locate;
     }    
 

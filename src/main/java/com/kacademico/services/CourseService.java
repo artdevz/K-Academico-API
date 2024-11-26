@@ -15,7 +15,6 @@ import org.springframework.web.server.ResponseStatusException;
 import com.kacademico.dtos.course.CourseRequestDTO;
 import com.kacademico.dtos.course.CourseResponseDTO;
 import com.kacademico.models.Course;
-import com.kacademico.models.User;
 import com.kacademico.repositories.CourseRepository;
 
 @Service
@@ -56,7 +55,7 @@ public class CourseService {
     public CourseResponseDTO readById(UUID id) {
 
         Course course = courseR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Curso não encontrado."));
         
         return new CourseResponseDTO(
             course.getId(),                
@@ -83,7 +82,7 @@ public class CourseService {
                         break;                    
 
                     default:
-                        Field field = ReflectionUtils.findField(User.class, key);
+                        Field field = ReflectionUtils.findField(Course.class, key);
                         if (field != null) {
                             field.setAccessible(true);
                             ReflectionUtils.setField(field, course, value);
