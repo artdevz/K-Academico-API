@@ -117,6 +117,11 @@ public class SubjectService {
 
         if (!subjectR.findById(id).isPresent()) 
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Disciplina não encontrada.");
+
+        subjectR.findById(id).get().getCourse().setDuration(        // Remove no Curso as Horas dessa Disciplina.
+            subjectR.findById(id).get().getCourse().getDuration() - // Duração do Curso
+            subjectR.findById(id).get().getDuration() );            // Duração da Disciplina
+
         subjectR.deleteById(id);
 
     }
