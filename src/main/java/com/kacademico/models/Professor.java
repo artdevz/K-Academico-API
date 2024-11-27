@@ -38,7 +38,7 @@ public class Professor implements Serializable {
 
     private int wage; // In Cents.
 
-    @OneToMany(mappedBy = "professor", cascade = CascadeType.ALL, orphanRemoval = false)
+    @OneToMany(mappedBy = "professor", cascade = CascadeType.PERSIST, orphanRemoval = false)
     private List<Grade> grades = new ArrayList<>();
 
     public Professor(User user, int wage) {
