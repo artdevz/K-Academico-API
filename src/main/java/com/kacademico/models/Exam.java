@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -27,10 +29,14 @@ public class Exam implements Serializable {
     @Column(name = "id")
     private UUID id;
 
+    // Grade ManyToOne
+    // Enrolleee ManyToMany
+
     private String name;
 
     private int maxScore;
-
+    
+    @JsonFormat(pattern = "YYYY-MM-DD")
     private LocalDate date;
 
 }

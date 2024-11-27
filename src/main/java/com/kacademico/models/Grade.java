@@ -45,6 +45,8 @@ public class Grade implements Serializable {
     @Min(1)
     private int capacity;
 
+    private int numberOfStudents;
+
     @ElementCollection
     @CollectionTable(name = "grade_timetables", joinColumns = @JoinColumn(name = "grade_id"))
     private List<Timetable> timetables;
@@ -57,6 +59,7 @@ public class Grade implements Serializable {
         this.capacity = capacity;
         this.timetables = timetables;
         this.locate = locate;
+        this.numberOfStudents = 0;
     }    
 
 }

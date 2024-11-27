@@ -1,6 +1,6 @@
 package com.kacademico.enums;
 
-public enum EGradeStatus {
+public enum EGrade {
     PENDING,
     ONGOING,
     FINISHED

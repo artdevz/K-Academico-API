@@ -1,6 +1,6 @@
 package com.kacademico.enums;
 
-public enum EStudentGradeStatus {
+public enum EEnrollee {
     ENROLLED,
     APPROVED,
     FINAL_EXAM,
