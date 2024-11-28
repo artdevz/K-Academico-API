@@ -35,8 +35,8 @@ public class GradeService {
             mapS.findSubjectById(data.subject()),
             mapS.findProfessorById(data.professor()),
             data.capacity(),
-            data.timetable(),
-            data.locate()
+            data.locate(),
+            data.timetable()
         );
 
         gradeR.save(grade);
@@ -51,8 +51,8 @@ public class GradeService {
                 grade.getSubject().getName(),
                 grade.getProfessor().getUser().getName(),
                 grade.getCapacity(),
-                grade.getTimetables(),
-                grade.getLocate()
+                grade.getLocate(),
+                grade.getTimetables()
             ))
             .collect(Collectors.toList());
 
@@ -68,8 +68,8 @@ public class GradeService {
             grade.getSubject().getName(),
             grade.getProfessor().getUser().getName(),
             grade.getCapacity(),
-            grade.getTimetables(),
-            grade.getLocate()
+            grade.getLocate(),
+            grade.getTimetables()
         );
 
     }
@@ -93,6 +93,8 @@ public class GradeService {
                         break;
                 }
             });
+
+            grade.setNumberOfStudents(grade.getEnrollees().size()); // Atualiza o Número de Estudantes.
             
             return gradeR.save(grade);
         } 

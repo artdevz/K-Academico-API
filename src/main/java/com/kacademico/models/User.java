@@ -27,11 +27,14 @@ import lombok.Setter;
 public class User implements UserDetails {
 
     private static final long serialVersionUID = 1L;
+
+    // Identifier
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     private UUID id;    
 
+    // Simple Attributes
     @NotBlank(message="Nome não deve está em branco.")
     @Size(min=3, max=48, message="Nome deve conter entre 3 a 48 caractéres.")
     private String name;
@@ -42,12 +45,14 @@ public class User implements UserDetails {
     @NotBlank
     private String password;
 
+    // Constructor
     public User(String name, String email, String password) {
         this.name = name;
         this.email = email;
         this.password = password;
     }
 
+    // Getters And Setters
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;

@@ -25,20 +25,27 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name="subjecties")
+@Table(name="subjects")
 @Entity
 public class Subject implements Serializable {
     
     private static final long serialVersionUID = 1L;
+
+    // Identifier
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     private UUID id;    
 
+    // Relationships
     @ManyToOne
     @JoinColumn(name = "course_id")
     private Course course;
 
+    @OneToMany(mappedBy = "subject")
+    private List<Grade> grades = new ArrayList<>();
+
+    // Simple Attributes
     private ESubject type;
 
     private String name;
@@ -52,13 +59,12 @@ public class Subject implements Serializable {
     @Min(1)
     private int semester;
 
-    @OneToMany(mappedBy = "subject")
-    private List<Grade> grades = new ArrayList<>();
-
+    // Collections
     private List<UUID> prerequisites;
 
     // private List<Subject> corequisites;
 
+    // Constructor
     public Subject(Course course, String name, String description, int duration, int semester, List<UUID> prerequisites) {
         this.course = course;
         this.name = name;

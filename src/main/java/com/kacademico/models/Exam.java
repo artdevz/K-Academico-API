@@ -31,20 +31,14 @@ import lombok.Setter;
 public class Exam implements Serializable {
     
     private static final long serialVersionUID = 1L;
+
+    // Identifier
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     private UUID id;
 
-    private String name;
-
-    private float score;
-
-    private int maximum;
-    
-    @JsonFormat(pattern = "YYYY-MM-DD")
-    private LocalDate date;
-
+    // Relationships
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "grade_id", nullable = false)
     private Grade grade;
@@ -52,13 +46,24 @@ public class Exam implements Serializable {
     @ManyToMany(mappedBy = "exams", cascade = { CascadeType.PERSIST, CascadeType.MERGE }, fetch = FetchType.LAZY)
     private Set<Enrollee> enrollees = new HashSet<>();
 
-    public Exam(String name, int maximum, LocalDate date, Grade grade, Set<Enrollee> enrollees) {
+    // Simple Attributes
+    private String name;
+
+    private float score;
+
+    private int maximum;
+    
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate date;
+
+    // Constructor
+    public Exam(Grade grade, Set<Enrollee> enrollees, String name, int maximum, LocalDate date) {
+        this.grade = grade;
+        this.enrollees = enrollees != null ? enrollees : new HashSet<>();
         this.name = name;
         this.score = 0;
         this.maximum = maximum;
         this.date = date;
-        this.grade = grade;
-        this.enrollees = enrollees != null ? enrollees : new HashSet<>();
     }    
 
 }

@@ -27,20 +27,25 @@ import lombok.Setter;
 public class Professor implements Serializable {
  
     private static final long serialVersionUID = 1L;
+
+    // Identifier
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     private UUID id;
 
+    // Relationships
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
 
-    private int wage; // In Cents.
-
     @OneToMany(mappedBy = "professor", cascade = CascadeType.PERSIST, orphanRemoval = false)
     private List<Grade> grades = new ArrayList<>();
 
+    // Simple Attributes
+    private int wage; // Wage in cents (e.g., 1000 cents = 10.00)
+
+    // Constructor
     public Professor(User user, int wage) {
         this.user = user;
         this.wage = wage;

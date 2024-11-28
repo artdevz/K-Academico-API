@@ -25,25 +25,29 @@ import lombok.Setter;
 public class Lesson implements Serializable {
     
     private static final long serialVersionUID = 1L;
+
+    // Identifier
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     private UUID id;
     
+    // Simple Attributes
     private String name;
 
     private String description;
 
-    @JsonFormat(pattern = "YYYY/MM/DD")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
 
     private ELesson status;
 
+    // Constructor
     public Lesson(String name, String description, LocalDate date) {
         this.name = name;
         this.description = description;
         this.date = date;
-        this.status = ELesson.UPCOMING;
+        this.status = ELesson.UPCOMING; // Default Status
     }
 
 }

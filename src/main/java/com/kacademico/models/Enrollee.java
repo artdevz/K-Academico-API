@@ -32,11 +32,14 @@ import lombok.Setter;
 public class Enrollee implements Serializable {
     
     private static final long serialVersionUID = 1L;
+    
+    // Identifier
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     private UUID id;
 
+    // Relationships
     @OneToOne
     @JoinColumn(name = "student_id", referencedColumnName = "id", nullable = false)
     private Student student;
@@ -49,13 +52,6 @@ public class Enrollee implements Serializable {
     @JoinColumn(name = "grade_id", referencedColumnName = "id", nullable = false)
     private Grade grade;
 
-    private EEnrollee status;
-
-    private int absences;
-
-    @Max(10)
-    private float avarage;
-
     @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     @JoinTable(
         name = "enrollee_exam",
@@ -64,13 +60,22 @@ public class Enrollee implements Serializable {
     )
     private Set<Exam> exams = new HashSet<>();
 
+    // Simple Attributes
+    private int absences;
+    
+    @Max(10)
+    private float avarage;
+    
+    private EEnrollee status;
+
+    // Constructor
     public Enrollee(Student student, Transcript transcript, Grade grade) {
         this.student = student;
         this.transcript = transcript;
         this.grade = grade;
-        this.status = EEnrollee.ENROLLED;
-        this.absences = 0;
-        this.avarage = 0;
+        this.status = EEnrollee.ENROLLED; // Default Status
+        this.absences = 0; // Inicia-se com 0
+        this.avarage = 0; // Inicia-se com 0
     }
 
 }

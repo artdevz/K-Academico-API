@@ -32,11 +32,11 @@ public class ExamService {
     public void create(ExamRequestDTO data) {
 
         Exam exam = new Exam(
+            mapS.findGradeById(data.grade()),
+            mapS.findGradeById(data.grade()).getEnrollees(),
             data.name(),
             data.maximum(),
-            data.date(),
-            mapS.findGradeById(data.grade()),
-            mapS.findGradeById(data.grade()).getEnrollees()
+            data.date()
         );
 
         examR.save(exam);
@@ -48,11 +48,11 @@ public class ExamService {
         return examR.findAll().stream()
             .map(exam -> new ExamResponseDTO(
                 exam.getId(),
+                exam.getGrade().getSubject().getName(),
                 exam.getName(),
                 exam.getScore(),
                 exam.getMaximum(),
-                exam.getDate(),
-                exam.getGrade().getSubject().getName()
+                exam.getDate()
             ))
             .collect(Collectors.toList());
     }
@@ -64,11 +64,11 @@ public class ExamService {
         
         return new ExamResponseDTO(
             exam.getId(),
+            exam.getGrade().getSubject().getName(),
             exam.getName(),
             exam.getScore(),
             exam.getMaximum(),
-            exam.getDate(),
-            exam.getGrade().getSubject().getName()
+            exam.getDate()
         );
     }
 

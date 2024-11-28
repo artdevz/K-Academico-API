@@ -29,33 +29,38 @@ import lombok.Setter;
 public class Student implements Serializable {
     
     private static final long serialVersionUID = 1L;
+
+    // Identifier
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     private UUID id;
 
+    // Relationships
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
 
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "transcript_id", nullable = false)
+    private Transcript transcript;
+
+    @ManyToOne
+    @JoinColumn(name = "course_id")
+    private Course course; 
+
+    // Simple Attributes
     @NotEmpty
     @Size(max=14, min=14, message="Matrícula deve conter 14 dígitos.")
     private String enrollment; // Year + Semester + CourseCode + ShiftCode + RandomNumbers = xxxx.x.xx.xxx.xxxx
     
     private EShift shift;
-
-    @ManyToOne
-    @JoinColumn(name = "course_id")
-    private Course course;    
     
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "transcript_id", nullable = false)
-    private Transcript transcript;
-    
-    public Student(User user, String enrollment, Course course, EShift shift) {
+    // Constructor
+    public Student(User user, Course course, String enrollment, EShift shift) {
         this.user = user;
-        this.enrollment = enrollment;
         this.course = course;
+        this.enrollment = enrollment;
         this.shift = shift;
     }
 

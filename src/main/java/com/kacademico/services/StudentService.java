@@ -37,8 +37,8 @@ public class StudentService {
 
         Student student = new Student(
             mapS.findUserById(data.user()),
-            generateEnrollment(mapS.findCourseById(data.course()), data.shift()),
             mapS.findCourseById(data.course()),
+            generateEnrollment(mapS.findCourseById(data.course()), data.shift()),
             data.shift()
         );
 
@@ -51,10 +51,10 @@ public class StudentService {
         return studentR.findAll().stream()
             .map(student -> new StudentResponseDTO(
                 student.getId(),                
+                student.getCourse().getName(),
                 student.getEnrollment(),
                 student.getUser().getName(),
                 student.getUser().getEmail(),
-                student.getCourse().getName(),
                 student.getShift()
             ))
             .collect(Collectors.toList());
@@ -67,10 +67,10 @@ public class StudentService {
         
         return new StudentResponseDTO(
             student.getId(),            
+            student.getCourse().getName(),
             student.getEnrollment(),
             student.getUser().getName(),
             student.getUser().getEmail(),
-            student.getCourse().getName(),
             student.getShift()
         );
     }

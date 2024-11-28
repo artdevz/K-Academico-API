@@ -28,11 +28,21 @@ import lombok.Setter;
 public class Course implements Serializable {
     
     private static final long serialVersionUID = 1L;
+
+    // Identifier
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     private UUID id;
 
+    // Relationships
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = false)
+    private List<Subject> subjects = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = false)
+    private List<Student> students = new ArrayList<>();
+
+    // Simple Attributes
     @NotBlank(message="Nome do Curso não deve está em branco.")
     @Size(min=4, max=160, message="Nome do Curso deve conter entre 4 e 160 caractéres.")
     private String name;
@@ -46,12 +56,7 @@ public class Course implements Serializable {
     @Size(max=256)
     private String description;
 
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = false)
-    private List<Subject> subjecties = new ArrayList<>();
-    
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = false)
-    private List<Student> students = new ArrayList<>();
-
+    // Constructor
     public Course(String name, String code, int duration, String description) {
         this.name = name;
         this.code = code;
