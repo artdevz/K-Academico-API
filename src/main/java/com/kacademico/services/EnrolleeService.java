@@ -33,6 +33,7 @@ public class EnrolleeService {
 
         Enrollee enrollee = new Enrollee(
             mapS.findStudentById(data.student()),
+            mapS.findStudentById(data.student()).getTranscript(),
             mapS.findGradeById(data.grade())
         );
 

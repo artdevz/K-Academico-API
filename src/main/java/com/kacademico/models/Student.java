@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import com.kacademico.enums.EShift;
 
-// import jakarta.persistence.CascadeType;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -46,14 +46,12 @@ public class Student implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "course_id")
-    private Course course;
+    private Course course;    
     
-    /*
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "transcript_id", nullable = false)
     private Transcript transcript;
-    */
-
+    
     public Student(User user, String enrollment, Course course, EShift shift) {
         this.user = user;
         this.enrollment = enrollment;

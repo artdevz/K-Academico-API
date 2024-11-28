@@ -16,6 +16,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Max;
@@ -40,6 +41,10 @@ public class Enrollee implements Serializable {
     @JoinColumn(name = "student_id", referencedColumnName = "id", nullable = false)
     private Student student;
 
+    @ManyToOne
+    @JoinColumn(name = "transcript_id", referencedColumnName = "id", nullable = false)
+    private Transcript transcript;
+
     @OneToOne
     @JoinColumn(name = "grade_id", referencedColumnName = "id", nullable = false)
     private Grade grade;
@@ -59,8 +64,9 @@ public class Enrollee implements Serializable {
     )
     private Set<Exam> exams = new HashSet<>();
 
-    public Enrollee(Student student, Grade grade) {
+    public Enrollee(Student student, Transcript transcript, Grade grade) {
         this.student = student;
+        this.transcript = transcript;
         this.grade = grade;
         this.status = EEnrollee.ENROLLED;
         this.absences = 0;
