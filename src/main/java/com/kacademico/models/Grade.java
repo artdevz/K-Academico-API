@@ -1,20 +1,26 @@
 package com.kacademico.models;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import com.kacademico.utils.Timetable;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
 import lombok.Getter;
@@ -47,9 +53,15 @@ public class Grade implements Serializable {
 
     private int numberOfStudents;
 
+    @OneToMany(mappedBy = "grade", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Enrollee> enrollees = new HashSet<>();
+
     @ElementCollection
     @CollectionTable(name = "grade_timetables", joinColumns = @JoinColumn(name = "grade_id"))
     private List<Timetable> timetables;
+
+    @OneToMany(mappedBy = "grade", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<Exam> exams = new ArrayList<>();
 
     private String locate;
 

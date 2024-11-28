@@ -1,7 +1,11 @@
 package com.kacademico.models;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.kacademico.enums.ELesson;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,6 +28,22 @@ public class Lesson implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
-    private UUID id;  
+    private UUID id;
+    
+    private String name;
+
+    private String description;
+
+    @JsonFormat(pattern = "YYYY/MM/DD")
+    private LocalDate date;
+
+    private ELesson status;
+
+    public Lesson(String name, String description, LocalDate date) {
+        this.name = name;
+        this.description = description;
+        this.date = date;
+        this.status = ELesson.UPCOMING;
+    }
 
 }
