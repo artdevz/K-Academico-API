@@ -33,7 +33,6 @@ public class ExamService {
 
         Exam exam = new Exam(
             mapS.findGradeById(data.grade()),
-            mapS.findGradeById(data.grade()).getEnrollees(),
             data.name(),
             data.maximum(),
             data.date()
@@ -49,8 +48,7 @@ public class ExamService {
             .map(exam -> new ExamResponseDTO(
                 exam.getId(),
                 exam.getGrade().getSubject().getName(),
-                exam.getName(),
-                exam.getScore(),
+                exam.getName(),                
                 exam.getMaximum(),
                 exam.getDate()
             ))
@@ -65,8 +63,7 @@ public class ExamService {
         return new ExamResponseDTO(
             exam.getId(),
             exam.getGrade().getSubject().getName(),
-            exam.getName(),
-            exam.getScore(),
+            exam.getName(),            
             exam.getMaximum(),
             exam.getDate()
         );

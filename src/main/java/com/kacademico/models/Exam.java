@@ -8,15 +8,14 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,17 +36,15 @@ public class Exam implements Serializable {
     private UUID id;
 
     // Relationships
+    @OneToMany(mappedBy = "exam")
+    private Set<Evaluation> evaluations = new HashSet<>();
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "grade_id", nullable = false)
     private Grade grade;
 
-    @ManyToMany(mappedBy = "exams", cascade = { CascadeType.PERSIST, CascadeType.MERGE }, fetch = FetchType.LAZY)
-    private Set<Enrollee> enrollees = new HashSet<>();
-
     // Simple Attributes
     private String name;
-
-    private float score;
 
     private int maximum;
     
@@ -55,11 +52,9 @@ public class Exam implements Serializable {
     private LocalDate date;
 
     // Constructor
-    public Exam(Grade grade, Set<Enrollee> enrollees, String name, int maximum, LocalDate date) {
+    public Exam(Grade grade, String name, int maximum, LocalDate date) {
         this.grade = grade;
-        this.enrollees = enrollees != null ? enrollees : new HashSet<>();
-        this.name = name;
-        this.score = 0;
+        this.name = name;        
         this.maximum = maximum;
         this.date = date;
     }    

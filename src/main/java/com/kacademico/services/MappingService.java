@@ -7,12 +7,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.kacademico.models.Course;
+import com.kacademico.models.Enrollee;
+import com.kacademico.models.Exam;
 import com.kacademico.models.Grade;
 import com.kacademico.models.Professor;
 import com.kacademico.models.Student;
 import com.kacademico.models.Subject;
 import com.kacademico.models.User;
 import com.kacademico.repositories.CourseRepository;
+import com.kacademico.repositories.EnrolleeRepository;
+import com.kacademico.repositories.ExamRepository;
 import com.kacademico.repositories.GradeRepository;
 import com.kacademico.repositories.ProfessorRepository;
 import com.kacademico.repositories.StudentRepository;
@@ -28,6 +32,8 @@ public class MappingService {
     private final ProfessorRepository professorR;
     private final StudentRepository studentR;
     private final GradeRepository gradeR;
+    private final EnrolleeRepository enrolleeR;
+    private final ExamRepository examR;
 
     public MappingService(
         UserRepository userR,
@@ -35,13 +41,17 @@ public class MappingService {
         SubjectRepository subjectR,
         ProfessorRepository professorR,
         StudentRepository studentR,
-        GradeRepository gradeR) {
+        GradeRepository gradeR,
+        EnrolleeRepository enrolleeR,
+        ExamRepository examR) {
             this.userR = userR;
             this.courseR = courseR;
             this.subjectR = subjectR;
             this.professorR = professorR;
             this.studentR = studentR;
             this.gradeR = gradeR;
+            this.enrolleeR = enrolleeR;
+            this.examR = examR;
     }
 
     public User findUserById(UUID id) {
@@ -66,6 +76,14 @@ public class MappingService {
 
     public Grade findGradeById(UUID id) {
         return gradeR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Grade"));
+    }
+
+    public Enrollee findEnrolleeById(UUID id) {
+        return enrolleeR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee"));
+    }
+
+    public Exam findExamById(UUID id) {
+        return examR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exam"));
     }
 
 }

@@ -7,15 +7,13 @@ import java.util.UUID;
 
 import com.kacademico.enums.EEnrollee;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Max;
@@ -50,13 +48,8 @@ public class Enrollee implements Serializable {
     @JoinColumn(name = "grade_id", referencedColumnName = "id", nullable = false)
     private Grade grade;
 
-    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
-    @JoinTable(
-        name = "enrollee_exam",
-        joinColumns = @JoinColumn(name = "enrollee_id"),
-        inverseJoinColumns = @JoinColumn(name = "exam_id")
-    )
-    private Set<Exam> exams = new HashSet<>();
+    @OneToMany(mappedBy = "enrollee")
+    private Set<Evaluation> evaluations = new HashSet<>();
 
     // Simple Attributes
     private int absences;
