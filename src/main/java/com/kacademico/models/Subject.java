@@ -7,7 +7,6 @@ import java.util.UUID;
 
 import com.kacademico.enums.ESubject;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -34,7 +33,6 @@ public class Subject implements Serializable {
     // Identifier
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id")
     private UUID id;    
 
     // Relationships

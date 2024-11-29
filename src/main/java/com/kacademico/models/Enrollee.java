@@ -8,7 +8,6 @@ import java.util.UUID;
 import com.kacademico.enums.EEnrollee;
 
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -36,7 +35,6 @@ public class Enrollee implements Serializable {
     // Identifier
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id")
     private UUID id;
 
     // Relationships

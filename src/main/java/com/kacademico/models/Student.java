@@ -6,7 +6,6 @@ import java.util.UUID;
 import com.kacademico.enums.EShift;
 
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -33,7 +32,6 @@ public class Student implements Serializable {
     // Identifier
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id")
     private UUID id;
 
     // Relationships
@@ -62,6 +60,7 @@ public class Student implements Serializable {
         this.course = course;
         this.enrollment = enrollment;
         this.shift = shift;
+        this.transcript = new Transcript(this);
     }
 
 }

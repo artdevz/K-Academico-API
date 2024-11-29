@@ -118,8 +118,7 @@ public class StudentService {
     // Enrollment:
     private String generateEnrollment(Course course, EShift shift) {
 
-        // Year + Semester + CourseId + ShiftId + RandomNumber
-        System.out.println(getYear() + getSemester() + course.getCode() + shift.getCode() + getRandomNumber());
+        // Year + Semester + CourseId + ShiftId + RandomNumber        
         return getYear() + getSemester() + course.getCode() + shift.getCode() + getRandomNumber();
 
     }

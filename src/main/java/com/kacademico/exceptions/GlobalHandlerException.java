@@ -7,6 +7,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.validation.ConstraintViolationException;
 import lombok.Getter;
@@ -56,6 +57,12 @@ public class GlobalHandlerException {
         ApiErrorResponse response = new ApiErrorResponse(errorMessage.toString(), "PASSWORD_VIOLATION");
         
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<ApiErrorResponse> handleResponseStatusException(ResponseStatusException e) {
+        ApiErrorResponse response = new ApiErrorResponse(e.getReason(), "NOT_FOUND");
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
     private String extractError(String message) {
