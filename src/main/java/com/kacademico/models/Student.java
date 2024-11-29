@@ -51,6 +51,8 @@ public class Student implements Serializable {
     @NotEmpty
     @Size(max=14, min=14, message="Matrícula deve conter 14 dígitos.")
     private String enrollment; // Year + Semester + CourseCode + ShiftCode + RandomNumbers = xxxx.x.xx.xxx.xxxx
+
+    private float avarage;
     
     private EShift shift;
     
@@ -59,6 +61,7 @@ public class Student implements Serializable {
         this.user = user;
         this.course = course;
         this.enrollment = enrollment;
+        this.avarage = 0; // Inicia-se com 0
         this.shift = shift;
         this.transcript = new Transcript(this);
     }

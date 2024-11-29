@@ -55,6 +55,7 @@ public class StudentService {
                 student.getEnrollment(),
                 student.getUser().getName(),
                 student.getUser().getEmail(),
+                student.getAvarage(),
                 student.getShift()
             ))
             .collect(Collectors.toList());
@@ -71,6 +72,7 @@ public class StudentService {
             student.getEnrollment(),
             student.getUser().getName(),
             student.getUser().getEmail(),
+            student.getAvarage(),
             student.getShift()
         );
     }
