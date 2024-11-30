@@ -28,11 +28,13 @@ public class GradeService {
     private final GradeRepository gradeR;
     private final EnrolleeRepository enrolleeR;
     
+    private final StudentService studentS;
     private final MappingService mapS;
 
-    public GradeService(GradeRepository gradeR, EnrolleeRepository enrolleeR, MappingService mapS) {
+    public GradeService(GradeRepository gradeR, EnrolleeRepository enrolleeR, StudentService studentS, MappingService mapS) {
         this.gradeR = gradeR;
         this.enrolleeR = enrolleeR;
+        this.studentS = studentS;
         this.mapS = mapS;
     }
     
@@ -133,16 +135,10 @@ public class GradeService {
      
         List<Grade> grades = gradeR.findAll();
 
-        for (Grade grade : grades) {
-            
-            if (grade.getStatus().equals(EGrade.ONGOING) && grade.getSemester().equals(semester)) {
-
-                grade.setStatus(EGrade.FINISHED);
-                // Atualizar a Média dos Alunos dessa turma...
-
-            }
-
-        }
+        for (Grade grade : grades) if (grade.getStatus().equals(EGrade.ONGOING) && grade.getSemester().equals(semester)) grade.setStatus(EGrade.FINISHED);
+        
+        studentS.updateStatus();
+        studentS.updateAvarage();
 
     }
 

@@ -18,6 +18,7 @@ import com.kacademico.dtos.student.StudentRequestDTO;
 import com.kacademico.dtos.student.StudentResponseDTO;
 import com.kacademico.enums.EShift;
 import com.kacademico.models.Course;
+import com.kacademico.models.Enrollee;
 import com.kacademico.models.Student;
 import com.kacademico.repositories.StudentRepository;
 
@@ -87,11 +88,6 @@ public class StudentService {
             fields.forEach((key, value) -> {
                 switch (key) {
 
-                    // case "name":
-                    //     String name = (String) value;
-                    //     user.setName(name);
-                    //     break;                    
-
                     default:
                         Field field = ReflectionUtils.findField(Student.class, key);
                         if (field != null) {
@@ -145,5 +141,31 @@ public class StudentService {
     }
 
     // Avarage
+    public void updateAvarage() {
+
+        for (Student student : studentR.findAll() ) { 
+            student.setAvarage(calculateAvarage(student));
+            studentR.save(student);
+        }
+    }
+
+    private float calculateAvarage(Student student) {
+        
+        float sum = 0;
+        for (Enrollee enrollee : student.getEnrollees() ) sum += enrollee.getAvarage();
+        
+        return sum / student.getEnrollees().size();
+
+    }
+
+    // Status
+    public void updateStatus() {
+
+        // APROVADO, REPROVADO?
+        /*
+         * AF Não pode está em finish(), criar fecharDiario() -> APROVADO, REPROVADO ou AF
+         */
+
+    }
 
 }

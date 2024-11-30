@@ -119,6 +119,7 @@ public class EvaluationService {
         evaluation.getEnrollee().getEvaluations().add(evaluation);
         
         evaluation.getEnrollee().setAvarage( updateAvarage(evaluation.getEnrollee().getEvaluations()) );
+        
     }
 
     private void editEvaluation(Evaluation evaluation) {

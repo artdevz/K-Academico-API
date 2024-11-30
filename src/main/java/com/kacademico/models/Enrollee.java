@@ -37,16 +37,16 @@ public class Enrollee implements Serializable {
 
     // Relationships
     @OneToOne
+    @JoinColumn(name = "grade_id", referencedColumnName = "id", nullable = true)
+    private Grade grade;
+
+    @ManyToOne
     @JoinColumn(name = "student_id", referencedColumnName = "id", nullable = false)
     private Student student;
 
     @ManyToOne
     @JoinColumn(name = "transcript_id", referencedColumnName = "id", nullable = false)
     private Transcript transcript;
-
-    @OneToOne
-    @JoinColumn(name = "grade_id", referencedColumnName = "id", nullable = true)
-    private Grade grade;
 
     @OneToMany(mappedBy = "enrollee")
     private Set<Evaluation> evaluations = new HashSet<>();
