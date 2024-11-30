@@ -45,7 +45,7 @@ public class Enrollee implements Serializable {
     private Transcript transcript;
 
     @OneToOne
-    @JoinColumn(name = "grade_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "grade_id", referencedColumnName = "id", nullable = true)
     private Grade grade;
 
     @OneToMany(mappedBy = "enrollee")

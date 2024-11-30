@@ -54,7 +54,7 @@ public class GlobalHandlerException {
 
         for (FieldError fieldError : e.getBindingResult().getFieldErrors()) errorMessage.append(fieldError.getDefaultMessage());
         
-        ApiErrorResponse response = new ApiErrorResponse(errorMessage.toString(), "PASSWORD_VIOLATION");
+        ApiErrorResponse response = new ApiErrorResponse(errorMessage.toString(), "REGEX_VIOLATION");
         
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }

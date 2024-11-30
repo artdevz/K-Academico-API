@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.kacademico.dtos.grade.GradeRequestDTO;
 import com.kacademico.dtos.grade.GradeResponseDTO;
 import com.kacademico.services.GradeService;
+import com.kacademico.utils.Semester;
 
 import jakarta.validation.Valid;
 
@@ -70,6 +71,14 @@ public class GradeController {
         gradeS.delete(id);
         return new ResponseEntity<>("Deleted Grade", HttpStatus.OK);
            
+    }
+
+    @PostMapping("/{semester}")
+    public ResponseEntity<String> finish(@PathVariable @Semester String semester) {
+
+        gradeS.finish(semester);
+        return new ResponseEntity<>("Finalizado todas as Turmas do Semestre " + semester, HttpStatus.OK);
+
     }
 
 }

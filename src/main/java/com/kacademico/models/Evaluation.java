@@ -2,6 +2,7 @@ package com.kacademico.models;
 
 import java.util.UUID;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -26,11 +27,11 @@ public class Evaluation {
     private UUID id;
 
     // Relationships
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "enrollee_id", referencedColumnName = "id")
     private Enrollee enrollee;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "exam_id", referencedColumnName = "id")
     private Exam exam;
 

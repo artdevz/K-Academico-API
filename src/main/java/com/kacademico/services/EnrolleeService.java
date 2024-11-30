@@ -50,7 +50,7 @@ public class EnrolleeService {
             .map(enrollee -> new EnrolleeResponseDTO(
                 enrollee.getId(),
                 enrollee.getStudent().getUser().getName(),
-                enrollee.getGrade().getSubject().getName(),
+                enrollee.getGrade() != null ? enrollee.getGrade().getSubject().getName() : "Indisponível",
                 enrollee.getAbsences(),
                 enrollee.getAvarage(),
                 enrollee.getStatus()
@@ -67,7 +67,7 @@ public class EnrolleeService {
         return new EnrolleeResponseDTO(
             enrollee.getId(),
             enrollee.getStudent().getUser().getName(),
-            enrollee.getGrade().getSubject().getName(),
+            enrollee.getGrade() != null ? enrollee.getGrade().getSubject().getName() : "Indisponível",
             enrollee.getAbsences(),
             enrollee.getAvarage(),
             enrollee.getStatus()

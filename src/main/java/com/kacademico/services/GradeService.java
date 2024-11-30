@@ -14,18 +14,25 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.kacademico.dtos.grade.GradeRequestDTO;
 import com.kacademico.dtos.grade.GradeResponseDTO;
+import com.kacademico.enums.EGrade;
 import com.kacademico.models.Grade;
+import com.kacademico.repositories.EnrolleeRepository;
 import com.kacademico.repositories.GradeRepository;
+import com.kacademico.utils.Semester;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class GradeService {
     
     private final GradeRepository gradeR;
+    private final EnrolleeRepository enrolleeR;
     
     private final MappingService mapS;
 
-    public GradeService(GradeRepository gradeR, MappingService mapS) {
+    public GradeService(GradeRepository gradeR, EnrolleeRepository enrolleeR, MappingService mapS) {
         this.gradeR = gradeR;
+        this.enrolleeR = enrolleeR;
         this.mapS = mapS;
     }
     
@@ -35,6 +42,7 @@ public class GradeService {
             mapS.findSubjectById(data.subject()),
             mapS.findProfessorById(data.professor()),
             data.capacity(),
+            data.semester(),
             data.locate(),
             data.timetable()
         );
@@ -51,6 +59,7 @@ public class GradeService {
                 grade.getSubject().getName(),
                 grade.getProfessor().getUser().getName(),
                 grade.getCapacity(),
+                grade.getSemester(),
                 grade.getLocate(),
                 grade.getTimetables()
             ))
@@ -68,6 +77,7 @@ public class GradeService {
             grade.getSubject().getName(),
             grade.getProfessor().getUser().getName(),
             grade.getCapacity(),
+            grade.getSemester(),
             grade.getLocate(),
             grade.getTimetables()
         );
@@ -82,7 +92,12 @@ public class GradeService {
             Grade grade = existingGrade.get();            
     
             fields.forEach((key, value) -> {
-                switch (key) {                                   
+                switch (key) {   
+                    
+                    case "status":
+                        EGrade status = (EGrade) value;
+                        grade.setStatus(status);
+                        break;
 
                     default:
                         Field field = ReflectionUtils.findField(Grade.class, key);
@@ -103,11 +118,31 @@ public class GradeService {
         
     }
 
+    @Transactional
     public void delete(UUID id) {
 
         if (!gradeR.findById(id).isPresent()) 
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Turma não encontrada.");
-            gradeR.deleteById(id);
+        
+        enrolleeR.removeGradeFromEnrollees(id);
+        gradeR.deleteById(id);
+
+    }
+
+    public void finish(@Semester String semester) {
+     
+        List<Grade> grades = gradeR.findAll();
+
+        for (Grade grade : grades) {
+            
+            if (grade.getStatus().equals(EGrade.ONGOING) && grade.getSemester().equals(semester)) {
+
+                grade.setStatus(EGrade.FINISHED);
+                // Atualizar a Média dos Alunos dessa turma...
+
+            }
+
+        }
 
     }
 

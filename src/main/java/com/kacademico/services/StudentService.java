@@ -117,7 +117,7 @@ public class StudentService {
 
     }
 
-    // Enrollment:
+    // Enrollment
     private String generateEnrollment(Course course, EShift shift) {
 
         // Year + Semester + CourseId + ShiftId + RandomNumber        
@@ -143,5 +143,7 @@ public class StudentService {
         return "0000";
 
     }
+
+    // Avarage
 
 }
