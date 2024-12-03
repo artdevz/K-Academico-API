@@ -14,7 +14,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Max;
 import lombok.Getter;
@@ -36,7 +35,7 @@ public class Enrollee implements Serializable {
     private UUID id;
 
     // Relationships
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "grade_id", referencedColumnName = "id", nullable = true)
     private Grade grade;
 

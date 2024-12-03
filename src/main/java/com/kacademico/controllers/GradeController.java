@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.kacademico.dtos.grade.GradeRequestDTO;
 import com.kacademico.dtos.grade.GradeResponseDTO;
 import com.kacademico.services.GradeService;
-import com.kacademico.utils.Semester;
+import com.kacademico.services.SemesterService;
 
 import jakarta.validation.Valid;
 
@@ -27,9 +27,11 @@ import jakarta.validation.Valid;
 public class GradeController {
     
     private final GradeService gradeS;
+    private final SemesterService semesterS;
 
-    public GradeController(GradeService gradeS) {
+    public GradeController(GradeService gradeS, SemesterService semesterS) {
         this.gradeS = gradeS;
+        this.semesterS = semesterS;
     }
 
     @PostMapping
@@ -73,11 +75,11 @@ public class GradeController {
            
     }
 
-    @PostMapping("/{semester}")
-    public ResponseEntity<String> finish(@PathVariable @Semester String semester) {
+    @PostMapping("/{id}")
+    public ResponseEntity<String> partialSubmit(@PathVariable UUID id) {
 
-        gradeS.finish(semester);
-        return new ResponseEntity<>("Finalizado todas as Turmas do Semestre " + semester, HttpStatus.OK);
+        semesterS.partialSubmit(id);
+        return new ResponseEntity<>("Finalizado parcialmente as Atividades da Turma.", HttpStatus.OK);
 
     }
 

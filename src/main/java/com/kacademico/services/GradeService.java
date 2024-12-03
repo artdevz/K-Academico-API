@@ -18,7 +18,6 @@ import com.kacademico.enums.EGrade;
 import com.kacademico.models.Grade;
 import com.kacademico.repositories.EnrolleeRepository;
 import com.kacademico.repositories.GradeRepository;
-import com.kacademico.utils.Semester;
 
 import jakarta.transaction.Transactional;
 
@@ -28,13 +27,11 @@ public class GradeService {
     private final GradeRepository gradeR;
     private final EnrolleeRepository enrolleeR;
     
-    private final StudentService studentS;
     private final MappingService mapS;
 
-    public GradeService(GradeRepository gradeR, EnrolleeRepository enrolleeR, StudentService studentS, MappingService mapS) {
+    public GradeService(GradeRepository gradeR, EnrolleeRepository enrolleeR, MappingService mapS) {
         this.gradeR = gradeR;
         this.enrolleeR = enrolleeR;
-        this.studentS = studentS;
         this.mapS = mapS;
     }
     
@@ -128,17 +125,6 @@ public class GradeService {
         
         enrolleeR.removeGradeFromEnrollees(id);
         gradeR.deleteById(id);
-
-    }
-
-    public void finish(@Semester String semester) {
-     
-        List<Grade> grades = gradeR.findAll();
-
-        for (Grade grade : grades) if (grade.getStatus().equals(EGrade.ONGOING) && grade.getSemester().equals(semester)) grade.setStatus(EGrade.FINISHED);
-        
-        studentS.updateStatus();
-        studentS.updateAvarage();
 
     }
 
