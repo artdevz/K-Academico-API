@@ -59,7 +59,7 @@ public class UserService {
     public UserResponseDTO readById(UUID id) {
 
         User user = userR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado."));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not Found."));
         
         return new UserResponseDTO(
             user.getId(),            
@@ -88,7 +88,7 @@ public class UserService {
                         String password = (String) value;
                         
                         if (!passwordValidator.isValid(password, null)) 
-                            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A senha deve conter pelo menos uma letra minúscula, uma letra maiúscula, um número, um caractere especial e ter entre 8 e 32 caracteres.");
+                            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The password must contain at least one lowercase letter, one uppercase letter, one number, one special character and be between 8 and 32 characters long.");
                         
                         user.setPassword(passwordEncoder.encode(password));
                         break;  
@@ -106,14 +106,14 @@ public class UserService {
             return userR.save(user);
         } 
         
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado.");
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not Found.");
         
     }
 
     public void delete(UUID id) {
 
         if (!userR.findById(id).isPresent()) 
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not Found.");
         userR.deleteById(id);
 
     }
@@ -121,7 +121,7 @@ public class UserService {
     private void validateEmail(String email) {
 
         if (userR.findByEmail(email) != null)
-            throw new DuplicateValueException("Email já está sendo utilizado.");
+            throw new DuplicateValueException("Email already being used.");
 
     }
 
