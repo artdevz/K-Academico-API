@@ -10,6 +10,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.server.ResponseStatusException;
@@ -24,6 +25,8 @@ import com.kacademic.repositories.StudentRepository;
 @Service
 public class StudentService {
     
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
     private final StudentRepository studentR;
 
     private final MappingService mapS;
@@ -36,7 +39,9 @@ public class StudentService {
     public void create(StudentRequestDTO data) {
 
         Student student = new Student(
-            mapS.findUserById(data.user()),
+            data.user().name(),
+            data.user().email(),
+            passwordEncoder.encode(data.user().password()),
             mapS.findCourseById(data.course()),
             generateEnrollment(mapS.findCourseById(data.course()), data.shift()),
             data.shift()
@@ -51,10 +56,10 @@ public class StudentService {
         return studentR.findAll().stream()
             .map(student -> new StudentResponseDTO(
                 student.getId(),                
-                student.getCourse().getName(),
+                student.getCourse().getId(),
                 student.getEnrollment(),
-                student.getUser().getName(),
-                student.getUser().getEmail(),
+                student.getName(),
+                student.getEmail(),
                 student.getAvarage(),
                 student.getShift()
             ))
@@ -68,10 +73,10 @@ public class StudentService {
         
         return new StudentResponseDTO(
             student.getId(),            
-            student.getCourse().getName(),
+            student.getCourse().getId(),
             student.getEnrollment(),
-            student.getUser().getName(),
-            student.getUser().getEmail(),
+            student.getName(),
+            student.getEmail(),
             student.getAvarage(),
             student.getShift()
         );

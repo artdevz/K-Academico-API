@@ -44,7 +44,7 @@ public class TranscriptService {
         return transcriptR.findAll().stream()
             .map(transcript -> new TranscriptResponseDTO(
                 transcript.getId(),
-                transcript.getStudent().getUser().getName(),
+                transcript.getStudent().getName(),
                 transcript.getEnrollees()
             ))
             .collect(Collectors.toList());
@@ -57,7 +57,7 @@ public class TranscriptService {
         
         return new TranscriptResponseDTO(
             transcript.getId(),
-            transcript.getStudent().getUser().getName(),
+            transcript.getStudent().getName(),
             transcript.getEnrollees()
         );
     }

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kacademic.dto.course.CourseDetailsDTO;
 import com.kacademic.dto.course.CourseRequestDTO;
 import com.kacademic.dto.course.CourseResponseDTO;
 import com.kacademic.services.CourseService;
@@ -48,11 +49,9 @@ public class CourseController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CourseResponseDTO> readById(@PathVariable UUID id) {
+    public ResponseEntity<CourseDetailsDTO> readById(@PathVariable UUID id) {
 
-        CourseResponseDTO response = courseS.readById(id);
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return new ResponseEntity<>(courseS.readById(id), HttpStatus.OK);
 
     }    
     

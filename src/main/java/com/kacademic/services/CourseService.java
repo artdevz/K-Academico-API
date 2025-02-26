@@ -12,8 +12,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.kacademic.dto.course.CourseDetailsDTO;
 import com.kacademic.dto.course.CourseRequestDTO;
 import com.kacademic.dto.course.CourseResponseDTO;
+import com.kacademic.dto.subject.SubjectResponseDTO;
 import com.kacademic.models.Course;
 import com.kacademic.repositories.CourseRepository;
 
@@ -52,17 +54,26 @@ public class CourseService {
             .collect(Collectors.toList());
     }
 
-    public CourseResponseDTO readById(UUID id) {
+    public CourseDetailsDTO readById(UUID id) {
 
         Course course = courseR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Curso não encontrado."));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found."));
         
-        return new CourseResponseDTO(
-            course.getId(),                
-            course.getName(),
-            course.getCode(),
-            course.getDuration(),
-            course.getDescription()
+        return new CourseDetailsDTO(
+            new CourseResponseDTO(
+                course.getId(),
+                course.getName(),
+                course.getCode(),
+                course.getDuration(),
+                course.getDescription()),
+            course.getSubjects().stream().map(subject -> new SubjectResponseDTO(
+                subject.getId(),
+                subject.getCourse().getName(),
+                subject.getName(),
+                subject.getDescription(),
+                subject.getDuration(),
+                subject.getSemester(),
+                subject.getPrerequisites())).collect(Collectors.toList())
         );
     }
 
@@ -94,14 +105,14 @@ public class CourseService {
             return courseR.save(course);
         } 
         
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Curso não encontrado.");
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found.");
         
     }
 
     public void delete(UUID id) {
 
         if (!courseR.findById(id).isPresent()) 
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Curso não encontrado.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found.");
             courseR.deleteById(id);
 
     }

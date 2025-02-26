@@ -48,7 +48,7 @@ public class EvaluationService {
         return evaluationR.findAll().stream()
             .map(evaluation -> new EvaluationResponseDTO(
                 evaluation.getId(),
-                evaluation.getEnrollee().getStudent().getUser().getName(),
+                evaluation.getEnrollee().getStudent().getName(),
                 evaluation.getExam().getGrade().getId(),
                 evaluation.getExam().getName(),
                 evaluation.getScore()
@@ -64,7 +64,7 @@ public class EvaluationService {
         
         return new EvaluationResponseDTO(
             evaluation.getId(),
-            evaluation.getEnrollee().getStudent().getUser().getName(),
+            evaluation.getEnrollee().getStudent().getName(),
             evaluation.getExam().getGrade().getId(),
             evaluation.getExam().getName(),
             evaluation.getScore()

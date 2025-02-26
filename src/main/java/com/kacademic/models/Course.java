@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -26,21 +28,17 @@ import lombok.Setter;
 @Entity
 public class Course implements Serializable {
     
-    private static final long serialVersionUID = 1L;
-
-    // Identifier
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    // Relationships
+    @JsonManagedReference
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = false)
     private List<Subject> subjects = new ArrayList<>();
     
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = false)
     private List<Student> students = new ArrayList<>();
 
-    // Simple Attributes
     @NotBlank(message="Nome do Curso não deve está em branco.")
     @Size(min=4, max=160, message="Nome do Curso deve conter entre 4 e 160 caractéres.")
     private String name;

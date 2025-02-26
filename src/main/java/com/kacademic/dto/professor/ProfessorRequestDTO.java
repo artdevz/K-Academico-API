@@ -1,5 +1,5 @@
 package com.kacademic.dto.professor;
 
-import java.util.UUID;
+import com.kacademic.dto.user.UserRequestDTO;
 
-public record ProfessorRequestDTO(UUID user, int wage) {}
+public record ProfessorRequestDTO(UserRequestDTO user, int wage) {}

@@ -56,7 +56,7 @@ public class GradeService {
             .map(grade -> new GradeResponseDTO(
                 grade.getId(),
                 grade.getSubject().getName(),
-                grade.getProfessor().getUser().getName(),
+                grade.getProfessor().getName(),
                 grade.getCapacity(),
                 grade.getSemester(),
                 grade.getLocate(),
@@ -74,7 +74,7 @@ public class GradeService {
         return new GradeResponseDTO(
             grade.getId(),
             grade.getSubject().getName(),
-            grade.getProfessor().getUser().getName(),
+            grade.getProfessor().getName(),
             grade.getCapacity(),
             grade.getSemester(),
             grade.getLocate(),

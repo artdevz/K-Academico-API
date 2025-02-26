@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.kacademic.enums.ESubject;
 
 import jakarta.persistence.Entity;
@@ -28,14 +29,11 @@ import lombok.Setter;
 @Entity
 public class Subject implements Serializable {
     
-    private static final long serialVersionUID = 1L;
-
-    // Identifier
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;    
 
-    // Relationships
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "course_id")
     private Course course;
@@ -43,7 +41,6 @@ public class Subject implements Serializable {
     @OneToMany(mappedBy = "subject")
     private List<Grade> grades = new ArrayList<>();
 
-    // Simple Attributes
     private ESubject type;
 
     private String name;
@@ -57,7 +54,6 @@ public class Subject implements Serializable {
     @Min(1)
     private int semester;
 
-    // Collections
     private List<UUID> prerequisites;
 
     // private List<Subject> corequisites;

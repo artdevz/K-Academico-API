@@ -8,6 +8,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.server.ResponseStatusException;
@@ -20,19 +21,20 @@ import com.kacademic.repositories.ProfessorRepository;
 @Service
 public class ProfessorService {
     
-    private final ProfessorRepository professorR;
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    private final MappingService mapS;
+    private final ProfessorRepository professorR;
 
     public ProfessorService(ProfessorRepository professorR, MappingService mapS) {
         this.professorR = professorR;
-        this.mapS = mapS;
     }
 
     public void create(ProfessorRequestDTO data) {
 
         Professor professor = new Professor(
-            mapS.findUserById(data.user()),
+            data.user().name(),
+            data.user().email(),
+            passwordEncoder.encode(data.user().password()),            
             data.wage()            
         );
 
@@ -45,8 +47,8 @@ public class ProfessorService {
         return professorR.findAll().stream()
             .map(professor -> new ProfessorResponseDTO(
                 professor.getId(),                
-                professor.getUser().getName(),
-                professor.getUser().getEmail(),
+                professor.getName(),
+                professor.getEmail(),
                 professor.getWage()
             ))
             .collect(Collectors.toList());
@@ -59,8 +61,8 @@ public class ProfessorService {
         
         return new ProfessorResponseDTO(
             professor.getId(),                
-            professor.getUser().getName(),
-            professor.getUser().getEmail(),
+            professor.getName(),
+            professor.getEmail(),
             professor.getWage()
         );
     }
