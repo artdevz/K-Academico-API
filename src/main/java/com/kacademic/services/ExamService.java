@@ -47,7 +47,7 @@ public class ExamService {
         return examR.findAll().stream()
             .map(exam -> new ExamResponseDTO(
                 exam.getId(),
-                exam.getGrade().getSubject().getName(),
+                exam.getGrade().getId(),
                 exam.getName(),                
                 exam.getMaximum(),
                 exam.getDate()
@@ -58,11 +58,11 @@ public class ExamService {
     public ExamResponseDTO readById(UUID id) {
 
         Exam exam = examR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Avaliação não encontrada."));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exam not Found."));
         
         return new ExamResponseDTO(
             exam.getId(),
-            exam.getGrade().getSubject().getName(),
+            exam.getGrade().getId(),
             exam.getName(),            
             exam.getMaximum(),
             exam.getDate()
@@ -92,14 +92,14 @@ public class ExamService {
             return examR.save(exam);
         } 
         
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Avaliação não encontrada.");
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Exam not Found.");
         
     }
 
     public void delete(UUID id) {
 
         if (!examR.findById(id).isPresent()) 
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Avaliação não encontrada.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Exam not Found.");
         examR.deleteById(id);
 
     }

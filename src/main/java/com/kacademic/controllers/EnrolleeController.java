@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kacademic.dto.enrollee.EnrolleeDetailsDTO;
 import com.kacademic.dto.enrollee.EnrolleeRequestDTO;
 import com.kacademic.dto.enrollee.EnrolleeResponseDTO;
 import com.kacademic.services.EnrolleeService;
@@ -48,11 +49,9 @@ public class EnrolleeController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<EnrolleeResponseDTO> readById(@PathVariable UUID id) {
+    public ResponseEntity<EnrolleeDetailsDTO> readById(@PathVariable UUID id) {
 
-        EnrolleeResponseDTO response = enrolleeS.readById(id);
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return new ResponseEntity<>(enrolleeS.readById(id), HttpStatus.OK);
 
     }    
     

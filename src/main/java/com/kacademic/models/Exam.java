@@ -29,14 +29,10 @@ import lombok.Setter;
 @Entity
 public class Exam implements Serializable {
     
-    private static final long serialVersionUID = 1L;
-
-    // Identifier
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    // Relationships
     @OneToMany(mappedBy = "exam")
     private Set<Evaluation> evaluations = new HashSet<>();
 
@@ -44,7 +40,6 @@ public class Exam implements Serializable {
     @JoinColumn(name = "grade_id", nullable = false)
     private Grade grade;
 
-    // Simple Attributes
     private String name;
 
     private int maximum;
@@ -52,7 +47,6 @@ public class Exam implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
 
-    // Constructor
     public Exam(Grade grade, String name, int maximum, LocalDate date) {
         this.grade = grade;
         this.name = name;        

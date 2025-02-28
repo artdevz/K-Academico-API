@@ -2,4 +2,4 @@ package com.kacademic.dto.evaluation;
 
 import java.util.UUID;
 
-public record EvaluationResponseDTO(UUID id, String enrollee, UUID grade, String exam, float score) {}
+public record EvaluationResponseDTO(UUID id, UUID enrollee, UUID grade, UUID exam, float score) {}

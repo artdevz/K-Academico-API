@@ -12,8 +12,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.kacademic.dto.enrollee.EnrolleeDetailsDTO;
 import com.kacademic.dto.enrollee.EnrolleeRequestDTO;
 import com.kacademic.dto.enrollee.EnrolleeResponseDTO;
+import com.kacademic.dto.evaluation.EvaluationResponseDTO;
 import com.kacademic.models.Enrollee;
 import com.kacademic.repositories.EnrolleeRepository;
 
@@ -60,18 +62,27 @@ public class EnrolleeService {
 
     }
 
-    public EnrolleeResponseDTO readById(UUID id) {
+    public EnrolleeDetailsDTO readById(UUID id) {
 
         Enrollee enrollee = enrolleeR.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee not Found."));
         
-        return new EnrolleeResponseDTO(
-            enrollee.getId(),
-            enrollee.getStudent().getId(),
-            enrollee.getGrade().getId(),
-            enrollee.getAbsences(),
-            enrollee.getAvarage(),
-            enrollee.getStatus()
+        return new EnrolleeDetailsDTO(
+            new EnrolleeResponseDTO(
+                enrollee.getId(),
+                enrollee.getStudent().getId(),
+                enrollee.getGrade().getId(),
+                enrollee.getAbsences(),
+                enrollee.getAvarage(),
+                enrollee.getStatus()
+                ),
+            enrollee.getEvaluations().stream().map(evaluation -> new EvaluationResponseDTO(
+                evaluation.getId(),
+                evaluation.getEnrollee().getId(),
+                evaluation.getExam().getId(),
+                evaluation.getExam().getId(),
+                evaluation.getScore()
+                )).collect(Collectors.toList())
         );
 
     }

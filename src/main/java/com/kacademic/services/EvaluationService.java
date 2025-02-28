@@ -48,9 +48,9 @@ public class EvaluationService {
         return evaluationR.findAll().stream()
             .map(evaluation -> new EvaluationResponseDTO(
                 evaluation.getId(),
-                evaluation.getEnrollee().getStudent().getName(),
+                evaluation.getEnrollee().getId(),
                 evaluation.getExam().getGrade().getId(),
-                evaluation.getExam().getName(),
+                evaluation.getExam().getId(),
                 evaluation.getScore()
             ))
             .collect(Collectors.toList());
@@ -60,13 +60,13 @@ public class EvaluationService {
     public EvaluationResponseDTO readById(UUID id) {
 
         Evaluation evaluation = evaluationR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resultado não encontrado."));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Evaluation not Found."));
         
         return new EvaluationResponseDTO(
             evaluation.getId(),
-            evaluation.getEnrollee().getStudent().getName(),
+            evaluation.getEnrollee().getId(),
             evaluation.getExam().getGrade().getId(),
-            evaluation.getExam().getName(),
+            evaluation.getExam().getId(),
             evaluation.getScore()
         );
 
@@ -101,14 +101,14 @@ public class EvaluationService {
             return evaluationR.save(evalution);
         } 
         
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resultado não encontrado.");
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Evaluation not Found.");
         
     }
 
     public void delete(UUID id) {
 
         if (!evaluationR.findById(id).isPresent()) 
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resultado não encontrado.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Evaluation not Found.");
         removeEvaluation(evaluationR.findById(id).get());
         evaluationR.deleteById(id);
 

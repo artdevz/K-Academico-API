@@ -21,12 +21,10 @@ import lombok.Setter;
 @Entity
 public class Evaluation {
     
-    // Identifier
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    // Relationships
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "enrollee_id", referencedColumnName = "id")
     private Enrollee enrollee;
@@ -35,10 +33,8 @@ public class Evaluation {
     @JoinColumn(name = "exam_id", referencedColumnName = "id")
     private Exam exam;
 
-    // Simple Attributes
     private float score;
 
-    // Constructor
     public Evaluation(Enrollee enrollee, Exam exam, float score) {
         this.enrollee = enrollee;
         this.exam = exam;
