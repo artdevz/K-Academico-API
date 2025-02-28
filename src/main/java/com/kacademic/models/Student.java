@@ -3,8 +3,6 @@ package com.kacademic.models;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.kacademic.enums.EShift;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
@@ -44,16 +42,12 @@ public class Student extends User {
     private String enrollment; // Year + Semester + CourseCode + ShiftCode + RandomNumbers = xxxx.x.xx.xxx.xxxx
 
     private float avarage;
-    
-    private EShift shift;
-    
-    // Constructor
-    public Student(String name, String email, String password, Course course, String enrollment, EShift shift) {
+        
+    public Student(String name, String email, String password, Course course, String enrollment) {
         super(name, email, password);
         this.course = course;
         this.enrollment = enrollment;
         this.avarage = 0; // Inicia-se com 0
-        this.shift = shift;
         this.transcript = new Transcript(this);
     }
 

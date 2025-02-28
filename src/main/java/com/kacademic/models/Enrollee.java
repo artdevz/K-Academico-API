@@ -26,15 +26,11 @@ import lombok.Setter;
 @Table(name = "enrollees")
 @Entity
 public class Enrollee implements Serializable {
-    
-    private static final long serialVersionUID = 1L;
-    
-    // Identifier
+        
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    // Relationships
     @ManyToOne
     @JoinColumn(name = "grade_id", referencedColumnName = "id", nullable = true)
     private Grade grade;
@@ -50,7 +46,6 @@ public class Enrollee implements Serializable {
     @OneToMany(mappedBy = "enrollee")
     private Set<Evaluation> evaluations = new HashSet<>();
 
-    // Simple Attributes
     private int absences;
     
     @Max(10)
@@ -58,7 +53,6 @@ public class Enrollee implements Serializable {
     
     private EEnrollee status;
 
-    // Constructor
     public Enrollee(Student student, Transcript transcript, Grade grade) {
         this.student = student;
         this.transcript = transcript;

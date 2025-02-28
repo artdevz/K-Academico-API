@@ -37,8 +37,8 @@ public class EnrolleeService {
             mapS.findGradeById(data.grade())
         );
 
-        enrollee.getGrade().setNumberOfStudents( // Adiciona 1 Estudante na Turma
-            enrollee.getGrade().getNumberOfStudents() + 1 
+        enrollee.getGrade().setCurrentStudents( // Adiciona 1 Estudante na Turma
+            enrollee.getGrade().getCurrentStudents() + 1 
         );
         enrolleeR.save(enrollee);
 
@@ -49,8 +49,9 @@ public class EnrolleeService {
         return enrolleeR.findAll().stream()
             .map(enrollee -> new EnrolleeResponseDTO(
                 enrollee.getId(),
-                enrollee.getStudent().getName(),
-                enrollee.getGrade() != null ? enrollee.getGrade().getSubject().getName() : "Indisponível",
+                enrollee.getStudent().getId(),
+                // enrollee.getGrade() != null ? enrollee.getGrade().getSubject().getName() : "Unavailable",
+                enrollee.getGrade().getId(),
                 enrollee.getAbsences(),
                 enrollee.getAvarage(),
                 enrollee.getStatus()
@@ -62,12 +63,12 @@ public class EnrolleeService {
     public EnrolleeResponseDTO readById(UUID id) {
 
         Enrollee enrollee = enrolleeR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Matriculado não encontrado."));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee not Found."));
         
         return new EnrolleeResponseDTO(
             enrollee.getId(),
-            enrollee.getStudent().getName(),
-            enrollee.getGrade() != null ? enrollee.getGrade().getSubject().getName() : "Indisponível",
+            enrollee.getStudent().getId(),
+            enrollee.getGrade().getId(),
             enrollee.getAbsences(),
             enrollee.getAvarage(),
             enrollee.getStatus()
@@ -98,17 +99,17 @@ public class EnrolleeService {
             return enrolleeR.save(enrollee);
         } 
         
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Matriculado não encontrado.");
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee not Found.");
         
     }
 
     public void delete(UUID id) {
 
         if (!enrolleeR.findById(id).isPresent()) 
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Matriculado não encontrado.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee not Found.");
 
-        enrolleeR.findById(id).get().getGrade().setNumberOfStudents( // Remove 1 Estudante na Turma
-            enrolleeR.findById(id).get().getGrade().getNumberOfStudents() - 1
+        enrolleeR.findById(id).get().getGrade().setCurrentStudents( // Remove 1 Estudante na Turma
+            enrolleeR.findById(id).get().getGrade().getCurrentStudents() - 1
         );
         enrolleeR.deleteById(id);
 

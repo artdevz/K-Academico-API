@@ -65,7 +65,8 @@ public class CourseService {
                 course.getName(),
                 course.getCode(),
                 course.getDuration(),
-                course.getDescription()),
+                course.getDescription()
+                ),
             course.getSubjects().stream().map(subject -> new SubjectResponseDTO(
                 subject.getId(),
                 subject.getCourse().getName(),
@@ -73,7 +74,8 @@ public class CourseService {
                 subject.getDescription(),
                 subject.getDuration(),
                 subject.getSemester(),
-                subject.getPrerequisites())).collect(Collectors.toList())
+                subject.getPrerequisites()
+                )).collect(Collectors.toList())
         );
     }
 

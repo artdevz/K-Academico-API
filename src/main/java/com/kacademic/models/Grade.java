@@ -35,14 +35,10 @@ import lombok.Setter;
 @Entity
 public class Grade implements Serializable {
     
-    private static final long serialVersionUID = 1L;
-
-    // Identifier
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    // Relationships
     @ManyToOne
     @JoinColumn(name = "subject_id", nullable = false)
     private Subject subject;
@@ -57,11 +53,10 @@ public class Grade implements Serializable {
     @OneToMany(mappedBy = "grade", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Exam> exams = new ArrayList<>();
 
-    // Simple Attributes
     @Min(1)
     private int capacity;
 
-    private int numberOfStudents;
+    private int currentStudents;
 
     @Semester
     private String semester;
@@ -70,17 +65,15 @@ public class Grade implements Serializable {
 
     private EGrade status;
 
-    // Collections
     @ElementCollection
     @CollectionTable(name = "grade_timetables", joinColumns = @JoinColumn(name = "grade_id"))
     private List<Timetable> timetables = new ArrayList<>();
 
-    // Constructor
     public Grade(Subject subject, Professor professor, int capacity, String semester, String locate, List<Timetable> timetables) {
         this.subject = subject;
         this.professor = professor;
         this.capacity = capacity;
-        this.numberOfStudents = 0; // Inicia-se em 0; Irá atulizar a medida que é adicionado novos Estudantes na Turma.
+        this.currentStudents = 0; // Inicia-se em 0; Irá atulizar a medida que é adicionado novos Estudantes na Turma.
         this.semester = semester;
         this.locate = locate;
         this.timetables = timetables;

@@ -53,9 +53,7 @@ public class GradeController {
     @GetMapping("/{id}")
     public ResponseEntity<GradeResponseDTO> readById(@PathVariable UUID id) {
 
-        GradeResponseDTO response = gradeS.readById(id);
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return new ResponseEntity<>(gradeS.readById(id), HttpStatus.OK);
 
     }    
     

@@ -55,8 +55,8 @@ public class GradeService {
         return gradeR.findAll().stream()
             .map(grade -> new GradeResponseDTO(
                 grade.getId(),
-                grade.getSubject().getName(),
-                grade.getProfessor().getName(),
+                grade.getSubject().getId(),
+                grade.getProfessor().getId(),
                 grade.getCapacity(),
                 grade.getSemester(),
                 grade.getLocate(),
@@ -69,12 +69,12 @@ public class GradeService {
     public GradeResponseDTO readById(UUID id) {
 
         Grade grade = gradeR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Turma não encontrada."));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Grade not Found."));
         
         return new GradeResponseDTO(
             grade.getId(),
-            grade.getSubject().getName(),
-            grade.getProfessor().getName(),
+            grade.getSubject().getId(),
+            grade.getProfessor().getId(),
             grade.getCapacity(),
             grade.getSemester(),
             grade.getLocate(),
@@ -108,12 +108,12 @@ public class GradeService {
                 }
             });
 
-            grade.setNumberOfStudents(grade.getEnrollees().size()); // Atualiza o Número de Estudantes.
+            grade.setCurrentStudents(grade.getEnrollees().size()); // Atualiza o Número de Estudantes.
             
             return gradeR.save(grade);
         } 
         
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Turma não encontrada.");
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Grade not Found.");
         
     }
 
@@ -121,7 +121,7 @@ public class GradeService {
     public void delete(UUID id) {
 
         if (!gradeR.findById(id).isPresent()) 
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Turma não encontrada.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Grade not Found.");
         
         enrolleeR.removeGradeFromEnrollees(id);
         gradeR.deleteById(id);

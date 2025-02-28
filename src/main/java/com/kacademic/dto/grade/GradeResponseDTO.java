@@ -5,4 +5,4 @@ import java.util.UUID;
 
 import com.kacademic.utils.Timetable;
 
-public record GradeResponseDTO(UUID id, String subject, String professor, int capacity, String semester, String locate, List<Timetable> timetable) {}
+public record GradeResponseDTO(UUID id, UUID subject, UUID professor, int capacity, String semester, String locate, List<Timetable> timetable) {}
