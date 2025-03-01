@@ -10,6 +10,7 @@ import com.kacademic.models.Course;
 import com.kacademic.models.Enrollee;
 import com.kacademic.models.Exam;
 import com.kacademic.models.Grade;
+import com.kacademic.models.Lesson;
 import com.kacademic.models.Professor;
 import com.kacademic.models.Student;
 import com.kacademic.models.Subject;
@@ -18,6 +19,7 @@ import com.kacademic.repositories.CourseRepository;
 import com.kacademic.repositories.EnrolleeRepository;
 import com.kacademic.repositories.ExamRepository;
 import com.kacademic.repositories.GradeRepository;
+import com.kacademic.repositories.LessonRepository;
 import com.kacademic.repositories.ProfessorRepository;
 import com.kacademic.repositories.StudentRepository;
 import com.kacademic.repositories.SubjectRepository;
@@ -34,6 +36,7 @@ public class MappingService {
     private final GradeRepository gradeR;
     private final EnrolleeRepository enrolleeR;
     private final ExamRepository examR;
+    private final LessonRepository lessonR;
 
     public MappingService(
         UserRepository userR,
@@ -43,7 +46,8 @@ public class MappingService {
         StudentRepository studentR,
         GradeRepository gradeR,
         EnrolleeRepository enrolleeR,
-        ExamRepository examR) {
+        ExamRepository examR,
+        LessonRepository lessonR) {
             this.userR = userR;
             this.courseR = courseR;
             this.subjectR = subjectR;
@@ -52,6 +56,7 @@ public class MappingService {
             this.gradeR = gradeR;
             this.enrolleeR = enrolleeR;
             this.examR = examR;
+            this.lessonR = lessonR;
     }
 
     public User findUserById(UUID id) {
@@ -84,6 +89,10 @@ public class MappingService {
 
     public Exam findExamById(UUID id) {
         return examR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exam"));
+    }
+
+    public Lesson findLessonById(UUID id) {
+        return lessonR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson"));
     }
 
 }

@@ -46,6 +46,9 @@ public class Enrollee implements Serializable {
     @OneToMany(mappedBy = "enrollee")
     private Set<Evaluation> evaluations = new HashSet<>();
 
+    @OneToMany(mappedBy = "enrollee")
+    private Set<Attendance> attendances = new HashSet<>();
+
     private int absences;
     
     @Max(10)

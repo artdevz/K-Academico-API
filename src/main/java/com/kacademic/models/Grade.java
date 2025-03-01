@@ -53,6 +53,9 @@ public class Grade implements Serializable {
     @OneToMany(mappedBy = "grade", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Exam> exams = new ArrayList<>();
 
+    @OneToMany(mappedBy = "grade", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<Lesson> lessons = new ArrayList<>();
+
     @Min(1)
     private int capacity;
 
