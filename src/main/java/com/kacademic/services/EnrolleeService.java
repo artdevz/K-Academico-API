@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.kacademic.dto.attendance.AttendanceResponseDTO;
 import com.kacademic.dto.enrollee.EnrolleeDetailsDTO;
 import com.kacademic.dto.enrollee.EnrolleeRequestDTO;
 import com.kacademic.dto.enrollee.EnrolleeResponseDTO;
@@ -76,13 +77,23 @@ public class EnrolleeService {
                 enrollee.getAvarage(),
                 enrollee.getStatus()
                 ),
+                
             enrollee.getEvaluations().stream().map(evaluation -> new EvaluationResponseDTO(
                 evaluation.getId(),
                 evaluation.getEnrollee().getId(),
-                evaluation.getExam().getId(),
+                evaluation.getExam().getGrade().getId(),
                 evaluation.getExam().getId(),
                 evaluation.getScore()
+                ))
+                .collect(Collectors.toList()),
+
+            enrollee.getAttendances().stream().map(attendance -> new AttendanceResponseDTO(
+                attendance.getId(),
+                attendance.getEnrollee().getId(),
+                attendance.getLesson().getId(),
+                attendance.isAbsent()
                 )).collect(Collectors.toList())
+            
         );
 
     }
