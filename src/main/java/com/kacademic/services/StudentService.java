@@ -129,7 +129,7 @@ public class StudentService {
     private String generateEnrollment(Course course) {
 
         // Year + Semester + CourseId + ShiftId + RandomNumber        
-        return getYear() + getSemester() + course.getCode() + "99" + getRandomNumber();
+        return getYear() + getSemester() + course.getCode() + "999" + getRandomNumber();
 
     }
 
