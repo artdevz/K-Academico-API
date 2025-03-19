@@ -1,19 +1,16 @@
 package com.kacademic.services;
 
-import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ReflectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.kacademic.dto.subject.SubjectRequestDTO;
 import com.kacademic.dto.subject.SubjectResponseDTO;
+import com.kacademic.dto.subject.SubjectUpdateDTO;
 import com.kacademic.models.Subject;
 import com.kacademic.repositories.SubjectRepository;
 
@@ -24,12 +21,14 @@ public class SubjectService {
 
     private final MappingService mapS;
 
+    private final String entity = "Subject";
+
     public SubjectService(SubjectRepository subjectR, MappingService mapS) {
         this.subjectR = subjectR;
         this.mapS = mapS;
     }    
 
-    public void create(SubjectRequestDTO data) {        
+    public String create(SubjectRequestDTO data) {        
 
         Subject subject = new Subject(
             mapS.findCourseById(data.course()),
@@ -42,6 +41,7 @@ public class SubjectService {
         
         subject.getCourse().setDuration(subject.getCourse().getDuration()+data.duration()); // Adiciona no Curso as Horas dessa Disciplina.
         subjectR.save(subject);
+        return "Created" + entity;
 
     }
 
@@ -76,44 +76,23 @@ public class SubjectService {
         );
     }
 
-    public Subject update(UUID id, Map<String, Object> fields) {
+    public String update(UUID id, SubjectUpdateDTO data) {
 
-        Optional<Subject> existingSubject = subjectR.findById(id);
-    
-        if (existingSubject.isPresent()) {
-            Subject subject = existingSubject.get();            
-    
-            fields.forEach((key, value) -> {
-                switch (key) {
-
-                    case "name":
-                        String name = (String) value;
-                        subject.setName(name);
-                        break;
-                        
-                    case "description":
-                        String description = (String) value;
-                        subject.setName(description);
-                        break;         
-
-                    default:
-                        Field field = ReflectionUtils.findField(Subject.class, key);
-                        if (field != null) {
-                            field.setAccessible(true);
-                            ReflectionUtils.setField(field, subject, value);
-                        }
-                        break;
-                }
-            });
+        Subject subject = subjectR.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
             
-            return subjectR.save(subject);
-        } 
-        
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Disciplina não encontrada.");
-        
+        data.type().ifPresent(subject::setType);
+        data.name().ifPresent(subject::setName);
+        data.description().ifPresent(subject::setDescription);
+        data.duration().ifPresent(subject::setDuration);
+        data.semester().ifPresent(subject::setSemester);
+
+        subjectR.save(subject);
+        return "Updated" + entity;
+                
     }
 
-    public void delete(UUID id) {
+    public String delete(UUID id) {
 
         if (!subjectR.findById(id).isPresent()) 
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Disciplina não encontrada.");
@@ -123,6 +102,7 @@ public class SubjectService {
             subjectR.findById(id).get().getDuration() );            // Duração da Disciplina
 
         subjectR.deleteById(id);
+        return "Deleted" + entity;
 
     }
 

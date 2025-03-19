@@ -1,7 +1,6 @@
 package com.kacademic.controllers;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.kacademic.dto.exam.ExamRequestDTO;
 import com.kacademic.dto.exam.ExamResponseDTO;
+import com.kacademic.dto.exam.ExamUpdateDTO;
 import com.kacademic.services.ExamService;
 
 import jakarta.validation.Valid;
@@ -33,45 +33,27 @@ public class ExamController {
 
     @PostMapping
     public ResponseEntity<String> create(@RequestBody @Valid ExamRequestDTO request) {
-
-        examS.create(request);
-
-        return new ResponseEntity<>("Created Exam.", HttpStatus.CREATED);
-
+        return new ResponseEntity<>(examS.create(request), HttpStatus.CREATED);
     }
     
     @GetMapping    
     public ResponseEntity<List<ExamResponseDTO>> readAll() {
-
         return new ResponseEntity<>(examS.readAll(), HttpStatus.OK);
-
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ExamResponseDTO> readById(@PathVariable UUID id) {
-
-        ExamResponseDTO response = examS.readById(id);
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
-
+        return new ResponseEntity<>(examS.readById(id), HttpStatus.OK);
     }    
     
     @PatchMapping("/{id}")
-    public ResponseEntity<String> update(@RequestBody Map<String, Object> fields, @PathVariable UUID id) {
-        
-        examS.update(id, fields);
-        
-        return new ResponseEntity<>("Updated Exam", HttpStatus.OK);
-        
+    public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid ExamUpdateDTO data) {
+        return new ResponseEntity<>(examS.update(id, data), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable UUID id) {
-        
-        examS.delete(id);
-
-        return new ResponseEntity<>("Deleted Exam", HttpStatus.OK);
-           
+        return new ResponseEntity<>(examS.delete(id), HttpStatus.OK);
     }
 
 }

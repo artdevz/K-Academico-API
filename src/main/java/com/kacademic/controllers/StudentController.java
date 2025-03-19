@@ -1,7 +1,6 @@
 package com.kacademic.controllers;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
@@ -18,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.kacademic.dto.student.StudentDetailsDTO;
 import com.kacademic.dto.student.StudentRequestDTO;
 import com.kacademic.dto.student.StudentResponseDTO;
+import com.kacademic.dto.student.StudentUpdateDTO;
 import com.kacademic.services.StudentService;
 
 import jakarta.validation.Valid;
@@ -34,41 +34,27 @@ public class StudentController {
     
     @PostMapping
     public ResponseEntity<String> create(@RequestBody @Valid StudentRequestDTO request) {
-
-        studentS.create(request);
-
-        return new ResponseEntity<>("Created Student.", HttpStatus.CREATED);
-
+        return new ResponseEntity<>(studentS.create(request), HttpStatus.CREATED);
     }
     
     @GetMapping    
     public ResponseEntity<List<StudentResponseDTO>> readAll() {
-
         return new ResponseEntity<>(studentS.readAll(), HttpStatus.OK);
-
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<StudentDetailsDTO> readById(@PathVariable UUID id) {
-
         return new ResponseEntity<>(studentS.readById(id), HttpStatus.OK);
-
     }    
     
     @PatchMapping("/{id}")
-    public ResponseEntity<String> update(@RequestBody Map<String, Object> fields, @PathVariable UUID id) {
-        
-        studentS.update(id, fields);
-        return new ResponseEntity<>("Updated Student", HttpStatus.OK);
-        
+    public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid StudentUpdateDTO data) {
+        return new ResponseEntity<>(studentS.update(id, data), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable UUID id) {
-        
-        studentS.delete(id);
-        return new ResponseEntity<>("Deleted Student", HttpStatus.OK);
-           
+        return new ResponseEntity<>(studentS.delete(id), HttpStatus.OK);
     }
     
 }

@@ -1,19 +1,16 @@
 package com.kacademic.services;
 
-import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ReflectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.kacademic.dto.attendance.AttendanceRequestDTO;
 import com.kacademic.dto.attendance.AttendanceResponseDTO;
+import com.kacademic.dto.attendance.AttendanceUpdateDTO;
 import com.kacademic.models.Attendance;
 import com.kacademic.repositories.AttendanceRepository;
 
@@ -24,12 +21,14 @@ public class AttendanceService {
     
     private final MappingService mapS;
 
+    private final String entity = "Attendance";
+
     public AttendanceService(AttendanceRepository attendanceR, MappingService mapS) {
         this.attendanceR = attendanceR;
         this.mapS = mapS;
     }
     
-    public void create(AttendanceRequestDTO data) {
+    public String create(AttendanceRequestDTO data) {
 
         Attendance attendance = new Attendance(
             mapS.findEnrolleeById(data.enrollee()),
@@ -38,6 +37,7 @@ public class AttendanceService {
         );
         
         attendanceR.save(attendance);
+        return "Created" + entity;
 
     }
 
@@ -68,38 +68,23 @@ public class AttendanceService {
 
     }
 
-    public Attendance update(UUID id, Map<String, Object> fields) {
+    public String update(UUID id, AttendanceUpdateDTO data) {
 
-        Optional<Attendance> existingEvalution = attendanceR.findById(id);
-    
-        if (existingEvalution.isPresent()) {
-            Attendance attendance = existingEvalution.get();            
-    
-            fields.forEach((key, value) -> {
-                switch (key) {
-                    
-                    default:
-                        Field field = ReflectionUtils.findField(Attendance.class, key);
-                        if (field != null) {
-                            field.setAccessible(true);
-                            ReflectionUtils.setField(field, attendance, value);
-                        }
-                        break;
-                }
-            });
+        Attendance attendance = attendanceR.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
             
-            return attendanceR.save(attendance);
-        } 
-        
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Attendance not Found.");
+        attendanceR.save(attendance);
+        return "Updated" + entity;
         
     }
 
-    public void delete(UUID id) {
+    public String delete(UUID id) {
 
         if (!attendanceR.findById(id).isPresent()) 
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Attendance not Found.");
+        
         attendanceR.deleteById(id);
+        return "Deleted" + entity;
 
     }
 

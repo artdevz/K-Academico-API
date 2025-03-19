@@ -1,7 +1,6 @@
 package com.kacademic.controllers;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
@@ -18,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.kacademic.dto.enrollee.EnrolleeDetailsDTO;
 import com.kacademic.dto.enrollee.EnrolleeRequestDTO;
 import com.kacademic.dto.enrollee.EnrolleeResponseDTO;
+import com.kacademic.dto.enrollee.EnrolleeUpdateDTO;
 import com.kacademic.services.EnrolleeService;
 
 import jakarta.validation.Valid;
@@ -34,41 +34,27 @@ public class EnrolleeController {
 
     @PostMapping
     public ResponseEntity<String> create(@RequestBody @Valid EnrolleeRequestDTO request) {
-
-        enrolleeS.create(request);
-
-        return new ResponseEntity<>("Created Enrollee.", HttpStatus.CREATED);
-
+        return new ResponseEntity<>(enrolleeS.create(request), HttpStatus.CREATED);
     }
     
     @GetMapping    
     public ResponseEntity<List<EnrolleeResponseDTO>> readAll() {
-
         return new ResponseEntity<>(enrolleeS.readAll(), HttpStatus.OK);
-
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<EnrolleeDetailsDTO> readById(@PathVariable UUID id) {
-
         return new ResponseEntity<>(enrolleeS.readById(id), HttpStatus.OK);
-
     }    
     
     @PatchMapping("/{id}")
-    public ResponseEntity<String> update(@RequestBody Map<String, Object> fields, @PathVariable UUID id) {
-        
-        enrolleeS.update(id, fields);
-        return new ResponseEntity<>("Updated Enrollee", HttpStatus.OK);
-        
+    public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid EnrolleeUpdateDTO data) {
+        return new ResponseEntity<>(enrolleeS.update(id, data), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable UUID id) {
-        
-        enrolleeS.delete(id);
-        return new ResponseEntity<>("Deleted Enrollee", HttpStatus.OK);
-           
+        return new ResponseEntity<>(enrolleeS.delete(id), HttpStatus.OK);
     }
 
 }

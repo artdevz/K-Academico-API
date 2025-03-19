@@ -1,7 +1,6 @@
 package com.kacademic.controllers;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.kacademic.dto.subject.SubjectRequestDTO;
 import com.kacademic.dto.subject.SubjectResponseDTO;
+import com.kacademic.dto.subject.SubjectUpdateDTO;
 import com.kacademic.services.SubjectService;
 
 import jakarta.validation.Valid;
@@ -33,43 +33,27 @@ public class SubjectController {
 
     @PostMapping
     public ResponseEntity<String> create(@RequestBody @Valid SubjectRequestDTO request) {
-
-        subjectS.create(request);
-
-        return new ResponseEntity<>("Created Subject.", HttpStatus.CREATED);
-
+        return new ResponseEntity<>(subjectS.create(request), HttpStatus.CREATED);
     }
     
     @GetMapping    
     public ResponseEntity<List<SubjectResponseDTO>> readAll() {
-
         return new ResponseEntity<>(subjectS.readAll(), HttpStatus.OK);
-
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<SubjectResponseDTO> readById(@PathVariable UUID id) {
-
-        SubjectResponseDTO response = subjectS.readById(id);
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
-
+        return new ResponseEntity<>(subjectS.readById(id), HttpStatus.OK);
     }    
     
     @PatchMapping("/{id}")
-    public ResponseEntity<String> update(@RequestBody Map<String, Object> fields, @PathVariable UUID id) {
-        
-        subjectS.update(id, fields);
-        return new ResponseEntity<>("Updated Subject", HttpStatus.OK);
-        
+    public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid SubjectUpdateDTO data) {
+        return new ResponseEntity<>(subjectS.update(id, data), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable UUID id) {
-        
-        subjectS.delete(id);
-        return new ResponseEntity<>("Deleted Subject", HttpStatus.OK);
-           
+        return new ResponseEntity<>(subjectS.delete(id), HttpStatus.OK);
     }
 
 

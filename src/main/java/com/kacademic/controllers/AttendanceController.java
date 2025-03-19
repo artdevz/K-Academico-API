@@ -1,7 +1,6 @@
 package com.kacademic.controllers;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.kacademic.dto.attendance.AttendanceRequestDTO;
 import com.kacademic.dto.attendance.AttendanceResponseDTO;
+import com.kacademic.dto.attendance.AttendanceUpdateDTO;
 import com.kacademic.services.AttendanceService;
 
 import jakarta.validation.Valid;
@@ -33,43 +33,27 @@ public class AttendanceController {
 
     @PostMapping
     public ResponseEntity<String> create(@RequestBody @Valid AttendanceRequestDTO request) {
-
-        attendanceS.create(request);
-
-        return new ResponseEntity<>("Created Attendance.", HttpStatus.CREATED);
-
+        return new ResponseEntity<>(attendanceS.create(request), HttpStatus.CREATED);
     }
     
     @GetMapping    
     public ResponseEntity<List<AttendanceResponseDTO>> readAll() {
-
         return new ResponseEntity<>(attendanceS.readAll(), HttpStatus.OK);
-
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<AttendanceResponseDTO> readById(@PathVariable UUID id) {
-
         return new ResponseEntity<>(attendanceS.readById(id), HttpStatus.OK);
-
     }    
     
     @PatchMapping("/{id}")
-    public ResponseEntity<String> update(@RequestBody Map<String, Object> fields, @PathVariable UUID id) {
-        
-        attendanceS.update(id, fields);
-        
-        return new ResponseEntity<>("Updated Attendance", HttpStatus.OK);
-        
+    public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid AttendanceUpdateDTO data) {
+        return new ResponseEntity<>(attendanceS.update(id, data), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable UUID id) {
-        
-        attendanceS.delete(id);
-
-        return new ResponseEntity<>("Deleted Attendance", HttpStatus.OK);
-           
+        return new ResponseEntity<>(attendanceS.delete(id), HttpStatus.OK);
     }
 
 }

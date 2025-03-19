@@ -1,20 +1,17 @@
 package com.kacademic.services;
 
-import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ReflectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.kacademic.dto.user.UserRequestDTO;
 import com.kacademic.dto.user.UserResponseDTO;
+import com.kacademic.dto.user.UserUpdateDTO;
 import com.kacademic.exceptions.DuplicateValueException;
 import com.kacademic.models.User;
 import com.kacademic.repositories.UserRepository;
@@ -25,13 +22,15 @@ public class UserService {
     
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    private final UserRepository userR;    
+    private final UserRepository userR;
+    
+    private final String entity = "User";
 
     public UserService(UserRepository userR) {
         this.userR = userR;
     }
 
-    public void create(UserRequestDTO data) {
+    public String create(UserRequestDTO data) {
          
         validateEmail(data.email());
 
@@ -42,6 +41,7 @@ public class UserService {
         );
         
         userR.save(user);
+        return "Created" + entity;
 
     }
 
@@ -59,7 +59,7 @@ public class UserService {
     public UserResponseDTO readById(UUID id) {
 
         User user = userR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not Found."));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
         
         return new UserResponseDTO(
             user.getId(),            
@@ -68,53 +68,26 @@ public class UserService {
         );
     }
 
-    public User update(UUID id, Map<String, Object> fields) {
+    public String update(UUID id, UserUpdateDTO data) {
 
-        Optional<User> existingUser = userR.findById(id);
-    
-        if (existingUser.isPresent()) {
-            User user = existingUser.get();
-            PasswordValidator passwordValidator = new PasswordValidator();
-    
-            fields.forEach((key, value) -> {
-                switch (key) {
-
-                    case "name":
-                        String name = (String) value;
-                        user.setName(name);
-                        break;
-
-                    case "password":
-                        String password = (String) value;
-                        
-                        if (!passwordValidator.isValid(password, null)) 
-                            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The password must contain at least one lowercase letter, one uppercase letter, one number, one special character and be between 8 and 32 characters long.");
-                        
-                        user.setPassword(passwordEncoder.encode(password));
-                        break;  
-
-                    default:
-                        Field field = ReflectionUtils.findField(User.class, key);
-                        if (field != null) {
-                            field.setAccessible(true);
-                            ReflectionUtils.setField(field, user, value);
-                        }
-                        break;
-                }
-            });
+        User user = userR.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
+        
+        data.name().ifPresent(user::setName);
+        data.password().ifPresent(password -> validatePassword(user, password.intern())); // Não faço menor ideia do pq funcionou
             
-            return userR.save(user);
-        } 
-        
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not Found.");
-        
+        userR.save(user);
+        return "Updated" + entity;
+                
     }
 
-    public void delete(UUID id) {
+    public String delete(UUID id) {
 
         if (!userR.findById(id).isPresent()) 
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not Found.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found.");
+        
         userR.deleteById(id);
+        return "Deleted " + entity;
 
     }
     
@@ -122,6 +95,18 @@ public class UserService {
 
         if (userR.findByEmail(email) != null)
             throw new DuplicateValueException("Email already being used.");
+
+    }
+
+    private void validatePassword(User user, String password) {
+
+        PasswordValidator passwordValidator = new PasswordValidator();
+
+        if (!passwordValidator.isValid(password, null))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+            "Password Invalid.");
+
+        user.setPassword(passwordEncoder.encode(password));
 
     }
 

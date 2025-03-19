@@ -1,7 +1,6 @@
 package com.kacademic.controllers;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.kacademic.dto.professor.ProfessorRequestDTO;
 import com.kacademic.dto.professor.ProfessorResponseDTO;
+import com.kacademic.dto.professor.ProfessorUpdateDTO;
 import com.kacademic.services.ProfessorService;
 
 import jakarta.validation.Valid;
@@ -33,45 +33,27 @@ public class ProfessorController {
 
     @PostMapping
     public ResponseEntity<String> create(@RequestBody @Valid ProfessorRequestDTO request) {
-
-        professorS.create(request);
-
-        return new ResponseEntity<>("Created Professor.", HttpStatus.CREATED);
-
+        return new ResponseEntity<>(professorS.create(request), HttpStatus.CREATED);
     }
     
     @GetMapping    
     public ResponseEntity<List<ProfessorResponseDTO>> readAll() {
-
         return new ResponseEntity<>(professorS.readAll(), HttpStatus.OK);
-
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ProfessorResponseDTO> readById(@PathVariable UUID id) {
-
-        ProfessorResponseDTO response = professorS.readById(id);
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
-
+        return new ResponseEntity<>(professorS.readById(id), HttpStatus.OK);
     }    
     
     @PatchMapping("/{id}")
-    public ResponseEntity<String> update(@RequestBody Map<String, Object> fields, @PathVariable UUID id) {
-        
-        professorS.update(id, fields);
-        
-        return new ResponseEntity<>("Updated Professor", HttpStatus.OK);
-        
+    public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid ProfessorUpdateDTO data) {
+        return new ResponseEntity<>(professorS.update(id, data), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable UUID id) {
-        
-        professorS.delete(id);
-
-        return new ResponseEntity<>("Deleted Professor", HttpStatus.OK);
-           
+        return new ResponseEntity<>(professorS.delete(id), HttpStatus.OK);
     }
 
 }

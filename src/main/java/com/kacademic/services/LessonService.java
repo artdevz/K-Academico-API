@@ -1,19 +1,16 @@
 package com.kacademic.services;
 
-import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ReflectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.kacademic.dto.lesson.LessonRequestDTO;
 import com.kacademic.dto.lesson.LessonResponseDTO;
+import com.kacademic.dto.lesson.LessonUpdateDTO;
 import com.kacademic.models.Lesson;
 import com.kacademic.repositories.LessonRepository;
 
@@ -24,12 +21,14 @@ public class LessonService {
 
     private final MappingService mapS;
 
+    private final String entity = "Lesson";
+
     public LessonService(LessonRepository lessonR, MappingService mapS) {
         this.lessonR = lessonR;
         this.mapS = mapS;
     }
 
-    public void create(LessonRequestDTO data) {
+    public String create(LessonRequestDTO data) {
 
         Lesson lesson = new Lesson(
             mapS.findGradeById(data.grade()),
@@ -38,6 +37,7 @@ public class LessonService {
         );
 
         lessonR.save(lesson);
+        return "Created" + entity;
         
     }
 
@@ -68,38 +68,23 @@ public class LessonService {
         );
     }
 
-    public Lesson update(UUID id, Map<String, Object> fields) {
+    public String update(UUID id, LessonUpdateDTO data) {
 
-        Optional<Lesson> existingLesson = lessonR.findById(id);
-    
-        if (existingLesson.isPresent()) {
-            Lesson lesson = existingLesson.get();
-    
-            fields.forEach((key, value) -> {
-                switch (key) {                
+        Lesson lesson = lessonR.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
 
-                    default:
-                        Field field = ReflectionUtils.findField(Lesson.class, key);
-                        if (field != null) {
-                            field.setAccessible(true);
-                            ReflectionUtils.setField(field, lesson, value);
-                        }
-                        break;
-                }
-            });
-            
-            return lessonR.save(lesson);
-        } 
-        
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not Found.");
+        lessonR.save(lesson);
+        return "Updated" + entity;
         
     }
 
-    public void delete(UUID id) {
+    public String delete(UUID id) {
 
         if (!lessonR.findById(id).isPresent()) 
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not Found.");
+        
         lessonR.deleteById(id);
+        return "Deleted" + entity;
 
     }
 

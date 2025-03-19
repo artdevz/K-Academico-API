@@ -1,20 +1,17 @@
 package com.kacademic.services;
 
-import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ReflectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.kacademic.dto.professor.ProfessorRequestDTO;
 import com.kacademic.dto.professor.ProfessorResponseDTO;
+import com.kacademic.dto.professor.ProfessorUpdateDTO;
 import com.kacademic.models.Professor;
 import com.kacademic.repositories.ProfessorRepository;
 
@@ -25,11 +22,13 @@ public class ProfessorService {
 
     private final ProfessorRepository professorR;
 
+    private final String entity = "Professor";
+
     public ProfessorService(ProfessorRepository professorR, MappingService mapS) {
         this.professorR = professorR;
     }
 
-    public void create(ProfessorRequestDTO data) {
+    public String create(ProfessorRequestDTO data) {
 
         Professor professor = new Professor(
             data.user().name(),
@@ -39,6 +38,7 @@ public class ProfessorService {
         );
 
         professorR.save(professor);
+        return "Created" + entity;
         
     }
 
@@ -67,43 +67,25 @@ public class ProfessorService {
         );
     }
 
-    public Professor update(UUID id, Map<String, Object> fields) {
+    public String update(UUID id, ProfessorUpdateDTO data) {
 
-        Optional<Professor> existingProfessor = professorR.findById(id);
-    
-        if (existingProfessor.isPresent()) {
-            Professor professor = existingProfessor.get();
-    
-            fields.forEach((key, value) -> {
-                switch (key) {
-
-                    // case "name":
-                    //     String name = (String) value;
-                    //     user.setName(name);
-                    //     break;                    
-
-                    default:
-                        Field field = ReflectionUtils.findField(Professor.class, key);
-                        if (field != null) {
-                            field.setAccessible(true);
-                            ReflectionUtils.setField(field, professor, value);
-                        }
-                        break;
-                }
-            });
-            
-            return professorR.save(professor);
-        } 
+        Professor professor = professorR.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
         
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Professor não encontrado.");
-        
+        data.wage().ifPresent(professor::setWage);
+
+        professorR.save(professor);
+        return "Updated" + entity;
+                
     }
 
-    public void delete(UUID id) {
+    public String delete(UUID id) {
 
         if (!professorR.findById(id).isPresent()) 
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Professor não encontrado.");
-            professorR.deleteById(id);
+        
+        professorR.deleteById(id);
+        return "Deleted" + entity;
 
     }
 

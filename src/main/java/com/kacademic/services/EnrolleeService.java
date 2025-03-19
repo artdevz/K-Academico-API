@@ -1,21 +1,18 @@
 package com.kacademic.services;
 
-import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ReflectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.kacademic.dto.attendance.AttendanceResponseDTO;
 import com.kacademic.dto.enrollee.EnrolleeDetailsDTO;
 import com.kacademic.dto.enrollee.EnrolleeRequestDTO;
 import com.kacademic.dto.enrollee.EnrolleeResponseDTO;
+import com.kacademic.dto.enrollee.EnrolleeUpdateDTO;
 import com.kacademic.dto.evaluation.EvaluationResponseDTO;
 import com.kacademic.models.Enrollee;
 import com.kacademic.repositories.EnrolleeRepository;
@@ -27,12 +24,14 @@ public class EnrolleeService {
     
     private final MappingService mapS;
 
+    private final String entity = "Enrollee";
+
     public EnrolleeService(EnrolleeRepository enrolleeR, MappingService mapS) {
         this.enrolleeR = enrolleeR;
         this.mapS = mapS;
     }
     
-    public void create(EnrolleeRequestDTO data) {
+    public String create(EnrolleeRequestDTO data) {
 
         Enrollee enrollee = new Enrollee(
             mapS.findStudentById(data.student()),
@@ -44,6 +43,7 @@ public class EnrolleeService {
             enrollee.getGrade().getCurrentStudents() + 1 
         );
         enrolleeR.save(enrollee);
+        return "Created" + entity;
 
     }
 
@@ -98,34 +98,17 @@ public class EnrolleeService {
 
     }
 
-    public Enrollee update(UUID id, Map<String, Object> fields) {
+    public String update(UUID id, EnrolleeUpdateDTO data) {
 
-        Optional<Enrollee> existingEnrollee = enrolleeR.findById(id);
-    
-        if (existingEnrollee.isPresent()) {
-            Enrollee enrollee = existingEnrollee.get();            
-    
-            fields.forEach((key, value) -> {
-                switch (key) {                                   
-
-                    default:
-                        Field field = ReflectionUtils.findField(Enrollee.class, key);
-                        if (field != null) {
-                            field.setAccessible(true);
-                            ReflectionUtils.setField(field, enrollee, value);
-                        }
-                        break;
-                }
-            });
+        Enrollee enrollee = enrolleeR.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
             
-            return enrolleeR.save(enrollee);
-        } 
-        
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee not Found.");
+        enrolleeR.save(enrollee);
+        return "Updated" + entity;
         
     }
 
-    public void delete(UUID id) {
+    public String delete(UUID id) {
 
         if (!enrolleeR.findById(id).isPresent()) 
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee not Found.");
@@ -134,6 +117,7 @@ public class EnrolleeService {
             enrolleeR.findById(id).get().getGrade().getCurrentStudents() - 1
         );
         enrolleeR.deleteById(id);
+        return "Deleted" + entity;
 
     }
 

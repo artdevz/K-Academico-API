@@ -1,7 +1,6 @@
 package com.kacademic.controllers;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
@@ -18,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.kacademic.dto.course.CourseDetailsDTO;
 import com.kacademic.dto.course.CourseRequestDTO;
 import com.kacademic.dto.course.CourseResponseDTO;
+import com.kacademic.dto.course.CourseUpdateDTO;
 import com.kacademic.services.CourseService;
 
 import jakarta.validation.Valid;
@@ -34,41 +34,27 @@ public class CourseController {
 
     @PostMapping
     public ResponseEntity<String> create(@RequestBody @Valid CourseRequestDTO request) {
-
-        courseS.create(request);
-
-        return new ResponseEntity<>("Created Course.", HttpStatus.CREATED);
-
+        return new ResponseEntity<>(courseS.create(request), HttpStatus.CREATED);
     }
     
     @GetMapping    
     public ResponseEntity<List<CourseResponseDTO>> readAll() {
-
         return new ResponseEntity<>(courseS.readAll(), HttpStatus.OK);
-
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<CourseDetailsDTO> readById(@PathVariable UUID id) {
-
         return new ResponseEntity<>(courseS.readById(id), HttpStatus.OK);
-
     }    
     
     @PatchMapping("/{id}")
-    public ResponseEntity<String> update(@RequestBody Map<String, Object> fields, @PathVariable UUID id) {
-        
-        courseS.update(id, fields);
-        return new ResponseEntity<>("Updated Course", HttpStatus.OK);
-        
+    public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid CourseUpdateDTO data) {
+        return new ResponseEntity<>(courseS.update(id, data), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable UUID id) {
-        
-        courseS.delete(id);
-        return new ResponseEntity<>("Deleted Course", HttpStatus.OK);
-           
+        return new ResponseEntity<>(courseS.delete(id), HttpStatus.OK);
     }
 
 }

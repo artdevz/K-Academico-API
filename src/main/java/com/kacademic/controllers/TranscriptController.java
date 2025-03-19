@@ -1,7 +1,6 @@
 package com.kacademic.controllers;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.kacademic.dto.transcript.TranscriptRequestDTO;
 import com.kacademic.dto.transcript.TranscriptResponseDTO;
+import com.kacademic.dto.transcript.TranscriptUpdateDTO;
 import com.kacademic.services.TranscriptService;
 
 import jakarta.validation.Valid;
@@ -33,45 +33,27 @@ public class TranscriptController {
 
     @PostMapping
     public ResponseEntity<String> create(@RequestBody @Valid TranscriptRequestDTO request) {
-
-        transcriptS.create(request);
-
-        return new ResponseEntity<>("Created Transcript.", HttpStatus.CREATED);
-
+        return new ResponseEntity<>(transcriptS.create(request), HttpStatus.CREATED);
     }
     
     @GetMapping    
     public ResponseEntity<List<TranscriptResponseDTO>> readAll() {
-
         return new ResponseEntity<>(transcriptS.readAll(), HttpStatus.OK);
-
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<TranscriptResponseDTO> readById(@PathVariable UUID id) {
-
-        TranscriptResponseDTO response = transcriptS.readById(id);
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
-
+        return new ResponseEntity<>(transcriptS.readById(id), HttpStatus.OK);
     }    
     
     @PatchMapping("/{id}")
-    public ResponseEntity<String> update(@RequestBody Map<String, Object> fields, @PathVariable UUID id) {
-        
-        transcriptS.update(id, fields);
-        
-        return new ResponseEntity<>("Updated Transcript", HttpStatus.OK);
-        
+    public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid TranscriptUpdateDTO data) {
+        return new ResponseEntity<>(transcriptS.update(id, data), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable UUID id) {
-        
-        transcriptS.delete(id);
-
-        return new ResponseEntity<>("Deleted Transcript", HttpStatus.OK);
-           
+        return new ResponseEntity<>(transcriptS.delete(id), HttpStatus.OK);
     }
 
 }

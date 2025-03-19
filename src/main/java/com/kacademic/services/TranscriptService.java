@@ -1,19 +1,16 @@
 package com.kacademic.services;
 
-import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ReflectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.kacademic.dto.transcript.TranscriptRequestDTO;
 import com.kacademic.dto.transcript.TranscriptResponseDTO;
+import com.kacademic.dto.transcript.TranscriptUpdateDTO;
 import com.kacademic.models.Transcript;
 import com.kacademic.repositories.TranscriptRepository;
 
@@ -24,18 +21,21 @@ public class TranscriptService {
 
     private final MappingService mapS;
 
+    private final String entity = "Transcript";
+
     public TranscriptService(TranscriptRepository transcriptR, MappingService mapS) {
         this.transcriptR = transcriptR;
         this.mapS = mapS;
     }
 
-    public void create(TranscriptRequestDTO data) {
+    public String create(TranscriptRequestDTO data) {
 
         Transcript transcript = new Transcript(
             mapS.findStudentById(data.student())
         );
 
         transcriptR.save(transcript);
+        return "Created" + entity;
         
     }
 
@@ -53,7 +53,7 @@ public class TranscriptService {
     public TranscriptResponseDTO readById(UUID id) {
 
         Transcript transcript = transcriptR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Boletim não encontrado."));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transcript Not Found."));
         
         return new TranscriptResponseDTO(
             transcript.getId(),
@@ -62,38 +62,23 @@ public class TranscriptService {
         );
     }
 
-    public Transcript update(UUID id, Map<String, Object> fields) {
+    public String update(UUID id, TranscriptUpdateDTO data) {
 
-        Optional<Transcript> existingTranscript = transcriptR.findById(id);
-    
-        if (existingTranscript.isPresent()) {
-            Transcript transcript = existingTranscript.get();
-    
-            fields.forEach((key, value) -> {
-                switch (key) {                
-
-                    default:
-                        Field field = ReflectionUtils.findField(Transcript.class, key);
-                        if (field != null) {
-                            field.setAccessible(true);
-                            ReflectionUtils.setField(field, transcript, value);
-                        }
-                        break;
-                }
-            });
+        Transcript transcript = transcriptR.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
             
-            return transcriptR.save(transcript);
-        } 
-        
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Boletim não encontrado.");
+        transcriptR.save(transcript);
+        return "Updated" + entity;
         
     }
 
-    public void delete(UUID id) {
+    public String delete(UUID id) {
 
         if (!transcriptR.findById(id).isPresent()) 
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Boletim não encontrado.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Transcript Not Found.");
+        
         transcriptR.deleteById(id);
+        return "Deleted" + entity;
 
     }
     

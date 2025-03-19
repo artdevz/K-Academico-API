@@ -1,7 +1,6 @@
 package com.kacademic.controllers;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.kacademic.dto.evaluation.EvaluationRequestDTO;
 import com.kacademic.dto.evaluation.EvaluationResponseDTO;
+import com.kacademic.dto.evaluation.EvaluationUpdateDTO;
 import com.kacademic.services.EvaluationService;
 
 import jakarta.validation.Valid;
@@ -33,43 +33,27 @@ public class EvalutionController {
 
     @PostMapping
     public ResponseEntity<String> create(@RequestBody @Valid EvaluationRequestDTO request) {
-
-        evalutionS.create(request);
-
-        return new ResponseEntity<>("Created Evalution.", HttpStatus.CREATED);
-
+        return new ResponseEntity<>(evalutionS.create(request), HttpStatus.CREATED);
     }
     
     @GetMapping    
     public ResponseEntity<List<EvaluationResponseDTO>> readAll() {
-
         return new ResponseEntity<>(evalutionS.readAll(), HttpStatus.OK);
-
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<EvaluationResponseDTO> readById(@PathVariable UUID id) {
-
-        EvaluationResponseDTO response = evalutionS.readById(id);
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
-
+        return new ResponseEntity<>(evalutionS.readById(id), HttpStatus.OK);
     }    
     
     @PatchMapping("/{id}")
-    public ResponseEntity<String> update(@RequestBody Map<String, Object> fields, @PathVariable UUID id) {
-        
-        evalutionS.update(id, fields);
-        return new ResponseEntity<>("Updated Evalution", HttpStatus.OK);
-        
+    public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid EvaluationUpdateDTO data) {
+        return new ResponseEntity<>(evalutionS.update(id, data), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable UUID id) {
-        
-        evalutionS.delete(id);
-        return new ResponseEntity<>("Deleted Evalution", HttpStatus.OK);
-           
+        return new ResponseEntity<>(evalutionS.delete(id), HttpStatus.OK);
     }
 
 }

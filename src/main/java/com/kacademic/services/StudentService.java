@@ -1,24 +1,21 @@
 package com.kacademic.services;
 
-import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ReflectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.kacademic.dto.enrollee.EnrolleeResponseDTO;
 import com.kacademic.dto.student.StudentDetailsDTO;
 import com.kacademic.dto.student.StudentRequestDTO;
 import com.kacademic.dto.student.StudentResponseDTO;
+import com.kacademic.dto.student.StudentUpdateDTO;
 import com.kacademic.models.Course;
 import com.kacademic.models.Student;
 import com.kacademic.repositories.StudentRepository;
@@ -32,12 +29,14 @@ public class StudentService {
 
     private final MappingService mapS;
 
+    private final String entity = "Student";
+
     public StudentService(StudentRepository studentR, MappingService mapS) {
         this.studentR = studentR;
         this.mapS = mapS;
     }
 
-    public void create(StudentRequestDTO data) {
+    public String create(StudentRequestDTO data) {
 
         Student student = new Student(
             data.user().name(),
@@ -48,6 +47,7 @@ public class StudentService {
         );
 
         studentR.save(student);
+        return "Created" + entity;
         
     }
 
@@ -90,38 +90,23 @@ public class StudentService {
         );
     }
 
-    public Student update(UUID id, Map<String, Object> fields) {
+    public String update(UUID id, StudentUpdateDTO data) {
 
-        Optional<Student> existingStudent = studentR.findById(id);
-    
-        if (existingStudent.isPresent()) {
-            Student student = existingStudent.get();
-    
-            fields.forEach((key, value) -> {
-                switch (key) {
-
-                    default:
-                        Field field = ReflectionUtils.findField(Student.class, key);
-                        if (field != null) {
-                            field.setAccessible(true);
-                            ReflectionUtils.setField(field, student, value);
-                        }
-                        break;
-                }
-            });
+        Student student = studentR.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
             
-            return studentR.save(student);
-        } 
-        
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not Found.");
+        studentR.save(student);
+        return "Updated" + entity;
         
     }
 
-    public void delete(UUID id) {
+    public String delete(UUID id) {
 
         if (!studentR.findById(id).isPresent()) 
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not Found.");
+        
         studentR.deleteById(id);
+        return "Deleted" + entity;
 
     }
 

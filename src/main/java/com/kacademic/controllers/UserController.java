@@ -1,7 +1,6 @@
 package com.kacademic.controllers;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.kacademic.dto.user.UserRequestDTO;
 import com.kacademic.dto.user.UserResponseDTO;
+import com.kacademic.dto.user.UserUpdateDTO;
 import com.kacademic.services.UserService;
 
 import jakarta.validation.Valid;
@@ -33,41 +33,27 @@ public class UserController {
     
     @PostMapping
     public ResponseEntity<String> create(@RequestBody @Valid UserRequestDTO request) {
-
-        userS.create(request);
-
-        return new ResponseEntity<>("Created User.", HttpStatus.CREATED);
-
+        return new ResponseEntity<>(userS.create(request), HttpStatus.CREATED);
     }
     
     @GetMapping    
     public ResponseEntity<List<UserResponseDTO>> readAll() {
-
         return new ResponseEntity<>(userS.readAll(), HttpStatus.OK);
-
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDTO> readById(@PathVariable UUID id) {
-
         return new ResponseEntity<>(userS.readById(id), HttpStatus.OK);
-
     }    
     
     @PatchMapping("/{id}")
-    public ResponseEntity<String> update(@RequestBody Map<String, Object> fields, @PathVariable UUID id) {
-        
-        userS.update(id, fields);
-        return new ResponseEntity<>("Updated User", HttpStatus.OK);
-        
+    public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid UserUpdateDTO data) {
+        return new ResponseEntity<>(userS.update(id, data), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable UUID id) {
-        
-        userS.delete(id);
-        return new ResponseEntity<>("Deleted User", HttpStatus.OK);
-           
+        return new ResponseEntity<>(userS.delete(id), HttpStatus.OK);
     }
 
 }

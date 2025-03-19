@@ -1,20 +1,16 @@
 package com.kacademic.services;
 
-import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ReflectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.kacademic.dto.grade.GradeRequestDTO;
 import com.kacademic.dto.grade.GradeResponseDTO;
-import com.kacademic.enums.EGrade;
+import com.kacademic.dto.grade.GradeUpdateDTO;
 import com.kacademic.models.Grade;
 import com.kacademic.repositories.EnrolleeRepository;
 import com.kacademic.repositories.GradeRepository;
@@ -29,13 +25,15 @@ public class GradeService {
     
     private final MappingService mapS;
 
+    private final String entity = "Grade";
+
     public GradeService(GradeRepository gradeR, EnrolleeRepository enrolleeR, MappingService mapS) {
         this.gradeR = gradeR;
         this.enrolleeR = enrolleeR;
         this.mapS = mapS;
     }
     
-    public void create(GradeRequestDTO data) {
+    public String create(GradeRequestDTO data) {
 
         Grade grade = new Grade(
             mapS.findSubjectById(data.subject()),
@@ -47,6 +45,7 @@ public class GradeService {
         );
 
         gradeR.save(grade);
+        return "Created" + entity;
 
     }
 
@@ -83,48 +82,29 @@ public class GradeService {
 
     }
 
-    public Grade update(UUID id, Map<String, Object> fields) {
+    public String update(UUID id, GradeUpdateDTO data) {
 
-        Optional<Grade> existingGrade = gradeR.findById(id);
+        Grade grade = gradeR.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
     
-        if (existingGrade.isPresent()) {
-            Grade grade = existingGrade.get();            
-    
-            fields.forEach((key, value) -> {
-                switch (key) {   
-                    
-                    case "status":
-                        EGrade status = (EGrade) value;
-                        grade.setStatus(status);
-                        break;
+        data.status().ifPresent(grade::setStatus);
 
-                    default:
-                        Field field = ReflectionUtils.findField(Grade.class, key);
-                        if (field != null) {
-                            field.setAccessible(true);
-                            ReflectionUtils.setField(field, grade, value);
-                        }
-                        break;
-                }
-            });
-
-            grade.setCurrentStudents(grade.getEnrollees().size()); // Atualiza o Número de Estudantes.
-            
-            return gradeR.save(grade);
-        } 
+        grade.setCurrentStudents(grade.getEnrollees().size()); // Atualiza o Número de Estudantes.
         
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Grade not Found.");
+        gradeR.save(grade);
+        return "Updated" + entity;
         
     }
 
     @Transactional
-    public void delete(UUID id) {
+    public String delete(UUID id) {
 
         if (!gradeR.findById(id).isPresent()) 
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Grade not Found.");
         
         enrolleeR.removeGradeFromEnrollees(id);
         gradeR.deleteById(id);
+        return "Deleted" + entity;
 
     }
 

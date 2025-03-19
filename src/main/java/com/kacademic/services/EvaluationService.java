@@ -1,20 +1,17 @@
 package com.kacademic.services;
 
-import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ReflectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.kacademic.dto.evaluation.EvaluationRequestDTO;
 import com.kacademic.dto.evaluation.EvaluationResponseDTO;
+import com.kacademic.dto.evaluation.EvaluationUpdateDTO;
 import com.kacademic.models.Evaluation;
 import com.kacademic.repositories.EvaluationRepository;
 
@@ -25,12 +22,14 @@ public class EvaluationService {
     
     private final MappingService mapS;
 
+    private final String entity = "Evaluation";
+
     public EvaluationService(EvaluationRepository evaluationR, MappingService mapS) {
         this.evaluationR = evaluationR;
         this.mapS = mapS;
     }
     
-    public void create(EvaluationRequestDTO data) {
+    public String create(EvaluationRequestDTO data) {
 
         Evaluation evaluation = new Evaluation(
             mapS.findEnrolleeById(data.enrollee()),
@@ -40,6 +39,7 @@ public class EvaluationService {
         
         addEvaluation(evaluation);
         evaluationR.save(evaluation);
+        return "Created" + entity;
 
     }
 
@@ -72,45 +72,27 @@ public class EvaluationService {
 
     }
 
-    public Evaluation update(UUID id, Map<String, Object> fields) {
+    public String update(UUID id, EvaluationUpdateDTO data) {
 
-        Optional<Evaluation> existingEvalution = evaluationR.findById(id);
-    
-        if (existingEvalution.isPresent()) {
-            Evaluation evalution = existingEvalution.get();            
-    
-            fields.forEach((key, value) -> {
-                switch (key) {
-                    
-                    case "score":
-                        float score = (Float) value;
-                        evalution.setScore(score);
-                        editEvaluation(evalution); // Atualizar Média
-                        break;
-
-                    default:
-                        Field field = ReflectionUtils.findField(Evaluation.class, key);
-                        if (field != null) {
-                            field.setAccessible(true);
-                            ReflectionUtils.setField(field, evalution, value);
-                        }
-                        break;
-                }
-            });
+        Evaluation evaluation = evaluationR.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
+        
+        data.score().ifPresent(evaluation::setScore);
+        if (data.score().isPresent()) editEvaluation(evaluation);
             
-            return evaluationR.save(evalution);
-        } 
-        
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Evaluation not Found.");
-        
+        evaluationR.save(evaluation);
+        return "Updated" + entity;
+                 
     }
 
-    public void delete(UUID id) {
+    public String delete(UUID id) {
 
         if (!evaluationR.findById(id).isPresent()) 
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Evaluation not Found.");
+        
         removeEvaluation(evaluationR.findById(id).get());
         evaluationR.deleteById(id);
+        return "Deleted" + entity;
 
     }
 
