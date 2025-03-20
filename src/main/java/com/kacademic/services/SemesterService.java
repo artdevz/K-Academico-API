@@ -33,7 +33,7 @@ public class SemesterService {
     }
 
     // PRE AF
-    public void partialSubmit(UUID id) {
+    public String partialSubmit(UUID id) {
         
         Grade grade = gradeR.findById(id).get();
 
@@ -44,11 +44,13 @@ public class SemesterService {
             enrolleeR.save(enrollee);
 
         }
+
+        return "Finalizado parcialmente as Atividades da Turma.";
         
     }
 
     // POS AF
-    public void finalSubmit(@Semester String semester) {
+    public String finalSubmit(@Semester String semester) {
      
         List<Grade> grades = gradeR.findAll();
 
@@ -69,6 +71,7 @@ public class SemesterService {
         }
 
         this.updateAvarage();
+        return "Finalizado todas as Turmas do Semestre ";
 
     }
 

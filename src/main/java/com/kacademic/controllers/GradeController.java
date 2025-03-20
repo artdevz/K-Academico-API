@@ -61,8 +61,7 @@ public class GradeController {
 
     @PostMapping("/{id}")
     public ResponseEntity<String> partialSubmit(@PathVariable UUID id) {
-        semesterS.partialSubmit(id);
-        return new ResponseEntity<>("Finalizado parcialmente as Atividades da Turma.", HttpStatus.OK);
+        return new ResponseEntity<>(semesterS.partialSubmit(id), HttpStatus.OK);
     }
 
 }

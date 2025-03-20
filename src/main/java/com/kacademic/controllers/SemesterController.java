@@ -22,10 +22,7 @@ public class SemesterController {
 
     @PostMapping("/{semester}")
     public ResponseEntity<String> finalSubmit(@PathVariable @Semester String semester) {
-
-        semesterS.finalSubmit(semester);
-        return new ResponseEntity<>("Finalizado todas as Turmas do Semestre " + semester, HttpStatus.OK);
-
+        return new ResponseEntity<>(semesterS.finalSubmit(semester) + semester, HttpStatus.OK);
     }
 
 }
