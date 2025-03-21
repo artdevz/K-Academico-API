@@ -37,7 +37,7 @@ public class CourseService {
         );
         
         courseR.save(course);
-        return "Created" + entity;
+        return "Created " + entity;
 
     }
 
@@ -88,7 +88,7 @@ public class CourseService {
         data.description().ifPresent(course::setDescription);
 
         courseR.save(course);
-        return "Updated" + entity;
+        return "Updated " + entity;
         
     }
 
@@ -98,7 +98,7 @@ public class CourseService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found.");
         
         courseR.deleteById(id);
-        return "Deleted" + entity;
+        return "Deleted " + entity;
 
     }
 

@@ -41,7 +41,7 @@ public class SubjectService {
         
         subject.getCourse().setDuration(subject.getCourse().getDuration()+data.duration()); // Adiciona no Curso as Horas dessa Disciplina.
         subjectR.save(subject);
-        return "Created" + entity;
+        return "Created " + entity;
 
     }
 
@@ -88,7 +88,7 @@ public class SubjectService {
         data.semester().ifPresent(subject::setSemester);
 
         subjectR.save(subject);
-        return "Updated" + entity;
+        return "Updated " + entity;
                 
     }
 
@@ -102,7 +102,7 @@ public class SubjectService {
             subjectR.findById(id).get().getDuration() );            // Duração da Disciplina
 
         subjectR.deleteById(id);
-        return "Deleted" + entity;
+        return "Deleted " + entity;
 
     }
 

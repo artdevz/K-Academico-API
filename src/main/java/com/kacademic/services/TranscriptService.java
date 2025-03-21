@@ -35,7 +35,7 @@ public class TranscriptService {
         );
 
         transcriptR.save(transcript);
-        return "Created" + entity;
+        return "Created " + entity;
         
     }
 
@@ -68,7 +68,7 @@ public class TranscriptService {
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
             
         transcriptR.save(transcript);
-        return "Updated" + entity;
+        return "Updated " + entity;
         
     }
 
@@ -78,7 +78,7 @@ public class TranscriptService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Transcript Not Found.");
         
         transcriptR.deleteById(id);
-        return "Deleted" + entity;
+        return "Deleted " + entity;
 
     }
     

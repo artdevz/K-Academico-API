@@ -42,7 +42,7 @@ public class EvaluationService {
         
         addEvaluation(evaluation);
         evaluationR.save(evaluation);
-        return "Created" + entity;
+        return "Created " + entity;
 
     }
 
@@ -84,7 +84,7 @@ public class EvaluationService {
         if (data.score().isPresent()) editEvaluation(evaluation);
             
         evaluationR.save(evaluation);
-        return "Updated" + entity;
+        return "Updated " + entity;
                  
     }
 
@@ -95,7 +95,7 @@ public class EvaluationService {
         
         removeEvaluation(evaluationR.findById(id).get());
         evaluationR.deleteById(id);
-        return "Deleted" + entity;
+        return "Deleted " + entity;
 
     }
 

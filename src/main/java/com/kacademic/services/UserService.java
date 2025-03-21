@@ -41,7 +41,7 @@ public class UserService {
         );
         
         userR.save(user);
-        return "Created" + entity;
+        return "Created " + entity;
 
     }
 
@@ -77,7 +77,7 @@ public class UserService {
         data.password().ifPresent(password -> validatePassword(user, password.intern())); // Não faço menor ideia do pq funcionou
             
         userR.save(user);
-        return "Updated" + entity;
+        return "Updated " + entity;
                 
     }
 

@@ -40,7 +40,7 @@ public class AttendanceService {
         );
         
         attendanceR.save(attendance);
-        return "Created" + entity;
+        return "Created " + entity;
 
     }
 
@@ -77,7 +77,7 @@ public class AttendanceService {
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
             
         attendanceR.save(attendance);
-        return "Updated" + entity;
+        return "Updated " + entity;
         
     }
 
@@ -87,7 +87,7 @@ public class AttendanceService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Attendance not Found.");
         
         attendanceR.deleteById(id);
-        return "Deleted" + entity;
+        return "Deleted " + entity;
 
     }
 

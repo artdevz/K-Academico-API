@@ -46,7 +46,7 @@ public class EnrolleeService {
             enrollee.getGrade().getCurrentStudents() + 1 
         );
         enrolleeR.save(enrollee);
-        return "Created" + entity;
+        return "Created " + entity;
 
     }
 
@@ -107,7 +107,7 @@ public class EnrolleeService {
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
             
         enrolleeR.save(enrollee);
-        return "Updated" + entity;
+        return "Updated " + entity;
         
     }
 
@@ -120,7 +120,7 @@ public class EnrolleeService {
             enrolleeR.findById(id).get().getGrade().getCurrentStudents() - 1
         );
         enrolleeR.deleteById(id);
-        return "Deleted" + entity;
+        return "Deleted " + entity;
 
     }
 

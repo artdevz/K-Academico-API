@@ -38,7 +38,7 @@ public class ExamService {
         );
 
         examR.save(exam);
-        return "Created" + entity;
+        return "Created " + entity;
         
     }
 
@@ -75,7 +75,7 @@ public class ExamService {
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
             
         examR.save(exam);
-        return "Updated" + entity;
+        return "Updated " + entity;
                 
     }
 
@@ -85,7 +85,7 @@ public class ExamService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Exam not Found.");
         
         examR.deleteById(id);
-        return "Deleted" + entity;
+        return "Deleted " + entity;
 
     }
 

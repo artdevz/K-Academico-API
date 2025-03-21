@@ -37,7 +37,7 @@ public class LessonService {
         );
 
         lessonR.save(lesson);
-        return "Created" + entity;
+        return "Created " + entity;
         
     }
 
@@ -74,7 +74,7 @@ public class LessonService {
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
 
         lessonR.save(lesson);
-        return "Updated" + entity;
+        return "Updated " + entity;
         
     }
 
@@ -84,7 +84,7 @@ public class LessonService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not Found.");
         
         lessonR.deleteById(id);
-        return "Deleted" + entity;
+        return "Deleted " + entity;
 
     }
 

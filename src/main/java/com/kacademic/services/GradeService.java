@@ -11,6 +11,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.kacademic.dto.grade.GradeRequestDTO;
 import com.kacademic.dto.grade.GradeResponseDTO;
 import com.kacademic.dto.grade.GradeUpdateDTO;
+import com.kacademic.enums.EGrade;
 import com.kacademic.models.Grade;
 import com.kacademic.repositories.EnrolleeRepository;
 import com.kacademic.repositories.GradeRepository;
@@ -25,15 +26,18 @@ public class GradeService {
     private final GradeRepository gradeR;
     private final EnrolleeRepository enrolleeR;
     private final SubjectRepository subjectR;
-    private final ProfessorRepository professorR;    
+    private final ProfessorRepository professorR;  
+    
+    private final SemesterService semesterS;
 
     private final String entity = "Grade";
 
-    public GradeService(GradeRepository gradeR, EnrolleeRepository enrolleeR, SubjectRepository subjectR, ProfessorRepository professorR) {
+    public GradeService(GradeRepository gradeR, EnrolleeRepository enrolleeR, SubjectRepository subjectR, ProfessorRepository professorR, SemesterService semesterS) {
         this.gradeR = gradeR;
         this.enrolleeR = enrolleeR;
         this.subjectR = subjectR;
         this.professorR = professorR;
+        this.semesterS = semesterS;
     }
     
     public String create(GradeRequestDTO data) {
@@ -48,7 +52,7 @@ public class GradeService {
         );
 
         gradeR.save(grade);
-        return "Created" + entity;
+        return "Created " + entity;
 
     }
 
@@ -60,7 +64,9 @@ public class GradeService {
                 grade.getSubject().getId(),
                 grade.getProfessor().getId(),
                 grade.getCapacity(),
+                grade.getCurrentStudents(),
                 grade.getSemester(),
+                grade.getStatus(),
                 grade.getLocate(),
                 grade.getTimetables()
             ))
@@ -78,7 +84,9 @@ public class GradeService {
             grade.getSubject().getId(),
             grade.getProfessor().getId(),
             grade.getCapacity(),
+            grade.getCurrentStudents(),
             grade.getSemester(),
+            grade.getStatus(),
             grade.getLocate(),
             grade.getTimetables()
         );
@@ -91,11 +99,12 @@ public class GradeService {
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
     
         data.status().ifPresent(grade::setStatus);
+        if (data.status().isPresent() && data.status().get().equals(EGrade.FINISHED)) semesterS.partialSubmit(id);
 
         grade.setCurrentStudents(grade.getEnrollees().size()); // Atualiza o Número de Estudantes.
         
         gradeR.save(grade);
-        return "Updated" + entity;
+        return "Updated " + entity;
         
     }
 
@@ -107,7 +116,7 @@ public class GradeService {
         
         enrolleeR.removeGradeFromEnrollees(id);
         gradeR.deleteById(id);
-        return "Deleted" + entity;
+        return "Deleted " + entity;
 
     }
 

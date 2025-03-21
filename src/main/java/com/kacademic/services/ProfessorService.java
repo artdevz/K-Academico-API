@@ -38,7 +38,7 @@ public class ProfessorService {
         );
 
         professorR.save(professor);
-        return "Created" + entity;
+        return "Created " + entity;
         
     }
 
@@ -57,7 +57,7 @@ public class ProfessorService {
     public ProfessorResponseDTO readById(UUID id) {
 
         Professor professor = professorR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Professor não encontrado."));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
         
         return new ProfessorResponseDTO(
             professor.getId(),                
@@ -75,17 +75,17 @@ public class ProfessorService {
         data.wage().ifPresent(professor::setWage);
 
         professorR.save(professor);
-        return "Updated" + entity;
+        return "Updated " + entity;
                 
     }
 
     public String delete(UUID id) {
 
         if (!professorR.findById(id).isPresent()) 
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Professor não encontrado.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found.");
         
         professorR.deleteById(id);
-        return "Deleted" + entity;
+        return "Deleted " + entity;
 
     }
 

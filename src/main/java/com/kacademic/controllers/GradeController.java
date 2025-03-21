@@ -18,7 +18,6 @@ import com.kacademic.dto.grade.GradeRequestDTO;
 import com.kacademic.dto.grade.GradeResponseDTO;
 import com.kacademic.dto.grade.GradeUpdateDTO;
 import com.kacademic.services.GradeService;
-import com.kacademic.services.SemesterService;
 
 import jakarta.validation.Valid;
 
@@ -27,11 +26,9 @@ import jakarta.validation.Valid;
 public class GradeController {
     
     private final GradeService gradeS;
-    private final SemesterService semesterS;
 
-    public GradeController(GradeService gradeS, SemesterService semesterS) {
+    public GradeController(GradeService gradeS) {
         this.gradeS = gradeS;
-        this.semesterS = semesterS;
     }
 
     @PostMapping
@@ -57,11 +54,6 @@ public class GradeController {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable UUID id) {
         return new ResponseEntity<>(gradeS.delete(id), HttpStatus.OK);
-    }
-
-    @PostMapping("/{id}")
-    public ResponseEntity<String> partialSubmit(@PathVariable UUID id) {
-        return new ResponseEntity<>(semesterS.partialSubmit(id), HttpStatus.OK);
     }
 
 }

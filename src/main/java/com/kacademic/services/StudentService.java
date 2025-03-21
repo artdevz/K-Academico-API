@@ -47,7 +47,7 @@ public class StudentService {
         );
 
         studentR.save(student);
-        return "Created" + entity;
+        return "Created " + entity;
         
     }
 
@@ -96,7 +96,7 @@ public class StudentService {
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
             
         studentR.save(student);
-        return "Updated" + entity;
+        return "Updated " + entity;
         
     }
 
@@ -106,7 +106,7 @@ public class StudentService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not Found.");
         
         studentR.deleteById(id);
-        return "Deleted" + entity;
+        return "Deleted " + entity;
 
     }
 
