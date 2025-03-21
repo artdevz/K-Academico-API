@@ -13,26 +13,29 @@ import com.kacademic.dto.attendance.AttendanceResponseDTO;
 import com.kacademic.dto.attendance.AttendanceUpdateDTO;
 import com.kacademic.models.Attendance;
 import com.kacademic.repositories.AttendanceRepository;
+import com.kacademic.repositories.EnrolleeRepository;
+import com.kacademic.repositories.LessonRepository;
 
 @Service
 public class AttendanceService {
     
     private final AttendanceRepository attendanceR;
+    private final EnrolleeRepository enrolleeR;
+    private final LessonRepository lessonR;
     
-    private final MappingService mapS;
-
     private final String entity = "Attendance";
 
-    public AttendanceService(AttendanceRepository attendanceR, MappingService mapS) {
+    public AttendanceService(AttendanceRepository attendanceR, EnrolleeRepository enrolleeR, LessonRepository lessonR) {
         this.attendanceR = attendanceR;
-        this.mapS = mapS;
+        this.enrolleeR = enrolleeR;
+        this.lessonR = lessonR;
     }
     
     public String create(AttendanceRequestDTO data) {
 
         Attendance attendance = new Attendance(
-            mapS.findEnrolleeById(data.enrollee()),
-            mapS.findLessonById(data.lesson()),
+            enrolleeR.findById(data.enrollee()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee")),
+            lessonR.findById(data.lesson()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson")),
             data.isAbsent()
         );
         

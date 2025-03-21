@@ -24,7 +24,7 @@ public class ProfessorService {
 
     private final String entity = "Professor";
 
-    public ProfessorService(ProfessorRepository professorR, MappingService mapS) {
+    public ProfessorService(ProfessorRepository professorR) {
         this.professorR = professorR;
     }
 

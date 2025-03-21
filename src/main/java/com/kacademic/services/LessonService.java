@@ -12,26 +12,26 @@ import com.kacademic.dto.lesson.LessonRequestDTO;
 import com.kacademic.dto.lesson.LessonResponseDTO;
 import com.kacademic.dto.lesson.LessonUpdateDTO;
 import com.kacademic.models.Lesson;
+import com.kacademic.repositories.GradeRepository;
 import com.kacademic.repositories.LessonRepository;
 
 @Service
 public class LessonService {
     
     private final LessonRepository lessonR;
-
-    private final MappingService mapS;
+    private final GradeRepository gradeR;
 
     private final String entity = "Lesson";
 
-    public LessonService(LessonRepository lessonR, MappingService mapS) {
+    public LessonService(LessonRepository lessonR, GradeRepository gradeR) {
         this.lessonR = lessonR;
-        this.mapS = mapS;
+        this.gradeR = gradeR;
     }
 
     public String create(LessonRequestDTO data) {
 
         Lesson lesson = new Lesson(
-            mapS.findGradeById(data.grade()),
+            gradeR.findById(data.grade()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Grade")),
             data.topic(),
             data.date()
         );

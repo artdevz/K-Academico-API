@@ -16,27 +16,30 @@ import com.kacademic.dto.enrollee.EnrolleeUpdateDTO;
 import com.kacademic.dto.evaluation.EvaluationResponseDTO;
 import com.kacademic.models.Enrollee;
 import com.kacademic.repositories.EnrolleeRepository;
+import com.kacademic.repositories.GradeRepository;
+import com.kacademic.repositories.StudentRepository;
 
 @Service
 public class EnrolleeService {
     
     private final EnrolleeRepository enrolleeR;
-    
-    private final MappingService mapS;
+    private final StudentRepository studentR;
+    private final GradeRepository gradeR;
 
     private final String entity = "Enrollee";
 
-    public EnrolleeService(EnrolleeRepository enrolleeR, MappingService mapS) {
+    public EnrolleeService(EnrolleeRepository enrolleeR, StudentRepository studentR, GradeRepository gradeR) {
         this.enrolleeR = enrolleeR;
-        this.mapS = mapS;
+        this.studentR = studentR;
+        this.gradeR = gradeR;
     }
     
     public String create(EnrolleeRequestDTO data) {
 
         Enrollee enrollee = new Enrollee(
-            mapS.findStudentById(data.student()),
-            mapS.findStudentById(data.student()).getTranscript(),
-            mapS.findGradeById(data.grade())
+            studentR.findById(data.student()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student")),
+            studentR.findById(data.student()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student.Transcript")).getTranscript(),
+            gradeR.findById(data.grade()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Grade"))
         );
 
         enrollee.getGrade().setCurrentStudents( // Adiciona 1 Estudante na Turma

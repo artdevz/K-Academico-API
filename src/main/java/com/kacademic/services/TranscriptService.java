@@ -12,26 +12,26 @@ import com.kacademic.dto.transcript.TranscriptRequestDTO;
 import com.kacademic.dto.transcript.TranscriptResponseDTO;
 import com.kacademic.dto.transcript.TranscriptUpdateDTO;
 import com.kacademic.models.Transcript;
+import com.kacademic.repositories.StudentRepository;
 import com.kacademic.repositories.TranscriptRepository;
 
 @Service
 public class TranscriptService {
     
     private final TranscriptRepository transcriptR;
-
-    private final MappingService mapS;
+    private final StudentRepository studentR;
 
     private final String entity = "Transcript";
 
-    public TranscriptService(TranscriptRepository transcriptR, MappingService mapS) {
+    public TranscriptService(TranscriptRepository transcriptR, StudentRepository studentR) {
         this.transcriptR = transcriptR;
-        this.mapS = mapS;
+        this.studentR = studentR;
     }
 
     public String create(TranscriptRequestDTO data) {
 
         Transcript transcript = new Transcript(
-            mapS.findStudentById(data.student())
+            studentR.findById(data.student()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student"))
         );
 
         transcriptR.save(transcript);

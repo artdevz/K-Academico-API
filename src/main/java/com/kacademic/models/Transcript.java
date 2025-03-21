@@ -24,21 +24,16 @@ import lombok.Setter;
 @Entity
 public class Transcript implements Serializable {
     
-    private static final long serialVersionUID = 1L;
-
-    // Identifier
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
     
-    // Relationships
     @OneToOne(mappedBy = "transcript", cascade = CascadeType.ALL, orphanRemoval = true)
     private Student student;
     
     @OneToMany(mappedBy = "transcript", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Enrollee> enrollees = new HashSet<>();
 
-    // Constructor
     public Transcript(Student student) {
         this.student = student;
         student.setTranscript(this);

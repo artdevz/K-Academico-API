@@ -18,6 +18,7 @@ import com.kacademic.dto.student.StudentResponseDTO;
 import com.kacademic.dto.student.StudentUpdateDTO;
 import com.kacademic.models.Course;
 import com.kacademic.models.Student;
+import com.kacademic.repositories.CourseRepository;
 import com.kacademic.repositories.StudentRepository;
 
 @Service
@@ -26,14 +27,13 @@ public class StudentService {
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     private final StudentRepository studentR;
-
-    private final MappingService mapS;
+    private final CourseRepository courseR;
 
     private final String entity = "Student";
 
-    public StudentService(StudentRepository studentR, MappingService mapS) {
+    public StudentService(StudentRepository studentR, CourseRepository courseR) {
         this.studentR = studentR;
-        this.mapS = mapS;
+        this.courseR = courseR;
     }
 
     public String create(StudentRequestDTO data) {
@@ -42,8 +42,8 @@ public class StudentService {
             data.user().name(),
             data.user().email(),
             passwordEncoder.encode(data.user().password()),
-            mapS.findCourseById(data.course()),
-            generateEnrollment(mapS.findCourseById(data.course()))
+            courseR.findById(data.course()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course")),
+            generateEnrollment(courseR.findById(data.course()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course")))
         );
 
         studentR.save(student);

@@ -13,25 +13,25 @@ import com.kacademic.dto.exam.ExamResponseDTO;
 import com.kacademic.dto.exam.ExamUpdateDTO;
 import com.kacademic.models.Exam;
 import com.kacademic.repositories.ExamRepository;
+import com.kacademic.repositories.GradeRepository;
 
 @Service
 public class ExamService {
     
     private final ExamRepository examR;
-
-    private final MappingService mapS;
+    private final GradeRepository gradeR;
 
     private final String entity = "Exam";
 
-    public ExamService(ExamRepository examR, MappingService mapS) {
+    public ExamService(ExamRepository examR, GradeRepository gradeR) {
         this.examR = examR;
-        this.mapS = mapS;
+        this.gradeR = gradeR;
     }
 
     public String create(ExamRequestDTO data) {
 
         Exam exam = new Exam(
-            mapS.findGradeById(data.grade()),
+            gradeR.findById(data.grade()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Grade")),
             data.name(),
             data.maximum(),
             data.date()

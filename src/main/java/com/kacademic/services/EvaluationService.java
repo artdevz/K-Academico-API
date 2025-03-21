@@ -13,27 +13,30 @@ import com.kacademic.dto.evaluation.EvaluationRequestDTO;
 import com.kacademic.dto.evaluation.EvaluationResponseDTO;
 import com.kacademic.dto.evaluation.EvaluationUpdateDTO;
 import com.kacademic.models.Evaluation;
+import com.kacademic.repositories.EnrolleeRepository;
 import com.kacademic.repositories.EvaluationRepository;
+import com.kacademic.repositories.ExamRepository;
 
 @Service
 public class EvaluationService {
     
     private final EvaluationRepository evaluationR;
-    
-    private final MappingService mapS;
+    private final EnrolleeRepository enrolleeR;
+    private final ExamRepository examR;
 
     private final String entity = "Evaluation";
 
-    public EvaluationService(EvaluationRepository evaluationR, MappingService mapS) {
+    public EvaluationService(EvaluationRepository evaluationR, EnrolleeRepository enrolleeR, ExamRepository examR) {
         this.evaluationR = evaluationR;
-        this.mapS = mapS;
+        this.enrolleeR = enrolleeR;
+        this.examR = examR;
     }
     
     public String create(EvaluationRequestDTO data) {
 
         Evaluation evaluation = new Evaluation(
-            mapS.findEnrolleeById(data.enrollee()),
-            mapS.findExamById(data.exam()),
+            enrolleeR.findById(data.enrollee()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee")),
+            examR.findById(data.exam()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exam")),
             data.score()
         );
         

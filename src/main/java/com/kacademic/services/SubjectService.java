@@ -12,26 +12,26 @@ import com.kacademic.dto.subject.SubjectRequestDTO;
 import com.kacademic.dto.subject.SubjectResponseDTO;
 import com.kacademic.dto.subject.SubjectUpdateDTO;
 import com.kacademic.models.Subject;
+import com.kacademic.repositories.CourseRepository;
 import com.kacademic.repositories.SubjectRepository;
 
 @Service
 public class SubjectService {
     
     private final SubjectRepository subjectR;
-
-    private final MappingService mapS;
+    private final CourseRepository courseR;
 
     private final String entity = "Subject";
 
-    public SubjectService(SubjectRepository subjectR, MappingService mapS) {
+    public SubjectService(SubjectRepository subjectR, CourseRepository courseR) {
         this.subjectR = subjectR;
-        this.mapS = mapS;
+        this.courseR = courseR;
     }    
 
     public String create(SubjectRequestDTO data) {        
 
         Subject subject = new Subject(
-            mapS.findCourseById(data.course()),
+            courseR.findById(data.course()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course")),
             data.name(),
             data.description(),
             data.duration(),

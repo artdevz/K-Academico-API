@@ -14,6 +14,8 @@ import com.kacademic.dto.grade.GradeUpdateDTO;
 import com.kacademic.models.Grade;
 import com.kacademic.repositories.EnrolleeRepository;
 import com.kacademic.repositories.GradeRepository;
+import com.kacademic.repositories.ProfessorRepository;
+import com.kacademic.repositories.SubjectRepository;
 
 import jakarta.transaction.Transactional;
 
@@ -22,22 +24,23 @@ public class GradeService {
     
     private final GradeRepository gradeR;
     private final EnrolleeRepository enrolleeR;
-    
-    private final MappingService mapS;
+    private final SubjectRepository subjectR;
+    private final ProfessorRepository professorR;    
 
     private final String entity = "Grade";
 
-    public GradeService(GradeRepository gradeR, EnrolleeRepository enrolleeR, MappingService mapS) {
+    public GradeService(GradeRepository gradeR, EnrolleeRepository enrolleeR, SubjectRepository subjectR, ProfessorRepository professorR) {
         this.gradeR = gradeR;
         this.enrolleeR = enrolleeR;
-        this.mapS = mapS;
+        this.subjectR = subjectR;
+        this.professorR = professorR;
     }
     
     public String create(GradeRequestDTO data) {
 
         Grade grade = new Grade(
-            mapS.findSubjectById(data.subject()),
-            mapS.findProfessorById(data.professor()),
+            subjectR.findById(data.subject()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subject")),
+            professorR.findById(data.professor()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Professor")),
             data.capacity(),
             data.semester(),
             data.locate(),
