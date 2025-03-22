@@ -20,6 +20,9 @@ import com.kacademic.dto.student.StudentResponseDTO;
 import com.kacademic.dto.student.StudentUpdateDTO;
 import com.kacademic.services.StudentService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 
 @RequestMapping("/student")
@@ -32,26 +35,68 @@ public class StudentController {
         this.studentS = studentS;
     }
     
+    @Operation(
+        summary = "Create a new student",
+        description = "Create a new student in the system with the provided name, email, password, enrollment, and course."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Student created successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid email or enrollment format"),
+        @ApiResponse(responseCode = "404", description = "Resource not found. The provided ID(s) do not match any existing record(s) in the system."),
+        @ApiResponse(responseCode = "409", description = "Enrollment or email already in use"),
+        @ApiResponse(responseCode = "422", description = "Enrollment or other fields have invalid length (too short or too long)")
+    }) 
     @PostMapping
     public ResponseEntity<String> create(@RequestBody @Valid StudentRequestDTO request) {
         return new ResponseEntity<>(studentS.create(request), HttpStatus.CREATED);
     }
     
+    @Operation(
+        summary = "Get all students",
+        description = "Retrieves a list of all students in the system"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Students successfully retrieved")
+    })
     @GetMapping    
     public ResponseEntity<List<StudentResponseDTO>> readAll() {
         return new ResponseEntity<>(studentS.readAll(), HttpStatus.OK);
     }
 
+    @Operation(
+        summary = "Get student details by ID",
+        description = "Retrieves the details of a specific student identified by the provided ID"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Student found and retrieved successfully"),
+        @ApiResponse(responseCode = "404", description = "Student not found")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<StudentDetailsDTO> readById(@PathVariable UUID id) {
         return new ResponseEntity<>(studentS.readById(id), HttpStatus.OK);
     }    
     
+    @Operation(
+        summary = "Update student by ID",
+        description = "Updates the details of a student identified by the provided ID. Only the specified fields will be updated. <br>If any field is passed as null in the request, it will not be changed"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Student successfully updated"),
+        @ApiResponse(responseCode = "404", description = "Student not found")
+    })
     @PatchMapping("/{id}")
     public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid StudentUpdateDTO data) {
         return new ResponseEntity<>(studentS.update(id, data), HttpStatus.OK);
     }
 
+    @Operation(
+        summary = "Delete student by ID",
+        description = "Deletes the student identified by the provided ID from the system"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Student successfully deleted"),
+        @ApiResponse(responseCode = "404", description = "Student not found")
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable UUID id) {
         return new ResponseEntity<>(studentS.delete(id), HttpStatus.OK);

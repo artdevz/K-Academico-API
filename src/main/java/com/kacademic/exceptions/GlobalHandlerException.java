@@ -1,6 +1,7 @@
 package com.kacademic.exceptions;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,16 +18,17 @@ public class GlobalHandlerException {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorResponse> handleInvalidArgException(MethodArgumentNotValidException e, WebRequest request) {
         
-        FieldError fieldError = e.getBindingResult().getFieldErrors().stream().findFirst().orElse(null);
-        
+        List<FieldError> fieldErrors = e.getBindingResult().getFieldErrors();
+        HttpStatus status = fieldErrors.isEmpty() ? HttpStatus.BAD_REQUEST : HttpStatus.UNPROCESSABLE_ENTITY;
+
         ApiErrorResponse response = new ApiErrorResponse(
-            HttpStatus.BAD_REQUEST.toString(),
-            fieldError != null ? fieldError.getDefaultMessage() : "Validation Error.",
+            status.toString(),
+            fieldErrors.isEmpty() ? "Validation Error." : fieldErrors.get(0).getDefaultMessage(),
             LocalDateTime.now(),
             request.getDescription(false)
         );
 
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(response, status);
     }
 
     @ExceptionHandler(ResponseStatusException.class)

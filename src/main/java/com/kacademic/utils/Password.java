@@ -5,13 +5,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import com.kacademic.validators.OptionalPasswordValidator;
 import com.kacademic.validators.PasswordValidator;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
-@Constraint(validatedBy = PasswordValidator.class)
-@Target({ ElementType.FIELD })
+@Constraint(validatedBy = { PasswordValidator.class, OptionalPasswordValidator.class })
+@Target({ ElementType.FIELD, ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Password {
     

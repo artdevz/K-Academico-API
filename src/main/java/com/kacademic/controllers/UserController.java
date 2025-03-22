@@ -19,6 +19,9 @@ import com.kacademic.dto.user.UserResponseDTO;
 import com.kacademic.dto.user.UserUpdateDTO;
 import com.kacademic.services.UserService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 
 @RequestMapping("/user")
@@ -31,26 +34,68 @@ public class UserController {
         this.userS = userS;
     }
     
+    @Operation(
+        summary = "Create a new user",
+        description = "Create a new user in the system with the provided name, email, and password<br>" + 
+                      "Crie um novo usuário no sistema providenciando nome, email e senha"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "User created successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid email"),
+        @ApiResponse(responseCode = "409", description = "Email already in use"),
+        @ApiResponse(responseCode = "422", description = "Name or password length is invalid (too short or too long)")
+    })    
     @PostMapping
     public ResponseEntity<String> create(@RequestBody @Valid UserRequestDTO request) {
         return new ResponseEntity<>(userS.create(request), HttpStatus.CREATED);
     }
     
+    @Operation(
+        summary = "Get all users",
+        description = "Retrieves a list of all users in the system"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Users successfully retrieved")
+    })
     @GetMapping    
     public ResponseEntity<List<UserResponseDTO>> readAll() {
         return new ResponseEntity<>(userS.readAll(), HttpStatus.OK);
     }
 
+    @Operation(
+        summary = "Get user details by ID",
+        description = "Retrieves the details of a specific user identified by the provided ID"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "User found and retrieved successfully"),
+        @ApiResponse(responseCode = "404", description = "User not found")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDTO> readById(@PathVariable UUID id) {
         return new ResponseEntity<>(userS.readById(id), HttpStatus.OK);
     }    
     
+    @Operation(
+        summary = "Update user by ID",
+        description = "Updates the details of a user identified by the provided ID. Only the specified fields will be updated. <br>If any field is passed as null in the request, it will not be changed."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "User successfully updated"),
+        @ApiResponse(responseCode = "404", description = "User not found")
+    })
     @PatchMapping("/{id}")
     public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid UserUpdateDTO data) {
         return new ResponseEntity<>(userS.update(id, data), HttpStatus.OK);
     }
 
+    @Operation(
+        summary = "Delete user by ID",
+        description = "Deletes the user identified by the provided ID from the system"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "User successfully deleted"),
+        @ApiResponse(responseCode = "404", description = "User not found")
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable UUID id) {
         return new ResponseEntity<>(userS.delete(id), HttpStatus.OK);

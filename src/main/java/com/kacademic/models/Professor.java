@@ -25,7 +25,6 @@ public class Professor extends User {
 
     private int wage; // Wage in cents (e.g., 1000 cents = 10.00)
 
-    // Constructor
     public Professor(String name, String email, String password, int wage) {
         super(name, email, password);
         this.wage = wage;
