@@ -19,6 +19,9 @@ import com.kacademic.dto.subject.SubjectResponseDTO;
 import com.kacademic.dto.subject.SubjectUpdateDTO;
 import com.kacademic.services.SubjectService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 
 @RequestMapping("/subject")
@@ -31,26 +34,66 @@ public class SubjectController {
         this.subjectS = subjectS;
     }
 
+    @Operation(
+        summary = "Create a new subject",
+        description = "Create a new subject in the system with the provided parameters and an Optional List of prerequisites."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Subject created successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid semester format"),
+        @ApiResponse(responseCode = "404", description = "Resource not found. The provided ID(s) do not match any existing record(s) in the system.")
+    })
     @PostMapping
     public ResponseEntity<String> create(@RequestBody @Valid SubjectRequestDTO request) {
         return new ResponseEntity<>(subjectS.create(request), HttpStatus.CREATED);
     }
     
+    @Operation(
+        summary = "Get all subjects",
+        description = "Retrieves a list of all subjects in the system"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Subjects successfully retrieved")
+    })
     @GetMapping    
     public ResponseEntity<List<SubjectResponseDTO>> readAll() {
         return new ResponseEntity<>(subjectS.readAll(), HttpStatus.OK);
     }
 
+    @Operation(
+        summary = "Get subjects details by ID",
+        description = "Retrieves the details of a specific subjects identified by the provided ID"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Subject found and retrieved successfully"),
+        @ApiResponse(responseCode = "404", description = "Subject not found")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<SubjectResponseDTO> readById(@PathVariable UUID id) {
         return new ResponseEntity<>(subjectS.readById(id), HttpStatus.OK);
     }    
     
+    @Operation(
+        summary = "Update subject by ID",
+        description = "Updates the details of a subject identified by the provided ID. Only the specified fields will be updated. <br>If any field is passed as null in the request, it will not be changed"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Subject successfully updated"),
+        @ApiResponse(responseCode = "404", description = "Subject not found")
+    })
     @PatchMapping("/{id}")
     public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid SubjectUpdateDTO data) {
         return new ResponseEntity<>(subjectS.update(id, data), HttpStatus.OK);
     }
 
+    @Operation(
+        summary = "Delete subject by ID",
+        description = "Deletes the subject identified by the provided ID from the system"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Subject successfully deleted"),
+        @ApiResponse(responseCode = "404", description = "Subject not found")
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable UUID id) {
         return new ResponseEntity<>(subjectS.delete(id), HttpStatus.OK);

@@ -69,7 +69,7 @@ public class CourseService {
                 ),
             course.getSubjects().stream().map(subject -> new SubjectResponseDTO(
                 subject.getId(),
-                subject.getCourse().getName(),
+                subject.getCourse().getId(),
                 subject.getName(),
                 subject.getDescription(),
                 subject.getDuration(),

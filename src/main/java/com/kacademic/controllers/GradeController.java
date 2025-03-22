@@ -19,6 +19,9 @@ import com.kacademic.dto.grade.GradeResponseDTO;
 import com.kacademic.dto.grade.GradeUpdateDTO;
 import com.kacademic.services.GradeService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 
 @RequestMapping("/grade")
@@ -31,26 +34,66 @@ public class GradeController {
         this.gradeS = gradeS;
     }
 
+    @Operation(
+        summary = "Create a new grade",
+        description = "Create a new grade in the system with the provided parameters. <br>Note: Timetable it's in HH:mm."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Grade created successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid data format"),
+        @ApiResponse(responseCode = "404", description = "Resource not found. The provided ID(s) do not match any existing record(s) in the system.")
+    })
     @PostMapping
     public ResponseEntity<String> create(@RequestBody @Valid GradeRequestDTO request) {
         return new ResponseEntity<>(gradeS.create(request), HttpStatus.CREATED);
     }
     
+    @Operation(
+        summary = "Get all grades",
+        description = "Retrieves a list of all grades in the system"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Grades successfully retrieved")
+    })
     @GetMapping    
     public ResponseEntity<List<GradeResponseDTO>> readAll() {
         return new ResponseEntity<>(gradeS.readAll(), HttpStatus.OK);
     }
 
+    @Operation(
+        summary = "Get grades details by ID",
+        description = "Retrieves the details of a specific grades identified by the provided ID"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Grade found and retrieved successfully"),
+        @ApiResponse(responseCode = "404", description = "Grade not found")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<GradeResponseDTO> readById(@PathVariable UUID id) {
         return new ResponseEntity<>(gradeS.readById(id), HttpStatus.OK);
     }    
     
+    @Operation(
+        summary = "Update grade by ID",
+        description = "Updates the details of a grade identified by the provided ID. Only the specified fields will be updated. <br>If any field is passed as null in the request, it will not be changed"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Grade successfully updated"),
+        @ApiResponse(responseCode = "404", description = "Grade not found")
+    })
     @PatchMapping("/{id}")
     public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid GradeUpdateDTO data) {
         return new ResponseEntity<>(gradeS.update(id, data), HttpStatus.OK);
     }
 
+    @Operation(
+        summary = "Delete grade by ID",
+        description = "Deletes the grade identified by the provided ID from the system"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Grade successfully deleted"),
+        @ApiResponse(responseCode = "404", description = "Grade not found")
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable UUID id) {
         return new ResponseEntity<>(gradeS.delete(id), HttpStatus.OK);

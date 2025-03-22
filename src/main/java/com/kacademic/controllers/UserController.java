@@ -36,8 +36,7 @@ public class UserController {
     
     @Operation(
         summary = "Create a new user",
-        description = "Create a new user in the system with the provided name, email, and password<br>" + 
-                      "Crie um novo usuário no sistema providenciando nome, email e senha"
+        description = "Create a new user in the system with the provided parameters."
     )
     @ApiResponses({
         @ApiResponse(responseCode = "201", description = "User created successfully"),

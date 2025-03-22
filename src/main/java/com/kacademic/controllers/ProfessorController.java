@@ -36,7 +36,7 @@ public class ProfessorController {
 
     @Operation(
         summary = "Create a new professor",
-        description = "Creates a new professor in the system with the provided name, email, password, and wage. <br>(Wage in cents)"
+        description = "Create a new professor in the system with the provided parameters. <br>(Wage in cents)"
     )
     @ApiResponses({
         @ApiResponse(responseCode = "201", description = "Professor successfully created"),

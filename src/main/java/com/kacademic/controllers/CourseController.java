@@ -20,6 +20,9 @@ import com.kacademic.dto.course.CourseResponseDTO;
 import com.kacademic.dto.course.CourseUpdateDTO;
 import com.kacademic.services.CourseService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 
 @RequestMapping("/course")
@@ -32,26 +35,66 @@ public class CourseController {
         this.courseS = courseS;
     }
 
+    @Operation(
+        summary = "Create a new course",
+        description = "Create a new course in the system with the provided parameters."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Course created successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid data format"),
+        @ApiResponse(responseCode = "404", description = "Resource not found. The provided ID(s) do not match any existing record(s) in the system.")
+    })
     @PostMapping
     public ResponseEntity<String> create(@RequestBody @Valid CourseRequestDTO request) {
         return new ResponseEntity<>(courseS.create(request), HttpStatus.CREATED);
     }
     
+    @Operation(
+        summary = "Get all courses",
+        description = "Retrieves a list of all courses in the system"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Courses successfully retrieved")
+    })
     @GetMapping    
     public ResponseEntity<List<CourseResponseDTO>> readAll() {
         return new ResponseEntity<>(courseS.readAll(), HttpStatus.OK);
     }
 
+    @Operation(
+        summary = "Get course details by ID",
+        description = "Retrieves the details of a specific course identified by the provided ID"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Course found and retrieved successfully"),
+        @ApiResponse(responseCode = "404", description = "Course not found")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<CourseDetailsDTO> readById(@PathVariable UUID id) {
         return new ResponseEntity<>(courseS.readById(id), HttpStatus.OK);
     }    
     
+    @Operation(
+        summary = "Update course by ID",
+        description = "Updates the details of a course identified by the provided ID. Only the specified fields will be updated. <br>If any field is passed as null in the request, it will not be changed"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Course successfully updated"),
+        @ApiResponse(responseCode = "404", description = "Course not found")
+    })
     @PatchMapping("/{id}")
     public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid CourseUpdateDTO data) {
         return new ResponseEntity<>(courseS.update(id, data), HttpStatus.OK);
     }
 
+    @Operation(
+        summary = "Delete course by ID",
+        description = "Deletes the course identified by the provided ID from the system"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Course successfully deleted"),
+        @ApiResponse(responseCode = "404", description = "Course not found")
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable UUID id) {
         return new ResponseEntity<>(courseS.delete(id), HttpStatus.OK);

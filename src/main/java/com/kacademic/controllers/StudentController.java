@@ -37,7 +37,7 @@ public class StudentController {
     
     @Operation(
         summary = "Create a new student",
-        description = "Create a new student in the system with the provided name, email, password, enrollment, and course."
+        description = "Create a new student in the system with the provided parameters."
     )
     @ApiResponses({
         @ApiResponse(responseCode = "201", description = "Student created successfully"),

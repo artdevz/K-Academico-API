@@ -31,7 +31,7 @@ public class SubjectService {
     public String create(SubjectRequestDTO data) {        
 
         Subject subject = new Subject(
-            courseR.findById(data.course()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course")),
+            courseR.findById(data.course()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not found")),
             data.name(),
             data.description(),
             data.duration(),
@@ -50,7 +50,7 @@ public class SubjectService {
         return subjectR.findAll().stream()
             .map(subject -> new SubjectResponseDTO(
                 subject.getId(),
-                subject.getCourse().getName(),                
+                subject.getCourse().getId(),                
                 subject.getName(),
                 subject.getDescription(),
                 subject.getDuration(),
@@ -63,11 +63,11 @@ public class SubjectService {
     public SubjectResponseDTO readById(UUID id) {
 
         Subject subject = subjectR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Disciplina não encontrada."));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not found."));
         
         return new SubjectResponseDTO(
             subject.getId(),
-            subject.getCourse().getName(),                
+            subject.getCourse().getId(),                
             subject.getName(),
             subject.getDescription(),
             subject.getDuration(),
@@ -79,7 +79,7 @@ public class SubjectService {
     public String update(UUID id, SubjectUpdateDTO data) {
 
         Subject subject = subjectR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not found."));
             
         data.type().ifPresent(subject::setType);
         data.name().ifPresent(subject::setName);
@@ -95,7 +95,7 @@ public class SubjectService {
     public String delete(UUID id) {
 
         if (!subjectR.findById(id).isPresent()) 
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Disciplina não encontrada.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not found.");
 
         subjectR.findById(id).get().getCourse().setDuration(        // Remove no Curso as Horas dessa Disciplina.
             subjectR.findById(id).get().getCourse().getDuration() - // Duração do Curso

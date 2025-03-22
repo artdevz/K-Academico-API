@@ -19,6 +19,9 @@ import com.kacademic.dto.evaluation.EvaluationResponseDTO;
 import com.kacademic.dto.evaluation.EvaluationUpdateDTO;
 import com.kacademic.services.EvaluationService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 
 @RequestMapping("/evalution")
@@ -31,26 +34,66 @@ public class EvalutionController {
         this.evalutionS = evalutionS;
     }
 
+    @Operation(
+        summary = "Create a new evaluation",
+        description = "Create a new evaluation in the system with the provided parameters."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Evaluation created successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid data format"),
+        @ApiResponse(responseCode = "404", description = "Resource not found. The provided ID(s) do not match any existing record(s) in the system.")
+    })
     @PostMapping
     public ResponseEntity<String> create(@RequestBody @Valid EvaluationRequestDTO request) {
         return new ResponseEntity<>(evalutionS.create(request), HttpStatus.CREATED);
     }
     
+    @Operation(
+        summary = "Get all evaluations",
+        description = "Retrieves a list of all evaluations in the system"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Evaluations successfully retrieved")
+    })
     @GetMapping    
     public ResponseEntity<List<EvaluationResponseDTO>> readAll() {
         return new ResponseEntity<>(evalutionS.readAll(), HttpStatus.OK);
     }
 
+    @Operation(
+        summary = "Get evaluation details by ID",
+        description = "Retrieves the details of a specific evaluation identified by the provided ID"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Evaluation found and retrieved successfully"),
+        @ApiResponse(responseCode = "404", description = "Evaluation not found")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<EvaluationResponseDTO> readById(@PathVariable UUID id) {
         return new ResponseEntity<>(evalutionS.readById(id), HttpStatus.OK);
     }    
-    
+
+    @Operation(
+        summary = "Update evaluation by ID",
+        description = "Updates the details of a evaluation identified by the provided ID. Only the specified fields will be updated. <br>If any field is passed as null in the request, it will not be changed"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Evaluation successfully updated"),
+        @ApiResponse(responseCode = "404", description = "Evaluation not found")
+    })
     @PatchMapping("/{id}")
     public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid EvaluationUpdateDTO data) {
         return new ResponseEntity<>(evalutionS.update(id, data), HttpStatus.OK);
     }
 
+    @Operation(
+        summary = "Delete evaluation by ID",
+        description = "Deletes the evaluation identified by the provided ID from the system"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Evaluation successfully deleted"),
+        @ApiResponse(responseCode = "404", description = "Evaluation not found")
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable UUID id) {
         return new ResponseEntity<>(evalutionS.delete(id), HttpStatus.OK);
