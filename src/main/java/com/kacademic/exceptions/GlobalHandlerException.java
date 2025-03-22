@@ -1,74 +1,59 @@
 package com.kacademic.exceptions;
 
+import java.time.LocalDateTime;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.server.ResponseStatusException;
-
-import jakarta.validation.ConstraintViolationException;
-import lombok.Getter;
 
 @RestControllerAdvice
 public class GlobalHandlerException {
-    
-    @Getter
-    public static class ApiErrorResponse {
-
-        private String message;
-        private String code;
-
-        public ApiErrorResponse(String message, String code) {
-            this.message = message;
-            this.code = code;
-        }
-
-    }
-
-    @ExceptionHandler(DuplicateValueException.class)
-    @ResponseBody
-    public ResponseEntity<ApiErrorResponse> handleDataIntegrityException(DuplicateValueException e) {
-        ApiErrorResponse response = new ApiErrorResponse(e.getMessage(), "DUPLICATE_DATA");
-        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
-    }
-
-    @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ApiErrorResponse> handleConstraintViolation(ConstraintViolationException e) {
-        ApiErrorResponse response = new ApiErrorResponse(extractError(e.getMessage()), "CONSTRAINT_VIOLATION");
-        return new ResponseEntity<>(response, HttpStatus.UNPROCESSABLE_ENTITY);
-    }
-
-    @ExceptionHandler(LengthException.class)
-    public ResponseEntity<ApiErrorResponse> handleLengthException(LengthException e) {
-        ApiErrorResponse response = new ApiErrorResponse(e.getMessage(), "LENGTH_VIOLATION");
-        return new ResponseEntity<>(response, HttpStatus.UNPROCESSABLE_ENTITY);
-    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiErrorResponse> handleInvalidArgException(MethodArgumentNotValidException e) {
+    public ResponseEntity<ApiErrorResponse> handleInvalidArgException(MethodArgumentNotValidException e, WebRequest request) {
         
-        StringBuilder errorMessage = new StringBuilder();
+        FieldError fieldError = e.getBindingResult().getFieldErrors().stream().findFirst().orElse(null);
+        
+        ApiErrorResponse response = new ApiErrorResponse(
+            HttpStatus.BAD_REQUEST.toString(),
+            fieldError != null ? fieldError.getDefaultMessage() : "Validation Error.",
+            LocalDateTime.now(),
+            request.getDescription(false)
+        );
 
-        for (FieldError fieldError : e.getBindingResult().getFieldErrors()) errorMessage.append(fieldError.getDefaultMessage());
-        
-        ApiErrorResponse response = new ApiErrorResponse(errorMessage.toString(), "REGEX_VIOLATION");
-        
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ResponseStatusException.class)
-    public ResponseEntity<ApiErrorResponse> handleResponseStatusException(ResponseStatusException e) {
-        ApiErrorResponse response = new ApiErrorResponse(e.getReason(), "NOT_FOUND");
-        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    public ResponseEntity<ApiErrorResponse> handleResponseStatusException(ResponseStatusException e, WebRequest request) {
+
+        ApiErrorResponse response = new ApiErrorResponse(
+            e.getStatusCode().toString(),
+            e.getReason(),
+            LocalDateTime.now(),
+            request.getDescription(false)
+        );
+
+        return new ResponseEntity<>(response, e.getStatusCode());
+
     }
 
-    private String extractError(String message) {
-        message = message.substring(message.indexOf("='") + 2, message.indexOf(".',"));
-        System.out.println(message);
-        return message;
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiErrorResponse> handleGlobalException(Exception e, WebRequest request) {
+
+        ApiErrorResponse response = new ApiErrorResponse(
+            HttpStatus.INTERNAL_SERVER_ERROR.toString(),
+            "Internal Server Error.",
+            LocalDateTime.now(),
+            request.getDescription(false)
+        );
+
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 
     }
 

@@ -15,7 +15,7 @@ import jakarta.validation.Payload;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Password {
     
-    String message() default "A senha deve conter pelo menos uma letra minúscula, uma letra maiúscula, um número, um caractere especial e ter entre 8 e 32 caracteres.";
+    String message() default "The password must contain at least one lowercase letter, one uppercase letter, one number, one special character, and be between 8 and 32 characters.";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 

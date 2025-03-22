@@ -12,7 +12,6 @@ import org.springframework.web.server.ResponseStatusException;
 import com.kacademic.dto.user.UserRequestDTO;
 import com.kacademic.dto.user.UserResponseDTO;
 import com.kacademic.dto.user.UserUpdateDTO;
-import com.kacademic.exceptions.DuplicateValueException;
 import com.kacademic.models.User;
 import com.kacademic.repositories.UserRepository;
 import com.kacademic.validators.PasswordValidator;
@@ -92,10 +91,7 @@ public class UserService {
     }
     
     private void validateEmail(String email) {
-
-        if (userR.findByEmail(email) != null)
-            throw new DuplicateValueException("Email already being used.");
-
+        if (userR.findByEmail(email) != null) throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already being used.");
     }
 
     private void validatePassword(User user, String password) {
@@ -104,7 +100,7 @@ public class UserService {
 
         if (!passwordValidator.isValid(password, null))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-            "Password Invalid.");
+            "Invalid Password Format.");
 
         user.setPassword(passwordEncoder.encode(password));
 
