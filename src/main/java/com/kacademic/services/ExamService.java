@@ -80,7 +80,7 @@ public class ExamService {
     public CompletableFuture<String> updateAsync(UUID id, ExamUpdateDTO data) {
 
         Exam exam = examR.findById(id)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found"));
             
         examR.save(exam);
         return CompletableFuture.completedFuture("Updated " + entity);
@@ -91,7 +91,7 @@ public class ExamService {
     public CompletableFuture<String> deleteAsync(UUID id) {
 
         if (!examR.findById(id).isPresent()) 
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found");
         
         examR.deleteById(id);
         return CompletableFuture.completedFuture("Deleted " + entity);

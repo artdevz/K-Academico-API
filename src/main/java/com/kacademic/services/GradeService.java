@@ -46,8 +46,8 @@ public class GradeService {
     public CompletableFuture<String> createAsync(GradeRequestDTO data) {
 
         Grade grade = new Grade(
-            subjectR.findById(data.subject()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subject not Found.")),
-            professorR.findById(data.professor()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Professor not Found.")),
+            subjectR.findById(data.subject()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subject not Found")),
+            professorR.findById(data.professor()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Professor not Found")),
             data.capacity(),
             data.semester(),
             data.locate(),
@@ -83,7 +83,7 @@ public class GradeService {
     public CompletableFuture<GradeResponseDTO> readByIdAsync(UUID id) {
 
         Grade grade = gradeR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found"));
         
         return CompletableFuture.completedFuture(
             new GradeResponseDTO(
@@ -104,7 +104,7 @@ public class GradeService {
     public CompletableFuture<String> updateAsync(UUID id, GradeUpdateDTO data) {
 
         Grade grade = gradeR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found"));
     
         data.status().ifPresent(grade::setStatus);
         if (data.status().isPresent() && data.status().get().equals(EGrade.FINISHED)) semesterS.partialSubmitAsync(id);
@@ -121,7 +121,7 @@ public class GradeService {
     public CompletableFuture<String> deleteAsync(UUID id) {
 
         if (!gradeR.findById(id).isPresent()) 
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Grade not Found.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Grade not Found");
         
         enrolleeR.removeGradeFromEnrollees(id);
         gradeR.deleteById(id);

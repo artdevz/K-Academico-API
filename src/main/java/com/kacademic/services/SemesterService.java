@@ -48,7 +48,7 @@ public class SemesterService {
 
         }
 
-        return CompletableFuture.completedFuture("Partially completed the Grade Activities.");
+        return CompletableFuture.completedFuture("Partially completed the Grade Activities");
         
     }
 

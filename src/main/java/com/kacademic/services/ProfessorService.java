@@ -63,7 +63,7 @@ public class ProfessorService {
     public CompletableFuture<ProfessorResponseDTO> readByIdAsync(UUID id) {
 
         Professor professor = professorR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found"));
         
         return CompletableFuture.completedFuture(
             new ProfessorResponseDTO(
@@ -78,7 +78,7 @@ public class ProfessorService {
     public CompletableFuture<String> updateAsync(UUID id, ProfessorUpdateDTO data) {
 
         Professor professor = professorR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found"));
         
         data.wage().ifPresent(professor::setWage);
 
@@ -91,7 +91,7 @@ public class ProfessorService {
     public CompletableFuture<String> deleteAsync(UUID id) {
 
         if (!professorR.findById(id).isPresent()) 
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found");
         
         professorR.deleteById(id);
         return CompletableFuture.completedFuture("Deleted " + entity);

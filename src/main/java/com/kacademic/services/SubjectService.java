@@ -34,7 +34,7 @@ public class SubjectService {
     public CompletableFuture<String> createAsync(SubjectRequestDTO data) {        
 
         Subject subject = new Subject(
-            courseR.findById(data.course()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not found")),
+            courseR.findById(data.course()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found")),
             data.name(),
             data.description(),
             data.duration(),
@@ -69,7 +69,7 @@ public class SubjectService {
     public CompletableFuture<SubjectResponseDTO> readByIdAsync(UUID id) {
 
         Subject subject = subjectR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not found."));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
         
         return CompletableFuture.completedFuture(
             new SubjectResponseDTO(
@@ -87,7 +87,7 @@ public class SubjectService {
     public CompletableFuture<String> updateAsync(UUID id, SubjectUpdateDTO data) {
 
         Subject subject = subjectR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not found."));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found"));
             
         data.type().ifPresent(subject::setType);
         data.name().ifPresent(subject::setName);
@@ -104,7 +104,7 @@ public class SubjectService {
     public CompletableFuture<String> deleteAsync(UUID id) {
 
         if (!subjectR.findById(id).isPresent()) 
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not found.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found");
 
         subjectR.findById(id).get().getCourse().setDuration(        // Remove no Curso as Horas dessa Disciplina.
             subjectR.findById(id).get().getCourse().getDuration() - // Duração do Curso

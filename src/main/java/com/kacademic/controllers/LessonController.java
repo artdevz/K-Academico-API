@@ -2,6 +2,7 @@ package com.kacademic.controllers;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,8 +45,8 @@ public class LessonController {
         @ApiResponse(responseCode = "404", description = "Resource not found. The provided ID(s) do not match any existing record(s) in the system.")
     })
     @PostMapping
-    public ResponseEntity<String> create(@RequestBody @Valid LessonRequestDTO request) {
-        return new ResponseEntity<>(lessonS.create(request), HttpStatus.CREATED);
+    public CompletableFuture<ResponseEntity<String>> create(@RequestBody @Valid LessonRequestDTO request) {
+        return lessonS.createAsync(request).thenApply(response -> new ResponseEntity<>(response, HttpStatus.CREATED));
     }
     
     @Operation(
@@ -56,8 +57,8 @@ public class LessonController {
         @ApiResponse(responseCode = "200", description = "Lessons successfully retrieved")
     })
     @GetMapping    
-    public ResponseEntity<List<LessonResponseDTO>> readAll() {
-        return new ResponseEntity<>(lessonS.readAll(), HttpStatus.OK);
+    public CompletableFuture<ResponseEntity<List<LessonResponseDTO>>> readAll() {
+        return lessonS.readAllAsync().thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
     }
 
     @Operation(
@@ -69,8 +70,8 @@ public class LessonController {
         @ApiResponse(responseCode = "404", description = "Lesson not found")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<LessonResponseDTO> readById(@PathVariable UUID id) {
-        return new ResponseEntity<>(lessonS.readById(id), HttpStatus.OK);
+    public CompletableFuture<ResponseEntity<LessonResponseDTO>> readById(@PathVariable UUID id) {
+        return lessonS.readByIdAsync(id).thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
     }    
     
     @Operation(
@@ -82,8 +83,8 @@ public class LessonController {
         @ApiResponse(responseCode = "404", description = "Lesson not found")
     })
     @PatchMapping("/{id}")
-    public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid LessonUpdateDTO data) {
-        return new ResponseEntity<>(lessonS.update(id, data), HttpStatus.OK);
+    public CompletableFuture<ResponseEntity<String>> update(@PathVariable UUID id, @RequestBody @Valid LessonUpdateDTO data) {
+        return lessonS.updateAsync(id, data).thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
     }
 
     @Operation(
@@ -95,8 +96,8 @@ public class LessonController {
         @ApiResponse(responseCode = "404", description = "Lesson not found")
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable UUID id) {
-        return new ResponseEntity<>(lessonS.delete(id), HttpStatus.OK);
+    public CompletableFuture<ResponseEntity<String>> delete(@PathVariable UUID id) {
+        return lessonS.deleteAsync(id).thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
     }
 
 }

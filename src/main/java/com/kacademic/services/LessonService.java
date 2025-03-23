@@ -34,7 +34,7 @@ public class LessonService {
     public CompletableFuture<String> createAsync(LessonRequestDTO data) {
 
         Lesson lesson = new Lesson(
-            gradeR.findById(data.grade()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Grade not Found.")),
+            gradeR.findById(data.grade()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Grade not Found")),
             data.topic(),
             data.date()
         );
@@ -63,7 +63,7 @@ public class LessonService {
     public CompletableFuture<LessonResponseDTO> readByIdAsync(UUID id) {
 
         Lesson lesson = lessonR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found"));
         
         return CompletableFuture.completedFuture(
             new LessonResponseDTO(
@@ -79,7 +79,7 @@ public class LessonService {
     public CompletableFuture<String> updateAsync(UUID id, LessonUpdateDTO data) {
 
         Lesson lesson = lessonR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found"));
 
         lessonR.save(lesson);
         return CompletableFuture.completedFuture("Updated " + entity);
@@ -90,7 +90,7 @@ public class LessonService {
     public CompletableFuture<String> deleteAsync(UUID id) {
 
         if (!lessonR.findById(id).isPresent()) 
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found");
         
         lessonR.deleteById(id);
         return CompletableFuture.completedFuture("Deleted " + entity);

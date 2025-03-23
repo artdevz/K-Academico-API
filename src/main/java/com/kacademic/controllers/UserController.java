@@ -59,7 +59,7 @@ public class UserController {
     })
     @GetMapping    
     public CompletableFuture<ResponseEntity<List<UserResponseDTO>>> readAll() {
-        return userS.readAllAsync().thenApply(response -> ResponseEntity.ok(response));
+        return userS.readAllAsync().thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
     }
 
     @Operation(
@@ -72,7 +72,7 @@ public class UserController {
     })
     @GetMapping("/{id}")
     public CompletableFuture<ResponseEntity<UserResponseDTO>> readById(@PathVariable UUID id) {
-        return userS.readByIdAsync(id).thenApply(response -> ResponseEntity.ok(response));
+        return userS.readByIdAsync(id).thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
     }    
     
     @Operation(
@@ -85,7 +85,7 @@ public class UserController {
     })
     @PatchMapping("/{id}")
     public CompletableFuture<ResponseEntity<String>> update(@PathVariable UUID id, @RequestBody @Valid UserUpdateDTO data) {
-        return userS.updateAsync(id, data).thenApply(response -> ResponseEntity.ok(response));
+        return userS.updateAsync(id, data).thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
     }
 
     @Operation(
@@ -98,7 +98,7 @@ public class UserController {
     })
     @DeleteMapping("/{id}")
     public CompletableFuture<ResponseEntity<String>> delete(@PathVariable UUID id) {
-        return userS.deleteAsync(id).thenApply(response -> ResponseEntity.ok(response));
+        return userS.deleteAsync(id).thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
     }
 
 }

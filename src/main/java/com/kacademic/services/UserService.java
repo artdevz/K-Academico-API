@@ -63,7 +63,7 @@ public class UserService {
     public CompletableFuture<UserResponseDTO> readByIdAsync(UUID id) {
 
         User user = userR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found"));
         
         return CompletableFuture.completedFuture(
             new UserResponseDTO(
@@ -77,7 +77,7 @@ public class UserService {
     public CompletableFuture<String> updateAsync(UUID id, UserUpdateDTO data) {
 
         User user = userR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found"));
         
         data.name().ifPresent(user::setName);
         data.password().ifPresent(password -> user.setPassword(passwordEncoder.encode(password)));
@@ -91,7 +91,7 @@ public class UserService {
     public CompletableFuture<String> deleteAsync(UUID id) {
 
         if (!userR.findById(id).isPresent()) 
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found");
         
         userR.deleteById(id);
         return CompletableFuture.completedFuture("Deleted " + entity);

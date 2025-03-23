@@ -2,9 +2,11 @@ package com.kacademic.services;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -27,7 +29,8 @@ public class CourseService {
         this.courseR = courseR;
     }
 
-    public String create(CourseRequestDTO data) {
+    @Async
+    public CompletableFuture<String> createAsync(CourseRequestDTO data) {
          
         Course course = new Course(
             data.name(),
@@ -37,13 +40,15 @@ public class CourseService {
         );
         
         courseR.save(course);
-        return "Created " + entity;
+        return CompletableFuture.completedFuture("Created " + entity);
 
     }
 
-    public List<CourseResponseDTO> readAll() {
+    @Async
+    public CompletableFuture<List<CourseResponseDTO>> readAllAsync() {
 
-        return courseR.findAll().stream()
+        return CompletableFuture.completedFuture(
+            courseR.findAll().stream()
             .map(course -> new CourseResponseDTO(
                 course.getId(),                
                 course.getName(),
@@ -51,54 +56,59 @@ public class CourseService {
                 course.getDuration(),
                 course.getDescription()
             ))
-            .collect(Collectors.toList());
+            .collect(Collectors.toList()));
     }
 
-    public CourseDetailsDTO readById(UUID id) {
+    @Async
+    public CompletableFuture<CourseDetailsDTO> readByIdAsync(UUID id) {
 
         Course course = courseR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found."));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found"));
         
-        return new CourseDetailsDTO(
-            new CourseResponseDTO(
-                course.getId(),
-                course.getName(),
-                course.getCode(),
-                course.getDuration(),
-                course.getDescription()
-                ),
-            course.getSubjects().stream().map(subject -> new SubjectResponseDTO(
-                subject.getId(),
-                subject.getCourse().getId(),
-                subject.getName(),
-                subject.getDescription(),
-                subject.getDuration(),
-                subject.getSemester(),
-                subject.getPrerequisites()
-                )).collect(Collectors.toList())
-        );
+        return CompletableFuture.completedFuture(
+            new CourseDetailsDTO(
+                new CourseResponseDTO(
+                    course.getId(),
+                    course.getName(),
+                    course.getCode(),
+                    course.getDuration(),
+                    course.getDescription()
+                    ),
+
+                course.getSubjects().stream().map(subject -> new SubjectResponseDTO(
+                    subject.getId(),
+                    subject.getCourse().getId(),
+                    subject.getName(),
+                    subject.getDescription(),
+                    subject.getDuration(),
+                    subject.getSemester(),
+                    subject.getPrerequisites()
+                    )).collect(Collectors.toList())
+        ));
     }
 
-    public String update(UUID id, CourseUpdateDTO data) {
+    @Async
+    public CompletableFuture<String> updateAsync(UUID id, CourseUpdateDTO data) {
 
         Course course = courseR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));        
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found"));        
         
         data.name().ifPresent(course::setName);
         data.description().ifPresent(course::setDescription);
 
         courseR.save(course);
-        return "Updated " + entity;
+        return CompletableFuture.completedFuture("Updated " + entity);
         
     }
 
-    public String delete(UUID id) {
+    @Async
+    public CompletableFuture<String> deleteAsync(UUID id) {
 
         if (!courseR.findById(id).isPresent()) 
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found");
         
         courseR.deleteById(id);
-        return "Deleted " + entity;
+        return CompletableFuture.completedFuture("Deleted " + entity);
 
     }
 

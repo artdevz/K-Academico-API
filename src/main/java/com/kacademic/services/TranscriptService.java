@@ -31,7 +31,7 @@ public class TranscriptService {
     public String create(TranscriptRequestDTO data) {
 
         Transcript transcript = new Transcript(
-            studentR.findById(data.student()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student"))
+            studentR.findById(data.student()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not Found"))
         );
 
         transcriptR.save(transcript);
@@ -53,7 +53,7 @@ public class TranscriptService {
     public TranscriptResponseDTO readById(UUID id) {
 
         Transcript transcript = transcriptR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transcript Not Found."));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " Not Found"));
         
         return new TranscriptResponseDTO(
             transcript.getId(),
@@ -65,7 +65,7 @@ public class TranscriptService {
     public String update(UUID id, TranscriptUpdateDTO data) {
 
         Transcript transcript = transcriptR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found"));
             
         transcriptR.save(transcript);
         return "Updated " + entity;
@@ -75,7 +75,7 @@ public class TranscriptService {
     public String delete(UUID id) {
 
         if (!transcriptR.findById(id).isPresent()) 
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Transcript Not Found.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " Not Found");
         
         transcriptR.deleteById(id);
         return "Deleted " + entity;

@@ -39,14 +39,14 @@ public class StudentService {
     }
 
     @Async
-    public CompletableFuture<String> create(StudentRequestDTO data) {
+    public CompletableFuture<String> createAsync(StudentRequestDTO data) {
 
         Student student = new Student(
             data.user().name(),
             data.user().email(),
             passwordEncoder.encode(data.user().password()),
-            courseR.findById(data.course()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found.")),
-            generateEnrollment(courseR.findById(data.course()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found.")))
+            courseR.findById(data.course()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found")),
+            generateEnrollment(courseR.findById(data.course()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found")))
         );
 
         studentR.save(student);
@@ -74,7 +74,7 @@ public class StudentService {
     public CompletableFuture<StudentDetailsDTO> readByIdAsync(UUID id) {
 
         Student student = studentR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found"));
         
         return CompletableFuture.completedFuture(
             new StudentDetailsDTO(
@@ -101,7 +101,7 @@ public class StudentService {
     public CompletableFuture<String> updateAsync(UUID id, StudentUpdateDTO data) {
 
         Student student = studentR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found"));
             
         studentR.save(student);
         return CompletableFuture.completedFuture("Updated " + entity);
@@ -109,10 +109,10 @@ public class StudentService {
     }
 
     @Async
-    public CompletableFuture<String> delete(UUID id) {
+    public CompletableFuture<String> deleteAsync(UUID id) {
 
         if (!studentR.findById(id).isPresent()) 
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found");
         
         studentR.deleteById(id);
         return CompletableFuture.completedFuture("Deleted " + entity);

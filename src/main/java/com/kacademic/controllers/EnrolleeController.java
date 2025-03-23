@@ -2,6 +2,7 @@ package com.kacademic.controllers;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,8 +46,8 @@ public class EnrolleeController {
         @ApiResponse(responseCode = "404", description = "Resource not found. The provided ID(s) do not match any existing record(s) in the system.")
     })
     @PostMapping
-    public ResponseEntity<String> create(@RequestBody @Valid EnrolleeRequestDTO request) {
-        return new ResponseEntity<>(enrolleeS.create(request), HttpStatus.CREATED);
+    public CompletableFuture<ResponseEntity<String>> create(@RequestBody @Valid EnrolleeRequestDTO request) {
+        return enrolleeS.createAsync(request).thenApply(response -> new ResponseEntity<>(response, HttpStatus.CREATED));
     }
     
     @Operation(
@@ -57,8 +58,8 @@ public class EnrolleeController {
         @ApiResponse(responseCode = "200", description = "Enrollees successfully retrieved")
     })
     @GetMapping    
-    public ResponseEntity<List<EnrolleeResponseDTO>> readAll() {
-        return new ResponseEntity<>(enrolleeS.readAll(), HttpStatus.OK);
+    public CompletableFuture<ResponseEntity<List<EnrolleeResponseDTO>>> readAll() {
+        return enrolleeS.readAllAsync().thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
     }
 
     @Operation(
@@ -70,8 +71,8 @@ public class EnrolleeController {
         @ApiResponse(responseCode = "404", description = "Enrollee not found")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<EnrolleeDetailsDTO> readById(@PathVariable UUID id) {
-        return new ResponseEntity<>(enrolleeS.readById(id), HttpStatus.OK);
+    public CompletableFuture<ResponseEntity<EnrolleeDetailsDTO>> readById(@PathVariable UUID id) {
+        return enrolleeS.readByIdAsync(id).thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
     }    
     
     @Operation(
@@ -83,8 +84,8 @@ public class EnrolleeController {
         @ApiResponse(responseCode = "404", description = "Enrollee not found")
     })
     @PatchMapping("/{id}")
-    public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid EnrolleeUpdateDTO data) {
-        return new ResponseEntity<>(enrolleeS.update(id, data), HttpStatus.OK);
+    public CompletableFuture<ResponseEntity<String>> update(@PathVariable UUID id, @RequestBody @Valid EnrolleeUpdateDTO data) {
+        return enrolleeS.updateAsync(id, data).thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
     }
 
     @Operation(
@@ -96,8 +97,8 @@ public class EnrolleeController {
         @ApiResponse(responseCode = "404", description = "Enrollee not found")
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable UUID id) {
-        return new ResponseEntity<>(enrolleeS.delete(id), HttpStatus.OK);
+    public CompletableFuture<ResponseEntity<String>> delete(@PathVariable UUID id) {
+        return enrolleeS.deleteAsync(id).thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
     }
 
 }

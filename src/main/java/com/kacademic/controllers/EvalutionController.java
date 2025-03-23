@@ -2,6 +2,7 @@ package com.kacademic.controllers;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,8 +45,8 @@ public class EvalutionController {
         @ApiResponse(responseCode = "404", description = "Resource not found. The provided ID(s) do not match any existing record(s) in the system.")
     })
     @PostMapping
-    public ResponseEntity<String> create(@RequestBody @Valid EvaluationRequestDTO request) {
-        return new ResponseEntity<>(evalutionS.create(request), HttpStatus.CREATED);
+    public CompletableFuture<ResponseEntity<String>> create(@RequestBody @Valid EvaluationRequestDTO request) {
+        return evalutionS.createAsync(request).thenApply(response -> new ResponseEntity<>(response, HttpStatus.CREATED));
     }
     
     @Operation(
@@ -56,8 +57,8 @@ public class EvalutionController {
         @ApiResponse(responseCode = "200", description = "Evaluations successfully retrieved")
     })
     @GetMapping    
-    public ResponseEntity<List<EvaluationResponseDTO>> readAll() {
-        return new ResponseEntity<>(evalutionS.readAll(), HttpStatus.OK);
+    public CompletableFuture<ResponseEntity<List<EvaluationResponseDTO>>> readAll() {
+        return evalutionS.readAllAsync().thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
     }
 
     @Operation(
@@ -69,8 +70,8 @@ public class EvalutionController {
         @ApiResponse(responseCode = "404", description = "Evaluation not found")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<EvaluationResponseDTO> readById(@PathVariable UUID id) {
-        return new ResponseEntity<>(evalutionS.readById(id), HttpStatus.OK);
+    public CompletableFuture<ResponseEntity<EvaluationResponseDTO>> readById(@PathVariable UUID id) {
+        return evalutionS.readByIdAsync(id).thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
     }    
 
     @Operation(
@@ -82,8 +83,8 @@ public class EvalutionController {
         @ApiResponse(responseCode = "404", description = "Evaluation not found")
     })
     @PatchMapping("/{id}")
-    public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid EvaluationUpdateDTO data) {
-        return new ResponseEntity<>(evalutionS.update(id, data), HttpStatus.OK);
+    public CompletableFuture<ResponseEntity<String>> update(@PathVariable UUID id, @RequestBody @Valid EvaluationUpdateDTO data) {
+        return evalutionS.updateAsync(id, data).thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
     }
 
     @Operation(
@@ -95,8 +96,8 @@ public class EvalutionController {
         @ApiResponse(responseCode = "404", description = "Evaluation not found")
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable UUID id) {
-        return new ResponseEntity<>(evalutionS.delete(id), HttpStatus.OK);
+    public CompletableFuture<ResponseEntity<String>> delete(@PathVariable UUID id) {
+        return evalutionS.deleteAsync(id).thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
     }
 
 }

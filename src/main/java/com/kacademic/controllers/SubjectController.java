@@ -2,6 +2,7 @@ package com.kacademic.controllers;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,8 +45,8 @@ public class SubjectController {
         @ApiResponse(responseCode = "404", description = "Resource not found. The provided ID(s) do not match any existing record(s) in the system.")
     })
     @PostMapping
-    public ResponseEntity<String> create(@RequestBody @Valid SubjectRequestDTO request) {
-        return new ResponseEntity<>(subjectS.create(request), HttpStatus.CREATED);
+    public CompletableFuture<ResponseEntity<String>> create(@RequestBody @Valid SubjectRequestDTO request) {
+        return subjectS.createAsync(request).thenApply(response -> new ResponseEntity<>(response, HttpStatus.CREATED));
     }
     
     @Operation(
@@ -56,8 +57,8 @@ public class SubjectController {
         @ApiResponse(responseCode = "200", description = "Subjects successfully retrieved")
     })
     @GetMapping    
-    public ResponseEntity<List<SubjectResponseDTO>> readAll() {
-        return new ResponseEntity<>(subjectS.readAll(), HttpStatus.OK);
+    public CompletableFuture<ResponseEntity<List<SubjectResponseDTO>>> readAll() {
+        return subjectS.readAllAsync().thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
     }
 
     @Operation(
@@ -69,8 +70,8 @@ public class SubjectController {
         @ApiResponse(responseCode = "404", description = "Subject not found")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<SubjectResponseDTO> readById(@PathVariable UUID id) {
-        return new ResponseEntity<>(subjectS.readById(id), HttpStatus.OK);
+    public CompletableFuture<ResponseEntity<SubjectResponseDTO>> readById(@PathVariable UUID id) {
+        return subjectS.readByIdAsync(id).thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
     }    
     
     @Operation(
@@ -82,8 +83,8 @@ public class SubjectController {
         @ApiResponse(responseCode = "404", description = "Subject not found")
     })
     @PatchMapping("/{id}")
-    public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid SubjectUpdateDTO data) {
-        return new ResponseEntity<>(subjectS.update(id, data), HttpStatus.OK);
+    public CompletableFuture<ResponseEntity<String>> update(@PathVariable UUID id, @RequestBody @Valid SubjectUpdateDTO data) {
+        return subjectS.updateAsync(id, data).thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
     }
 
     @Operation(
@@ -95,8 +96,8 @@ public class SubjectController {
         @ApiResponse(responseCode = "404", description = "Subject not found")
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable UUID id) {
-        return new ResponseEntity<>(subjectS.delete(id), HttpStatus.OK);
+    public CompletableFuture<ResponseEntity<String>> delete(@PathVariable UUID id) {
+        return subjectS.deleteAsync(id).thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
     }
 
 

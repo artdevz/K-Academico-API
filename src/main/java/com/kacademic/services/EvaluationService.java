@@ -3,9 +3,11 @@ package com.kacademic.services;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -32,23 +34,26 @@ public class EvaluationService {
         this.examR = examR;
     }
     
-    public String create(EvaluationRequestDTO data) {
+    @Async
+    public CompletableFuture<String> createAsync(EvaluationRequestDTO data) {
 
         Evaluation evaluation = new Evaluation(
-            enrolleeR.findById(data.enrollee()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee")),
-            examR.findById(data.exam()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exam")),
+            enrolleeR.findById(data.enrollee()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee not Found")),
+            examR.findById(data.exam()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exam not Found")),
             data.score()
         );
         
         addEvaluation(evaluation);
         evaluationR.save(evaluation);
-        return "Created " + entity;
+        return CompletableFuture.completedFuture("Created " + entity);
 
     }
 
-    public List<EvaluationResponseDTO> readAll() {
+    @Async
+    public CompletableFuture<List<EvaluationResponseDTO>> readAllAsync() {
 
-        return evaluationR.findAll().stream()
+        return CompletableFuture.completedFuture(
+            evaluationR.findAll().stream()
             .map(evaluation -> new EvaluationResponseDTO(
                 evaluation.getId(),
                 evaluation.getEnrollee().getId(),
@@ -56,46 +61,50 @@ public class EvaluationService {
                 evaluation.getExam().getId(),
                 evaluation.getScore()
             ))
-            .collect(Collectors.toList());
+            .collect(Collectors.toList()));
 
     }
 
-    public EvaluationResponseDTO readById(UUID id) {
+    @Async
+    public CompletableFuture<EvaluationResponseDTO> readByIdAsync(UUID id) {
 
         Evaluation evaluation = evaluationR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Evaluation not Found."));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found"));
         
-        return new EvaluationResponseDTO(
-            evaluation.getId(),
-            evaluation.getEnrollee().getId(),
-            evaluation.getExam().getGrade().getId(),
-            evaluation.getExam().getId(),
-            evaluation.getScore()
-        );
+        return CompletableFuture.completedFuture(
+            new EvaluationResponseDTO(
+                evaluation.getId(),
+                evaluation.getEnrollee().getId(),
+                evaluation.getExam().getGrade().getId(),
+                evaluation.getExam().getId(),
+                evaluation.getScore()
+        ));
 
     }
 
-    public String update(UUID id, EvaluationUpdateDTO data) {
+    @Async
+    public CompletableFuture<String> updateAsync(UUID id, EvaluationUpdateDTO data) {
 
         Evaluation evaluation = evaluationR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found"));
         
         data.score().ifPresent(evaluation::setScore);
         if (data.score().isPresent()) editEvaluation(evaluation);
             
         evaluationR.save(evaluation);
-        return "Updated " + entity;
+        return CompletableFuture.completedFuture("Updated " + entity);
                  
     }
 
-    public String delete(UUID id) {
+    @Async
+    public CompletableFuture<String> deleteAsync(UUID id) {
 
         if (!evaluationR.findById(id).isPresent()) 
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Evaluation not Found.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found");
         
         removeEvaluation(evaluationR.findById(id).get());
         evaluationR.deleteById(id);
-        return "Deleted " + entity;
+        return CompletableFuture.completedFuture("Deleted " + entity);
 
     }
 

@@ -2,9 +2,11 @@ package com.kacademic.services;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -34,25 +36,28 @@ public class EnrolleeService {
         this.gradeR = gradeR;
     }
     
-    public String create(EnrolleeRequestDTO data) {
+    @Async
+    public CompletableFuture<String> createAsync(EnrolleeRequestDTO data) {
 
         Enrollee enrollee = new Enrollee(
-            studentR.findById(data.student()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student")),
-            studentR.findById(data.student()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student.Transcript")).getTranscript(),
-            gradeR.findById(data.grade()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Grade"))
+            studentR.findById(data.student()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not Found")),
+            studentR.findById(data.student()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student.Transcript not Found")).getTranscript(),
+            gradeR.findById(data.grade()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Grade not Found"))
         );
 
         enrollee.getGrade().setCurrentStudents( // Adiciona 1 Estudante na Turma
             enrollee.getGrade().getCurrentStudents() + 1 
         );
         enrolleeR.save(enrollee);
-        return "Created " + entity;
+        return CompletableFuture.completedFuture("Created " + entity);
 
     }
 
-    public List<EnrolleeResponseDTO> readAll() {
+    @Async
+    public CompletableFuture<List<EnrolleeResponseDTO>> readAllAsync() {
 
-        return enrolleeR.findAll().stream()
+        return CompletableFuture.completedFuture(
+            enrolleeR.findAll().stream()
             .map(enrollee -> new EnrolleeResponseDTO(
                 enrollee.getId(),
                 enrollee.getStudent().getId(),
@@ -62,65 +67,69 @@ public class EnrolleeService {
                 enrollee.getAvarage(),
                 enrollee.getStatus()
             ))
-            .collect(Collectors.toList());
+            .collect(Collectors.toList()));
 
     }
 
-    public EnrolleeDetailsDTO readById(UUID id) {
+    @Async
+    public CompletableFuture<EnrolleeDetailsDTO> readByIdAsync(UUID id) {
 
         Enrollee enrollee = enrolleeR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee not Found."));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found"));
         
-        return new EnrolleeDetailsDTO(
-            new EnrolleeResponseDTO(
-                enrollee.getId(),
-                enrollee.getStudent().getId(),
-                enrollee.getGrade().getId(),
-                enrollee.getAbsences(),
-                enrollee.getAvarage(),
-                enrollee.getStatus()
-                ),
+        return CompletableFuture.completedFuture(
+            new EnrolleeDetailsDTO(
+                new EnrolleeResponseDTO(
+                    enrollee.getId(),
+                    enrollee.getStudent().getId(),
+                    enrollee.getGrade().getId(),
+                    enrollee.getAbsences(),
+                    enrollee.getAvarage(),
+                    enrollee.getStatus()
+                    ),
                 
-            enrollee.getEvaluations().stream().map(evaluation -> new EvaluationResponseDTO(
-                evaluation.getId(),
-                evaluation.getEnrollee().getId(),
-                evaluation.getExam().getGrade().getId(),
-                evaluation.getExam().getId(),
-                evaluation.getScore()
-                ))
-                .collect(Collectors.toList()),
+                enrollee.getEvaluations().stream().map(evaluation -> new EvaluationResponseDTO(
+                    evaluation.getId(),
+                    evaluation.getEnrollee().getId(),
+                    evaluation.getExam().getGrade().getId(),
+                    evaluation.getExam().getId(),
+                    evaluation.getScore()
+                    ))
+                    .collect(Collectors.toList()),
 
-            enrollee.getAttendances().stream().map(attendance -> new AttendanceResponseDTO(
-                attendance.getId(),
-                attendance.getEnrollee().getId(),
-                attendance.getLesson().getId(),
-                attendance.isAbsent()
-                )).collect(Collectors.toList())
+                enrollee.getAttendances().stream().map(attendance -> new AttendanceResponseDTO(
+                    attendance.getId(),
+                    attendance.getEnrollee().getId(),
+                    attendance.getLesson().getId(),
+                    attendance.isAbsent()
+                    )).collect(Collectors.toList())
             
-        );
+        ));
 
     }
 
-    public String update(UUID id, EnrolleeUpdateDTO data) {
+    @Async
+    public CompletableFuture<String> updateAsync(UUID id, EnrolleeUpdateDTO data) {
 
         Enrollee enrollee = enrolleeR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found"));
             
         enrolleeR.save(enrollee);
-        return "Updated " + entity;
+        return CompletableFuture.completedFuture("Updated " + entity);
         
     }
 
-    public String delete(UUID id) {
+    @Async
+    public CompletableFuture<String> deleteAsync(UUID id) {
 
         if (!enrolleeR.findById(id).isPresent()) 
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee not Found.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found");
 
         enrolleeR.findById(id).get().getGrade().setCurrentStudents( // Remove 1 Estudante na Turma
             enrolleeR.findById(id).get().getGrade().getCurrentStudents() - 1
         );
         enrolleeR.deleteById(id);
-        return "Deleted " + entity;
+        return CompletableFuture.completedFuture("Deleted " + entity);
 
     }
 
