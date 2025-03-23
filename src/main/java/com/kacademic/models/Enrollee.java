@@ -52,7 +52,7 @@ public class Enrollee implements Serializable {
     private int absences;
     
     @Max(10)
-    private float avarage;
+    private float average;
     
     private EEnrollee status;
 
@@ -62,7 +62,7 @@ public class Enrollee implements Serializable {
         this.grade = grade;
         this.status = EEnrollee.ENROLLED; // Default Status
         this.absences = 0; // Inicia-se com 0
-        this.avarage = 0; // Inicia-se com 0
+        this.average = 0; // Inicia-se com 0
     }
 
 }

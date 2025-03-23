@@ -41,13 +41,13 @@ public class Student extends User {
     @Size(max=14, min=14, message="Matrícula deve conter 14 dígitos.")
     private String enrollment; // Year + Semester + CourseCode + ShiftCode + RandomNumbers = xxxx.x.xx.xxx.xxxx
 
-    private float avarage;
+    private float average;
         
     public Student(String name, String email, String password, Course course, String enrollment) {
         super(name, email, password);
         this.course = course;
         this.enrollment = enrollment;
-        this.avarage = 0; // Inicia-se com 0
+        this.average = 0; // Inicia-se com 0
         this.transcript = new Transcript(this);
     }
 

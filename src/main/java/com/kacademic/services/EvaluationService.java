@@ -112,13 +112,13 @@ public class EvaluationService {
 
         evaluation.getEnrollee().getEvaluations().add(evaluation);
         
-        evaluation.getEnrollee().setAvarage( updateAvarage(evaluation.getEnrollee().getEvaluations()) );
+        evaluation.getEnrollee().setAverage( updateAverage(evaluation.getEnrollee().getEvaluations()) );
         
     }
 
     private void editEvaluation(Evaluation evaluation) {
 
-        evaluation.getEnrollee().setAvarage( updateAvarage(evaluation.getEnrollee().getEvaluations()) );
+        evaluation.getEnrollee().setAverage( updateAverage(evaluation.getEnrollee().getEvaluations()) );
 
     }    
 
@@ -128,11 +128,11 @@ public class EvaluationService {
             if (currentEvaluation.equals(evaluation)) evaluation.getEnrollee().getEvaluations().remove(evaluation);
         }
 
-        evaluation.getEnrollee().setAvarage( updateAvarage(evaluation.getEnrollee().getEvaluations()) );
+        evaluation.getEnrollee().setAverage( updateAverage(evaluation.getEnrollee().getEvaluations()) );
 
     }
 
-    private float updateAvarage(Set<Evaluation> evaluations) {
+    private float updateAverage(Set<Evaluation> evaluations) {
 
         float sum = 0;
         for (Evaluation evaluation : evaluations) sum += evaluation.getScore();           

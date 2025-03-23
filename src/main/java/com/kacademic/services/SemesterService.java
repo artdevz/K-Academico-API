@@ -42,7 +42,7 @@ public class SemesterService {
 
         for (Enrollee enrollee : grade.getEnrollees()) {
 
-            if (enrollee.getStatus().equals(EEnrollee.ENROLLED)) enrollee.setStatus( getPartialResult(enrollee.getAvarage() ));
+            if (enrollee.getStatus().equals(EEnrollee.ENROLLED)) enrollee.setStatus( getPartialResult(enrollee.getAverage() ));
             // SUSPENDED... (Disciplina Trancada)?
             enrolleeR.save(enrollee);
 
@@ -64,7 +64,7 @@ public class SemesterService {
             
             for (Enrollee enrollee : grade.getEnrollees()) {
                 
-                if (enrollee.getStatus().equals(EEnrollee.FINAL_EXAM)) enrollee.setStatus( getFinalResult(enrollee.getAvarage()) );
+                if (enrollee.getStatus().equals(EEnrollee.FINAL_EXAM)) enrollee.setStatus( getFinalResult(enrollee.getAverage()) );
                 
                 enrolleeR.save(enrollee);
 
@@ -99,7 +99,7 @@ public class SemesterService {
     public void updateAvarage() {
 
         for (Student student : studentR.findAll() ) { 
-            student.setAvarage(calculateAvarage(student));
+            student.setAverage(calculateAvarage(student));
             studentR.save(student);
         }
     }
@@ -107,7 +107,7 @@ public class SemesterService {
     private float calculateAvarage(Student student) {
         
         float sum = 0;
-        for (Enrollee enrollee : student.getEnrollees() ) sum += enrollee.getAvarage();
+        for (Enrollee enrollee : student.getEnrollees() ) sum += enrollee.getAverage();
         
         return sum / student.getEnrollees().size();
 

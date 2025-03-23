@@ -64,7 +64,7 @@ public class EnrolleeService {
                 // enrollee.getGrade() != null ? enrollee.getGrade().getSubject().getName() : "Unavailable",
                 enrollee.getGrade().getId(),
                 enrollee.getAbsences(),
-                enrollee.getAvarage(),
+                enrollee.getAverage(),
                 enrollee.getStatus()
             ))
             .collect(Collectors.toList()));
@@ -84,7 +84,7 @@ public class EnrolleeService {
                     enrollee.getStudent().getId(),
                     enrollee.getGrade().getId(),
                     enrollee.getAbsences(),
-                    enrollee.getAvarage(),
+                    enrollee.getAverage(),
                     enrollee.getStatus()
                     ),
                 

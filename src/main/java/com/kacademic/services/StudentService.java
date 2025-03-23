@@ -65,7 +65,7 @@ public class StudentService {
                 student.getEnrollment(),
                 student.getName(),
                 student.getEmail(),
-                student.getAvarage()
+                student.getAverage()
             ))
             .collect(Collectors.toList()));
     }
@@ -84,14 +84,14 @@ public class StudentService {
                     student.getEnrollment(),
                     student.getName(),
                     student.getEmail(),
-                    student.getAvarage()
+                    student.getAverage()
                     ),
                 student.getEnrollees().stream().map(enrollee -> new EnrolleeResponseDTO(
                     enrollee.getId(),
                     enrollee.getStudent().getId(),
                     enrollee.getGrade().getId(),
                     enrollee.getAbsences(),
-                    enrollee.getAvarage(),
+                    enrollee.getAverage(),
                     enrollee.getStatus()
                     )).collect(Collectors.toList())
         ));
