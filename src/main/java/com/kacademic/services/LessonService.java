@@ -2,9 +2,11 @@ package com.kacademic.services;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -28,22 +30,25 @@ public class LessonService {
         this.gradeR = gradeR;
     }
 
-    public String create(LessonRequestDTO data) {
+    @Async
+    public CompletableFuture<String> createAsync(LessonRequestDTO data) {
 
         Lesson lesson = new Lesson(
-            gradeR.findById(data.grade()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Grade")),
+            gradeR.findById(data.grade()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Grade not Found.")),
             data.topic(),
             data.date()
         );
 
         lessonR.save(lesson);
-        return "Created " + entity;
+        return CompletableFuture.completedFuture("Created " + entity);
         
     }
 
-    public List<LessonResponseDTO> readAll() {
+    @Async
+    public CompletableFuture<List<LessonResponseDTO>> readAllAsync() {
 
-        return lessonR.findAll().stream()
+        return CompletableFuture.completedFuture(
+            lessonR.findAll().stream()
             .map(lesson -> new LessonResponseDTO(
                 lesson.getId(),
                 lesson.getGrade().getId(),
@@ -51,40 +56,44 @@ public class LessonService {
                 lesson.getDate(),
                 lesson.getStatus()
             ))
-            .collect(Collectors.toList());
+            .collect(Collectors.toList()));
     }
 
-    public LessonResponseDTO readById(UUID id) {
+    @Async
+    public CompletableFuture<LessonResponseDTO> readByIdAsync(UUID id) {
 
         Lesson lesson = lessonR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not Found."));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
         
-        return new LessonResponseDTO(
-            lesson.getId(),
-            lesson.getGrade().getId(),
-            lesson.getTopic(),                
-            lesson.getDate(),
-            lesson.getStatus()
-        );
+        return CompletableFuture.completedFuture(
+            new LessonResponseDTO(
+                lesson.getId(),
+                lesson.getGrade().getId(),
+                lesson.getTopic(),                
+                lesson.getDate(),
+                lesson.getStatus()
+        ));
     }
 
-    public String update(UUID id, LessonUpdateDTO data) {
+    @Async
+    public CompletableFuture<String> updateAsync(UUID id, LessonUpdateDTO data) {
 
         Lesson lesson = lessonR.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
 
         lessonR.save(lesson);
-        return "Updated " + entity;
+        return CompletableFuture.completedFuture("Updated " + entity);
         
     }
 
-    public String delete(UUID id) {
+    @Async
+    public CompletableFuture<String> deleteAsync(UUID id) {
 
         if (!lessonR.findById(id).isPresent()) 
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not Found.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found.");
         
         lessonR.deleteById(id);
-        return "Deleted " + entity;
+        return CompletableFuture.completedFuture("Deleted " + entity);
 
     }
 

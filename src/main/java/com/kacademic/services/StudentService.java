@@ -45,8 +45,8 @@ public class StudentService {
             data.user().name(),
             data.user().email(),
             passwordEncoder.encode(data.user().password()),
-            courseR.findById(data.course()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course")),
-            generateEnrollment(courseR.findById(data.course()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course")))
+            courseR.findById(data.course()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found.")),
+            generateEnrollment(courseR.findById(data.course()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found.")))
         );
 
         studentR.save(student);
@@ -54,9 +54,11 @@ public class StudentService {
         
     }
 
-    public List<StudentResponseDTO> readAll() {
+    @Async
+    public CompletableFuture<List<StudentResponseDTO>> readAllAsync() {
 
-        return studentR.findAll().stream()
+        return CompletableFuture.completedFuture(
+            studentR.findAll().stream()
             .map(student -> new StudentResponseDTO(
                 student.getId(),                
                 student.getCourse().getId(),
@@ -65,51 +67,55 @@ public class StudentService {
                 student.getEmail(),
                 student.getAvarage()
             ))
-            .collect(Collectors.toList());
+            .collect(Collectors.toList()));
     }
 
-    public StudentDetailsDTO readById(UUID id) {
+    @Async
+    public CompletableFuture<StudentDetailsDTO> readByIdAsync(UUID id) {
 
         Student student = studentR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not Found."));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
         
-        return new StudentDetailsDTO(
-            new StudentResponseDTO(
-                student.getId(),            
-                student.getCourse().getId(),
-                student.getEnrollment(),
-                student.getName(),
-                student.getEmail(),
-                student.getAvarage()
-                ),
-            student.getEnrollees().stream().map(enrollee -> new EnrolleeResponseDTO(
-                enrollee.getId(),
-                enrollee.getStudent().getId(),
-                enrollee.getGrade().getId(),
-                enrollee.getAbsences(),
-                enrollee.getAvarage(),
-                enrollee.getStatus()
-                )).collect(Collectors.toList())
-        );
+        return CompletableFuture.completedFuture(
+            new StudentDetailsDTO(
+                new StudentResponseDTO(
+                    student.getId(),            
+                    student.getCourse().getId(),
+                    student.getEnrollment(),
+                    student.getName(),
+                    student.getEmail(),
+                    student.getAvarage()
+                    ),
+                student.getEnrollees().stream().map(enrollee -> new EnrolleeResponseDTO(
+                    enrollee.getId(),
+                    enrollee.getStudent().getId(),
+                    enrollee.getGrade().getId(),
+                    enrollee.getAbsences(),
+                    enrollee.getAvarage(),
+                    enrollee.getStatus()
+                    )).collect(Collectors.toList())
+        ));
     }
 
-    public String update(UUID id, StudentUpdateDTO data) {
+    @Async
+    public CompletableFuture<String> updateAsync(UUID id, StudentUpdateDTO data) {
 
         Student student = studentR.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
             
         studentR.save(student);
-        return "Updated " + entity;
+        return CompletableFuture.completedFuture("Updated " + entity);
         
     }
 
-    public String delete(UUID id) {
+    @Async
+    public CompletableFuture<String> delete(UUID id) {
 
         if (!studentR.findById(id).isPresent()) 
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not Found.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found.");
         
         studentR.deleteById(id);
-        return "Deleted " + entity;
+        return CompletableFuture.completedFuture("Deleted " + entity);
 
     }
 

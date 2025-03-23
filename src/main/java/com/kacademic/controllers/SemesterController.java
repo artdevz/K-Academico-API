@@ -37,7 +37,7 @@ public class SemesterController {
     public ResponseEntity<String> finalSubmit(
         @Parameter(description = "The semester to be finalized. <br>E.g: 25.1", required = true)
         @PathVariable @Semester String semester) {
-        return new ResponseEntity<>(semesterS.finalSubmit(semester) + semester, HttpStatus.OK);
+        return new ResponseEntity<>(semesterS.finalSubmitAsync(semester) + semester, HttpStatus.OK);
     }
 
 }
