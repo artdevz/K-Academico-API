@@ -1,5 +1,6 @@
 package com.kacademic.repositories;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,6 +12,6 @@ import com.kacademic.models.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, UUID> {
     
-    UserDetails findByEmail(String email);
+    Optional<UserDetails> findByEmail(String email);
 
 }

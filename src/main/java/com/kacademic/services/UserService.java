@@ -99,7 +99,7 @@ public class UserService {
     }
     
     private void validateEmail(String email) {
-        if (userR.findByEmail(email) != null) throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already being used.");
+        if (userR.findByEmail(email) != null) throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already being used");
     }
 
 }
