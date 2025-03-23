@@ -4,9 +4,11 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -36,7 +38,8 @@ public class StudentService {
         this.courseR = courseR;
     }
 
-    public String create(StudentRequestDTO data) {
+    @Async
+    public CompletableFuture<String> create(StudentRequestDTO data) {
 
         Student student = new Student(
             data.user().name(),
@@ -47,7 +50,7 @@ public class StudentService {
         );
 
         studentR.save(student);
-        return "Created " + entity;
+        return CompletableFuture.completedFuture("Created " + entity);
         
     }
 

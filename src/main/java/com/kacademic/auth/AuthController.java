@@ -1,5 +1,7 @@
 package com.kacademic.auth;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,10 +17,10 @@ import jakarta.validation.Valid;
 @RestController
 public class AuthController {
     
-    private final AuthService loginS;
+    private final AuthService authS;
 
-    public AuthController(AuthService loginS) {
-        this.loginS = loginS;
+    public AuthController(AuthService authS) {
+        this.authS = authS;
     }
 
     @Operation(
@@ -31,8 +33,8 @@ public class AuthController {
         @ApiResponse(responseCode = "401", description = "Unauthorized: Invalid credentials")
     })
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody @Valid AuthRequestDTO request) {
-        return ResponseEntity.ok(loginS.login(request));
+    public CompletableFuture<ResponseEntity<String>> login(@RequestBody @Valid AuthRequestDTO request) {
+        return authS.login(request).thenApply(token -> ResponseEntity.ok(token));
     }
 
 }

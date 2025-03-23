@@ -2,9 +2,11 @@ package com.kacademic.services;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -28,7 +30,8 @@ public class SubjectService {
         this.courseR = courseR;
     }    
 
-    public String create(SubjectRequestDTO data) {        
+    @Async
+    public CompletableFuture<String> createAsync(SubjectRequestDTO data) {        
 
         Subject subject = new Subject(
             courseR.findById(data.course()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not found")),
@@ -41,13 +44,15 @@ public class SubjectService {
         
         subject.getCourse().setDuration(subject.getCourse().getDuration()+data.duration()); // Adiciona no Curso as Horas dessa Disciplina.
         subjectR.save(subject);
-        return "Created " + entity;
+        return CompletableFuture.completedFuture("Created " + entity);
 
     }
 
-    public List<SubjectResponseDTO> readAll() {
+    @Async
+    public CompletableFuture<List<SubjectResponseDTO>> readAllAsync() {
 
-        return subjectR.findAll().stream()
+        return CompletableFuture.completedFuture(
+            subjectR.findAll().stream()
             .map(subject -> new SubjectResponseDTO(
                 subject.getId(),
                 subject.getCourse().getId(),                
@@ -57,26 +62,29 @@ public class SubjectService {
                 subject.getSemester(),
                 subject.getPrerequisites()
             ))
-            .collect(Collectors.toList());
+            .collect(Collectors.toList()));
     }
 
-    public SubjectResponseDTO readById(UUID id) {
+    @Async
+    public CompletableFuture<SubjectResponseDTO> readByIdAsync(UUID id) {
 
         Subject subject = subjectR.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not found."));
         
-        return new SubjectResponseDTO(
-            subject.getId(),
-            subject.getCourse().getId(),                
-            subject.getName(),
-            subject.getDescription(),
-            subject.getDuration(),
-            subject.getSemester(),
-            subject.getPrerequisites()
-        );
+        return CompletableFuture.completedFuture(
+            new SubjectResponseDTO(
+                subject.getId(),
+                subject.getCourse().getId(),                
+                subject.getName(),
+                subject.getDescription(),
+                subject.getDuration(),
+                subject.getSemester(),
+                subject.getPrerequisites()
+        ));
     }
 
-    public String update(UUID id, SubjectUpdateDTO data) {
+    @Async
+    public CompletableFuture<String> updateAsync(UUID id, SubjectUpdateDTO data) {
 
         Subject subject = subjectR.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not found."));
@@ -88,11 +96,12 @@ public class SubjectService {
         data.semester().ifPresent(subject::setSemester);
 
         subjectR.save(subject);
-        return "Updated " + entity;
+        return CompletableFuture.completedFuture("Updated " + entity);
                 
     }
 
-    public String delete(UUID id) {
+    @Async
+    public CompletableFuture<String> deleteAsync(UUID id) {
 
         if (!subjectR.findById(id).isPresent()) 
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not found.");
@@ -102,7 +111,7 @@ public class SubjectService {
             subjectR.findById(id).get().getDuration() );            // Duração da Disciplina
 
         subjectR.deleteById(id);
-        return "Deleted " + entity;
+        return CompletableFuture.completedFuture("Deleted " + entity);
 
     }
 

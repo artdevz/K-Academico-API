@@ -2,9 +2,11 @@ package com.kacademic.services;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -28,7 +30,8 @@ public class UserService {
         this.userR = userR;
     }
 
-    public String create(UserRequestDTO data) {
+    @Async
+    public CompletableFuture<String> createAsync(UserRequestDTO data) {
          
         validateEmail(data.email());
 
@@ -39,34 +42,39 @@ public class UserService {
         );
         
         userR.save(user);
-        return "Created " + entity;
+        return CompletableFuture.completedFuture("Created " + entity);
 
     }
 
-    public List<UserResponseDTO> readAll() {
+    @Async
+    public CompletableFuture<List<UserResponseDTO>> readAllAsync() {
 
-        return userR.findAll().stream()
+        return CompletableFuture.completedFuture(
+            userR.findAll().stream()
             .map(user -> new UserResponseDTO(
                 user.getId(),                
                 user.getName(),
                 user.getEmail()
             ))
-            .collect(Collectors.toList());
+            .collect(Collectors.toList()));
     }
 
-    public UserResponseDTO readById(UUID id) {
+    @Async
+    public CompletableFuture<UserResponseDTO> readByIdAsync(UUID id) {
 
         User user = userR.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
         
-        return new UserResponseDTO(
-            user.getId(),            
-            user.getName(),
-            user.getEmail()
-        );
+        return CompletableFuture.completedFuture(
+            new UserResponseDTO(
+                user.getId(),            
+                user.getName(),
+                user.getEmail()
+        ));
     }
 
-    public String update(UUID id, UserUpdateDTO data) {
+    @Async
+    public CompletableFuture<String> updateAsync(UUID id, UserUpdateDTO data) {
 
         User user = userR.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found."));
@@ -75,17 +83,18 @@ public class UserService {
         data.password().ifPresent(password -> user.setPassword(passwordEncoder.encode(password)));
             
         userR.save(user);
-        return "Updated " + entity;
+        return CompletableFuture.completedFuture("Updated " + entity);
                 
     }
 
-    public String delete(UUID id) {
+    @Async
+    public CompletableFuture<String> deleteAsync(UUID id) {
 
         if (!userR.findById(id).isPresent()) 
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found.");
         
         userR.deleteById(id);
-        return "Deleted " + entity;
+        return CompletableFuture.completedFuture("Deleted " + entity);
 
     }
     
