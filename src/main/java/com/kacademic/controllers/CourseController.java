@@ -6,6 +6,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -45,6 +46,7 @@ public class CourseController {
         @ApiResponse(responseCode = "400", description = "Invalid data format"),
         @ApiResponse(responseCode = "404", description = "Resource not found. The provided ID(s) do not match any existing record(s) in the system.")
     })
+    @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping
     public CompletableFuture<ResponseEntity<String>> create(@RequestBody @Valid CourseRequestDTO request) {
         return courseS.createAsync(request).thenApply(response -> new ResponseEntity<>(response, HttpStatus.CREATED));

@@ -42,13 +42,13 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("Should create User successfully when everything is OK")
-    void testCreateAsyncCase0() throws ExecutionException, InterruptedException {
+    @DisplayName("Given valid user data, when creating user, then should be successful")
+    void givenValidData_whenCreateUser_thenSuccess() throws ExecutionException, InterruptedException {
 
         // Arrange
         UserRequestDTO data = new UserRequestDTO("ArthurTest2", "arthurTest2@gmail.com", "4bcdefg!");
 
-        when(userR.findByEmail(anyString())).thenReturn(null);
+        when(userR.findByEmail(anyString())).thenReturn(Optional.empty());
         when(passwordEncoder.encode(anyString())).thenReturn("hashedPassword");
         when(userR.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -64,8 +64,8 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("Should create multiple users and handle email conflict")
-    void testCreateAsyncCase1() throws ExecutionException, InterruptedException {
+    @DisplayName("Given existing email, when creating user, then should return conflict error")
+    void givenExistingEmail_whenCreateUser_thenThrowConflict() throws ExecutionException, InterruptedException {
 
         // Arrange
         for (int i = 0; i < 100; i++) {
@@ -73,7 +73,7 @@ public class UserServiceTest {
             UserRequestDTO data = new UserRequestDTO("ArthurTest" + i, email, "4bcdefg!");
         
             if (i > 0) when(userR.findByEmail(anyString())).thenReturn(Optional.of(new User()));
-            else when(userR.findByEmail(anyString())).thenReturn(null);
+            else when(userR.findByEmail(anyString())).thenReturn(Optional.empty());
 
             when(passwordEncoder.encode(anyString())).thenReturn("hashedPassword");
             when(userR.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
@@ -97,26 +97,5 @@ public class UserServiceTest {
         }
 
     }
-
-    /*
-    @Test
-    void testDeleteAsync() {
-
-    }
-
-    @Test
-    void testReadAllAsync() {
-
-    }
-
-    @Test
-    void testReadByIdAsync() {
-
-    }
-
-    @Test
-    void testUpdateAsync() {
-
-    } */
 
 }

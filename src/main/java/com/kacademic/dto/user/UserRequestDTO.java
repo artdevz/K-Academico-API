@@ -2,4 +2,11 @@ package com.kacademic.dto.user;
 
 import com.kacademic.utils.Password;
 
-public record UserRequestDTO(String name, String email, @Password String password) {}
+import jakarta.validation.constraints.Size;
+
+public record UserRequestDTO(
+    @Size(min=3, max=48, message="Name must be between 3 and 48 characters")
+    String name,
+    String email,
+    @Password String password
+) {}

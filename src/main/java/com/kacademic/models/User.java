@@ -1,9 +1,11 @@
 package com.kacademic.models;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import jakarta.persistence.DiscriminatorColumn;
@@ -34,8 +36,7 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @NotBlank(message="Nome não deve está em branco.")
-    @Size(min=3, max=48, message="Nome deve conter entre 3 a 48 caractéres.")
+    @Size(min=3, max=48, message="Name must be between 3 and 48 characters")
     private String name;
 
     @Email
@@ -43,6 +44,8 @@ public class User implements UserDetails {
     
     @NotBlank
     private String password;
+
+    private List<GrantedAuthority> authorities;
 
     public User(String name, String email, String password) {
         this.name = name;
@@ -52,7 +55,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
     @Override

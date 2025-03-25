@@ -1,6 +1,7 @@
 package com.kacademic.services;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -99,7 +100,7 @@ public class UserService {
     }
     
     private void validateEmail(String email) {
-        if (userR.findByEmail(email) != null) throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already being used");
+        if (!(userR.findByEmail(email).equals(Optional.empty()))) throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already being used");
     }
 
 }

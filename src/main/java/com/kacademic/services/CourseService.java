@@ -35,7 +35,6 @@ public class CourseService {
         Course course = new Course(
             data.name(),
             data.code(),
-            data.duration(),
             data.description()
         );
         
