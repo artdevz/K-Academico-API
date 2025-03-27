@@ -98,6 +98,11 @@ public class UserService {
         return CompletableFuture.completedFuture("Deleted " + entity);
 
     }
+
+    public String createUserTesterSync() {
+        userR.save(new User("UserTest", "test@gmail.com", "4bcdefg!test"));
+        return "Created User Tester";
+    }
     
     private void validateEmail(String email) {
         if (!(userR.findByEmail(email).equals(Optional.empty()))) throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already being used");
