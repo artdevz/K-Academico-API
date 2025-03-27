@@ -1,12 +1,11 @@
 package com.kacademic.security;
 
 import java.security.Key;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-
 import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -85,8 +84,7 @@ public class JwtTokenProvider {
         
         List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
 
-        User userDetails = new User("Arthur", claims.getSubject(), "4bcdefg!");
-        userDetails.setAuthorities(authorities);
+        User userDetails = new User("Arthur", claims.getSubject(), "4bcdefg!", new HashSet<>());
 
         return new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
     

@@ -1,11 +1,16 @@
 package com.kacademic.repositories;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.kacademic.models.Attendance;
+import com.kacademic.models.Role;
 
 @Repository
-public interface AttendanceRepository extends JpaRepository<Attendance, UUID> {}
+public interface RoleRepository extends JpaRepository<Role, UUID> {
+
+    Optional<Role> findByName(String name);
+
+}

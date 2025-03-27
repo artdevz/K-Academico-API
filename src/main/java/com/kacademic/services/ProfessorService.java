@@ -36,7 +36,8 @@ public class ProfessorService {
         Professor professor = new Professor(
             data.user().name(),
             data.user().email(),
-            passwordEncoder.encode(data.user().password()),            
+            passwordEncoder.encode(data.user().password()),
+            data.user().roles(),            
             data.wage()            
         );
 

@@ -45,6 +45,7 @@ public class StudentService {
             data.user().name(),
             data.user().email(),
             passwordEncoder.encode(data.user().password()),
+            data.user().roles(),
             courseR.findById(data.course()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found")),
             generateEnrollment(courseR.findById(data.course()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found")))
         );

@@ -39,7 +39,8 @@ public class UserService {
         User user = new User(            
             data.name(),
             data.email(),
-            passwordEncoder.encode(data.password())
+            passwordEncoder.encode(data.password()),
+            data.roles()
         );
         
         userR.save(user);
@@ -55,7 +56,8 @@ public class UserService {
             .map(user -> new UserResponseDTO(
                 user.getId(),                
                 user.getName(),
-                user.getEmail()
+                user.getEmail(),
+                user.getRoles()
             ))
             .collect(Collectors.toList()));
     }
@@ -70,7 +72,8 @@ public class UserService {
             new UserResponseDTO(
                 user.getId(),            
                 user.getName(),
-                user.getEmail()
+                user.getEmail(),
+                user.getRoles()
         ));
     }
 
@@ -100,7 +103,7 @@ public class UserService {
     }
 
     public String createUserTesterSync() {
-        userR.save(new User("UserTest", "test@gmail.com", "4bcdefg!test"));
+        userR.save(new User());
         return "Created User Tester";
     }
     

@@ -2,6 +2,7 @@ package com.kacademic.models;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.DiscriminatorValue;
@@ -25,8 +26,8 @@ public class Professor extends User {
 
     private int wage; // Wage in cents (e.g., 1000 cents = 10.00)
 
-    public Professor(String name, String email, String password, int wage) {
-        super(name, email, password);
+    public Professor(String name, String email, String password, Set<Role> roles, int wage) {
+        super(name, email, password, roles);
         this.wage = wage;
     }
 

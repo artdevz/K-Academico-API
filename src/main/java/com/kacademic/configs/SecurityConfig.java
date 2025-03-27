@@ -2,7 +2,6 @@ package com.kacademic.configs;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -17,11 +16,9 @@ import com.kacademic.security.JwtTokenFilter;
 @EnableWebSecurity
 public class SecurityConfig {
     
-    private final AuthenticationProvider authProvider;
     private final JwtTokenFilter jwtF;
 
-    public SecurityConfig(AuthenticationProvider authProvider, JwtTokenFilter jwtF) {
-        this.authProvider = authProvider;
+    public SecurityConfig(JwtTokenFilter jwtF) {
         this.jwtF = jwtF;
     }
 
@@ -33,11 +30,11 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/auth/login").permitAll()
-                .requestMatchers("/api/course").hasRole("USER")
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/init/*").permitAll() // DEV MODE
+                .requestMatchers("/auth/login").permitAll()
+                .requestMatchers("/course").hasRole("USER")
                 .anyRequest().authenticated()
             )
-            .authenticationProvider(authProvider)
             .addFilterBefore(jwtF, UsernamePasswordAuthenticationFilter.class)
             .cors(cors -> cors.configurationSource(corsConfigurationSource()));
 
