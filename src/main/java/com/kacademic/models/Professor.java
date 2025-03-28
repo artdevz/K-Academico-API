@@ -26,7 +26,7 @@ public class Professor extends User {
 
     private int wage; // Wage in cents (e.g., 1000 cents = 10.00)
 
-    public Professor(String name, String email, String password, Set<Role> roles, int wage) {
+    public Professor(String name, String email, String password, Set<AppRole> roles, int wage) {
         super(name, email, password, roles);
         this.wage = wage;
     }

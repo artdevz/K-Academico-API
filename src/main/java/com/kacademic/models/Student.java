@@ -43,7 +43,7 @@ public class Student extends User {
 
     private float average;
         
-    public Student(String name, String email, String password, Set<Role> roles, Course course, String enrollment) {
+    public Student(String name, String email, String password, Set<AppRole> roles, Course course, String enrollment) {
         super(name, email, password, roles);
         this.course = course;
         this.enrollment = enrollment;

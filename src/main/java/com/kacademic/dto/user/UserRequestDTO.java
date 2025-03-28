@@ -2,7 +2,7 @@ package com.kacademic.dto.user;
 
 import java.util.Set;
 
-import com.kacademic.models.Role;
+import com.kacademic.models.AppRole;
 import com.kacademic.utils.Password;
 
 import jakarta.validation.constraints.Email;
@@ -18,6 +18,6 @@ public record UserRequestDTO(
 
     @Password String password,
 
-    Set<Role> roles
+    Set<AppRole> roles
 
 ) {}

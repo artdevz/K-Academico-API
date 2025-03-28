@@ -53,9 +53,9 @@ public class User implements UserDetails {
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     @Fetch(FetchMode.JOIN)
-    private Set<Role> roles;
+    private Set<AppRole> roles;
 
-    public User(String name, String email, String password, Set<Role> roles) {
+    public User(String name, String email, String password, Set<AppRole> roles) {
         this.name = name;
         this.email = email;
         this.password = password;

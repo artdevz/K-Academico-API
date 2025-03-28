@@ -18,13 +18,12 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "roles")
+@Table(name = "app_roles")
 @Entity
-public class Role implements GrantedAuthority {
+public class AppRole implements GrantedAuthority {
     
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", columnDefinition = "uuid", unique = true, nullable = false)
     private UUID id;
 
     @Column(unique = true)
@@ -34,7 +33,7 @@ public class Role implements GrantedAuthority {
     @Size(max = 255, message = "Description cannot exceed 255 characters")
     private String description;
 
-    public Role(String name, String description) {
+    public AppRole(String name, String description) {
         this.name = name;
         this.description = description;
     }
