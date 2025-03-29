@@ -12,28 +12,23 @@ import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kacademic.auth.AuthRequestDTO;
-import com.kacademic.auth.AuthService;
-import com.kacademic.dto.course.CourseRequestDTO;
-import com.kacademic.security.JwtTokenProvider;
-import com.kacademic.services.CourseService;
-import com.kacademic.services.UserService;
+import com.kacademic.app.dto.auth.AuthRequestDTO;
+import com.kacademic.app.dto.course.CourseRequestDTO;
+import com.kacademic.app.services.AuthService;
+import com.kacademic.app.services.CourseService;
+import com.kacademic.app.services.UserService;
+import com.kacademic.infra.security.JwtTokenProvider;
 
-@WebMvcTest(CourseController.class)
-@ExtendWith(SpringExtension.class)
 public class CourseControllerTest {
 
     @MockBean

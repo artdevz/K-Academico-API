@@ -15,8 +15,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.kacademic.dto.course.CourseRequestDTO;
-import com.kacademic.repositories.CourseRepository;
+import com.kacademic.app.dto.course.CourseRequestDTO;
+import com.kacademic.app.services.CourseService;
+import com.kacademic.domain.repositories.CourseRepository;
 
 public class CourseServiceTest {
 
