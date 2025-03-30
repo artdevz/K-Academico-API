@@ -2,7 +2,7 @@ package com.kacademic.interfaces.controllers;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
+// import java.util.concurrent.CompletableFuture;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,8 +45,9 @@ public class AttendanceController {
         @ApiResponse(responseCode = "404", description = "Resource not found. The provided ID(s) do not match any existing record(s) in the system.")
     })
     @PostMapping
-    public CompletableFuture<ResponseEntity<String>> create(@RequestBody @Valid AttendanceRequestDTO request) {
-        return attendanceS.createAsync(request).thenApply(response -> new ResponseEntity<>(response, HttpStatus.CREATED));
+    public ResponseEntity<String> create(@RequestBody @Valid AttendanceRequestDTO request) {
+        // return attendanceS.createAsync(request).thenApply(response -> new ResponseEntity<>(response, HttpStatus.CREATED));
+        return new ResponseEntity<>(attendanceS.createAsync(request), HttpStatus.CREATED);
     }
     
     @Operation(
@@ -57,8 +58,9 @@ public class AttendanceController {
         @ApiResponse(responseCode = "200", description = "Attendances successfully retrieved")
     })
     @GetMapping    
-    public CompletableFuture<ResponseEntity<List<AttendanceResponseDTO>>> readAll() {
-        return attendanceS.readAllAsync().thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
+    public ResponseEntity<List<AttendanceResponseDTO>> readAll() {
+        // return attendanceS.readAllAsync().thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
+        return new ResponseEntity<>(attendanceS.readAllAsync(), HttpStatus.OK);
     }
 
     @Operation(
@@ -70,8 +72,9 @@ public class AttendanceController {
         @ApiResponse(responseCode = "404", description = "Attendance not found")
     })
     @GetMapping("/{id}")
-    public CompletableFuture<ResponseEntity<AttendanceResponseDTO>> readById(@PathVariable UUID id) {
-        return attendanceS.readByIdAsync(id).thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
+    public ResponseEntity<AttendanceResponseDTO> readById(@PathVariable UUID id) {
+        // return attendanceS.readByIdAsync(id).thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
+        return new ResponseEntity<>(attendanceS.readByIdAsync(id), HttpStatus.OK);
     }    
     
     @Operation(
@@ -83,8 +86,9 @@ public class AttendanceController {
         @ApiResponse(responseCode = "404", description = "Attendance not found")
     })
     @PatchMapping("/{id}")
-    public CompletableFuture<ResponseEntity<String>> update(@PathVariable UUID id, @RequestBody @Valid AttendanceUpdateDTO data) {
-        return attendanceS.updateAsync(id, data).thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
+    public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid AttendanceUpdateDTO data) {
+        // return attendanceS.updateAsync(id, data).thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
+        return new ResponseEntity<>(attendanceS.updateAsync(id, data), HttpStatus.OK);
     }
 
     @Operation(
@@ -96,8 +100,9 @@ public class AttendanceController {
         @ApiResponse(responseCode = "404", description = "Attendance not found")
     })
     @DeleteMapping("/{id}")
-    public CompletableFuture<ResponseEntity<String>> delete(@PathVariable UUID id) {
-        return attendanceS.deleteAsync(id).thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
+    public ResponseEntity<String> delete(@PathVariable UUID id) {
+        // return attendanceS.deleteAsync(id).thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
+        return new ResponseEntity<>(attendanceS.deleteAsync(id), HttpStatus.OK);
     }
 
 }

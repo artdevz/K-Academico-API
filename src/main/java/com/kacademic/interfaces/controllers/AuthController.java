@@ -1,7 +1,8 @@
 package com.kacademic.interfaces.controllers;
 
-import java.util.concurrent.CompletableFuture;
+// import java.util.concurrent.CompletableFuture;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,8 +37,9 @@ public class AuthController {
         @ApiResponse(responseCode = "401", description = "Unauthorized: Invalid credentials")
     })
     @PostMapping("/login")
-    public CompletableFuture<ResponseEntity<String>> login(@RequestBody @Valid AuthRequestDTO request) {
-        return authS.login(request).thenApply(token -> ResponseEntity.ok(token));
+    public ResponseEntity<String> login(@RequestBody @Valid AuthRequestDTO request) {
+        // return authS.login(request).thenApply(token -> ResponseEntity.ok(token));
+        return new ResponseEntity<>(authS.login(request), HttpStatus.OK);
     }
 
 }

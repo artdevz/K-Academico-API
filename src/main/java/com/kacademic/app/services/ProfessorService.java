@@ -2,11 +2,9 @@ package com.kacademic.app.services;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -16,87 +14,71 @@ import com.kacademic.app.dto.professor.ProfessorResponseDTO;
 import com.kacademic.app.dto.professor.ProfessorUpdateDTO;
 import com.kacademic.domain.models.Professor;
 import com.kacademic.domain.repositories.ProfessorRepository;
+import com.kacademic.domain.repositories.RoleRepository;
 
 @Service
 public class ProfessorService {
     
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
+    
     private final ProfessorRepository professorR;
+    private final RoleRepository roleR;
 
-    private final String entity = "Professor";
-
-    public ProfessorService(ProfessorRepository professorR) {
+    public ProfessorService(ProfessorRepository professorR, RoleRepository roleR) {
         this.professorR = professorR;
+        this.roleR = roleR;
     }
 
-    @Async
-    public CompletableFuture<String> createAsync(ProfessorRequestDTO data) {
-
+    public String createAsync(ProfessorRequestDTO data) {
         Professor professor = new Professor(
             data.user().name(),
             data.user().email(),
             passwordEncoder.encode(data.user().password()),
-            data.user().roles(),            
-            data.wage()            
+            data.user().roles().stream()
+                .map(roleId -> roleR.findById(roleId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not Found")))
+                .collect(Collectors.toSet()),
+            data.wage()
         );
-
         professorR.save(professor);
-        return CompletableFuture.completedFuture("Created " + entity);
-        
+        return "Created Professor";
     }
 
-    @Async
-    public CompletableFuture<List<ProfessorResponseDTO>> readAllAsync() {
-
-        return CompletableFuture.completedFuture(
-            professorR.findAll().stream()
+    public List<ProfessorResponseDTO> readAllAsync() {
+        return professorR.findAll().stream()
             .map(professor -> new ProfessorResponseDTO(
-                professor.getId(),                
+                professor.getId(),
                 professor.getName(),
                 professor.getEmail(),
                 professor.getWage()
             ))
-            .collect(Collectors.toList()));
+            .collect(Collectors.toList());
     }
 
-    @Async
-    public CompletableFuture<ProfessorResponseDTO> readByIdAsync(UUID id) {
-
+    public ProfessorResponseDTO readByIdAsync(UUID id) {
         Professor professor = professorR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found"));
-        
-        return CompletableFuture.completedFuture(
-            new ProfessorResponseDTO(
-                professor.getId(),                
-                professor.getName(),
-                professor.getEmail(),
-                professor.getWage()
-        ));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Professor not Found"));
+        return new ProfessorResponseDTO(
+            professor.getId(),
+            professor.getName(),
+            professor.getEmail(),
+            professor.getWage()
+        );
     }
 
-    @Async
-    public CompletableFuture<String> updateAsync(UUID id, ProfessorUpdateDTO data) {
-
+    public String updateAsync(UUID id, ProfessorUpdateDTO data) {
         Professor professor = professorR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found"));
-        
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Professor not Found"));
         data.wage().ifPresent(professor::setWage);
-
         professorR.save(professor);
-        return CompletableFuture.completedFuture("Updated " + entity);
-                
+        return "Updated Professor";
     }
 
-    @Async
-    public CompletableFuture<String> deleteAsync(UUID id) {
-
-        if (!professorR.findById(id).isPresent()) 
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found");
-        
+    public String deleteAsync(UUID id) {
+        if (!professorR.findById(id).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Professor not Found");
+        }
         professorR.deleteById(id);
-        return CompletableFuture.completedFuture("Deleted " + entity);
-
+        return "Deleted Professor";
     }
-
 }

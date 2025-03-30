@@ -2,7 +2,6 @@ package com.kacademic.interfaces.controllers;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,8 +45,8 @@ public class UserController {
         @ApiResponse(responseCode = "422", description = "Name or password length is invalid (too short or too long)")
     })    
     @PostMapping
-    public CompletableFuture<ResponseEntity<String>> create(@RequestBody @Valid UserRequestDTO request) {
-        return userS.createAsync(request).thenApply(response -> new ResponseEntity<>(response, HttpStatus.CREATED));
+    public ResponseEntity<String> create(@RequestBody @Valid UserRequestDTO request) {
+        return new ResponseEntity<>(userS.createAsync(request), HttpStatus.CREATED);
     }
     
     @Operation(
@@ -58,8 +57,8 @@ public class UserController {
         @ApiResponse(responseCode = "200", description = "Users successfully retrieved")
     })    
     @GetMapping    
-    public CompletableFuture<ResponseEntity<List<UserResponseDTO>>> readAll() {
-        return userS.readAllAsync().thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
+    public ResponseEntity<List<UserResponseDTO>> readAll() {
+        return new ResponseEntity<>(userS.readAllAsync(), HttpStatus.OK);
     }
 
     @Operation(
@@ -71,8 +70,8 @@ public class UserController {
         @ApiResponse(responseCode = "404", description = "User not found")
     })
     @GetMapping("/{id}")
-    public CompletableFuture<ResponseEntity<UserResponseDTO>> readById(@PathVariable UUID id) {
-        return userS.readByIdAsync(id).thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
+    public ResponseEntity<UserResponseDTO> readById(@PathVariable UUID id) {
+        return new ResponseEntity<>(userS.readByIdAsync(id), HttpStatus.OK);
     }    
     
     @Operation(
@@ -84,8 +83,8 @@ public class UserController {
         @ApiResponse(responseCode = "404", description = "User not found")
     })
     @PatchMapping("/{id}")
-    public CompletableFuture<ResponseEntity<String>> update(@PathVariable UUID id, @RequestBody @Valid UserUpdateDTO data) {
-        return userS.updateAsync(id, data).thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
+    public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid UserUpdateDTO data) {
+        return new ResponseEntity<>(userS.updateAsync(id, data), HttpStatus.OK);
     }
 
     @Operation(
@@ -97,8 +96,8 @@ public class UserController {
         @ApiResponse(responseCode = "404", description = "User not found")
     })
     @DeleteMapping("/{id}")
-    public CompletableFuture<ResponseEntity<String>> delete(@PathVariable UUID id) {
-        return userS.deleteAsync(id).thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
+    public ResponseEntity<String> delete(@PathVariable UUID id) {
+        return new ResponseEntity<>(userS.deleteAsync(id), HttpStatus.OK);
     }
 
 }

@@ -1,6 +1,6 @@
 package com.kacademic.interfaces.controllers;
 
-import java.util.concurrent.CompletableFuture;
+// import java.util.concurrent.CompletableFuture;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,8 +36,9 @@ public class InitController {
         @ApiResponse(responseCode = "409", description = "Admin already be created")
     })
     @PostMapping("/admin")
-    public CompletableFuture<ResponseEntity<String>> initAdmin() {
-        return initS.initAdminAsync().thenApply(response -> new ResponseEntity<>(response, HttpStatus.CREATED));
+    public ResponseEntity<String> initAdmin() {
+        // return initS.initAdminAsync().thenApply(response -> new ResponseEntity<>(response, HttpStatus.CREATED));
+        return new ResponseEntity<>(initS.initAdminAsync(), HttpStatus.CREATED);
     }
 
     @Operation(
@@ -49,8 +50,9 @@ public class InitController {
         @ApiResponse(responseCode = "409", description = "Role name already being used")
     })
     @PostMapping("/roles")
-    public CompletableFuture<ResponseEntity<String>> initRoles(@RequestBody @Valid RoleRequestDTO data) {
-        return initS.initRolesAsync(data).thenApply(response -> new ResponseEntity<>(response, HttpStatus.CREATED));
+    public ResponseEntity<String> initRoles(@RequestBody @Valid RoleRequestDTO data) {
+        // return initS.initRolesAsync(data).thenApply(response -> new ResponseEntity<>(response, HttpStatus.CREATED));
+        return new ResponseEntity<>(initS.initRolesAsync(data), HttpStatus.CREATED);
     }
     
 }

@@ -2,7 +2,6 @@ package com.kacademic.interfaces.controllers;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,8 +45,8 @@ public class SubjectController {
         @ApiResponse(responseCode = "404", description = "Resource not found. The provided ID(s) do not match any existing record(s) in the system.")
     })
     @PostMapping
-    public CompletableFuture<ResponseEntity<String>> create(@RequestBody @Valid SubjectRequestDTO request) {
-        return subjectS.createAsync(request).thenApply(response -> new ResponseEntity<>(response, HttpStatus.CREATED));
+    public ResponseEntity<String> create(@RequestBody @Valid SubjectRequestDTO request) {
+        return new ResponseEntity<>(subjectS.createAsync(request), HttpStatus.CREATED);
     }
     
     @Operation(
@@ -59,22 +58,21 @@ public class SubjectController {
     })
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping    
-    public CompletableFuture<ResponseEntity<List<SubjectResponseDTO>>> readAll() {
-        System.out.println("Chegou em Controller");
-        return subjectS.readAllAsync().thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
+    public ResponseEntity<List<SubjectResponseDTO>> readAll() {
+        return new ResponseEntity<>(subjectS.readAllAsync(), HttpStatus.OK);
     }
 
     @Operation(
         summary = "Get subjects details by ID",
-        description = "Retrieves the details of a specific subjects identified by the provided ID"
+        description = "Retrieves the details of a specific subject identified by the provided ID"
     )
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Subject found and retrieved successfully"),
         @ApiResponse(responseCode = "404", description = "Subject not found")
     })
     @GetMapping("/{id}")
-    public CompletableFuture<ResponseEntity<SubjectResponseDTO>> readById(@PathVariable UUID id) {
-        return subjectS.readByIdAsync(id).thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
+    public ResponseEntity<SubjectResponseDTO> readById(@PathVariable UUID id) {
+        return new ResponseEntity<>(subjectS.readByIdAsync(id), HttpStatus.OK);
     }    
     
     @Operation(
@@ -86,8 +84,8 @@ public class SubjectController {
         @ApiResponse(responseCode = "404", description = "Subject not found")
     })
     @PatchMapping("/{id}")
-    public CompletableFuture<ResponseEntity<String>> update(@PathVariable UUID id, @RequestBody @Valid SubjectUpdateDTO data) {
-        return subjectS.updateAsync(id, data).thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
+    public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid SubjectUpdateDTO data) {
+        return new ResponseEntity<>(subjectS.updateAsync(id, data), HttpStatus.OK);
     }
 
     @Operation(
@@ -99,9 +97,7 @@ public class SubjectController {
         @ApiResponse(responseCode = "404", description = "Subject not found")
     })
     @DeleteMapping("/{id}")
-    public CompletableFuture<ResponseEntity<String>> delete(@PathVariable UUID id) {
-        return subjectS.deleteAsync(id).thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
+    public ResponseEntity<String> delete(@PathVariable UUID id) {
+        return new ResponseEntity<>(subjectS.deleteAsync(id), HttpStatus.OK);
     }
-
-
 }

@@ -2,11 +2,10 @@ package com.kacademic.app.services;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.annotation.Async;
+// import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -23,15 +22,12 @@ public class CourseService {
     
     private final CourseRepository courseR;
 
-    // private final Executor asyncExecutor;
-
-    public CourseService(CourseRepository courseR) { //, @Qualifier("asyncExecutor") Executor asyncExecutor) {
+    public CourseService(CourseRepository courseR) {
         this.courseR = courseR;
-        // this.asyncExecutor = asyncExecutor;
     }
 
-    @Async
-    public CompletableFuture<String> createAsync(CourseRequestDTO data) {
+    // @Async
+    public String createAsync(CourseRequestDTO data) {
         System.out.println("[app.services.CourseService]: Criando Course...");
         Course course = new Course(
             data.name(),
@@ -40,15 +36,15 @@ public class CourseService {
         );
 
         courseR.save(course);
-        System.out.println("[app.services.CrouseService]: Course!");
-        return CompletableFuture.completedFuture("Created Course");
-
+        System.out.println("[app.services.CourseService]: Course criado!");
+        // return CompletableFuture.completedFuture("Created Course");
+        return "Created Course";
     }
 
-    @Async
-    public CompletableFuture<List<CourseResponseDTO>> readAllAsync() {
+    // @Async
+    public List<CourseResponseDTO> readAllAsync() {
 
-        return CompletableFuture.completedFuture(
+        return (
             courseR.findAll().stream()
             .map(course -> new CourseResponseDTO(
                 course.getId(),                
@@ -58,15 +54,16 @@ public class CourseService {
                 course.getDescription()
             ))
             .collect(Collectors.toList()));
+            
     }
 
-    @Async
-    public CompletableFuture<CourseDetailsDTO> readByIdAsync(UUID id) {
+    // @Async
+    public CourseDetailsDTO readByIdAsync(UUID id) {
 
         Course course = courseR.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found"));
         
-        return CompletableFuture.completedFuture(
+        return (
             new CourseDetailsDTO(
                 new CourseResponseDTO(
                     course.getId(),
@@ -74,8 +71,7 @@ public class CourseService {
                     course.getCode(),
                     course.getDuration(),
                     course.getDescription()
-                    ),
-
+                ),
                 course.getSubjects().stream().map(subject -> new SubjectResponseDTO(
                     subject.getId(),
                     subject.getCourse().getId(),
@@ -84,12 +80,12 @@ public class CourseService {
                     subject.getDuration(),
                     subject.getSemester(),
                     subject.getPrerequisites()
-                    )).collect(Collectors.toList())
+                )).collect(Collectors.toList())
         ));
     }
 
-    @Async
-    public CompletableFuture<String> updateAsync(UUID id, CourseUpdateDTO data) {
+    // @Async
+    public String updateAsync(UUID id, CourseUpdateDTO data) {
 
         Course course = courseR.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found"));        
@@ -98,19 +94,18 @@ public class CourseService {
         data.description().ifPresent(course::setDescription);
 
         courseR.save(course);
-        return CompletableFuture.completedFuture("Updated Course");
-        
+        // return CompletableFuture.completedFuture("Updated Course");
+        return "Updated Course";
     }
 
-    @Async
-    public CompletableFuture<String> deleteAsync(UUID id) {
+    // @Async
+    public String deleteAsync(UUID id) {
 
         if (!courseR.findById(id).isPresent()) 
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found");
         
         courseR.deleteById(id);
-        return CompletableFuture.completedFuture("Deleted Course");
-
+        // return CompletableFuture.completedFuture("Deleted Course");
+        return "Deleted Course";
     }
-
 }

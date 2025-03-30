@@ -2,7 +2,6 @@ package com.kacademic.interfaces.controllers;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,8 +44,8 @@ public class GradeController {
         @ApiResponse(responseCode = "404", description = "Resource not found. The provided ID(s) do not match any existing record(s) in the system.")
     })
     @PostMapping
-    public CompletableFuture<ResponseEntity<String>> create(@RequestBody @Valid GradeRequestDTO request) {
-        return gradeS.createAsync(request).thenApply(response -> new ResponseEntity<>(response, HttpStatus.CREATED));
+    public ResponseEntity<String> create(@RequestBody @Valid GradeRequestDTO request) {
+        return new ResponseEntity<>(gradeS.createAsync(request), HttpStatus.CREATED);
     }
     
     @Operation(
@@ -57,23 +56,23 @@ public class GradeController {
         @ApiResponse(responseCode = "200", description = "Grades successfully retrieved")
     })
     @GetMapping    
-    public CompletableFuture<ResponseEntity<List<GradeResponseDTO>>> readAll() {
-        return gradeS.readAllAsync().thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
+    public ResponseEntity<List<GradeResponseDTO>> readAll() {
+        return new ResponseEntity<>(gradeS.readAllAsync(), HttpStatus.OK);
     }
 
     @Operation(
-        summary = "Get grades details by ID",
-        description = "Retrieves the details of a specific grades identified by the provided ID"
+        summary = "Get grade details by ID",
+        description = "Retrieves the details of a specific grade identified by the provided ID"
     )
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Grade found and retrieved successfully"),
         @ApiResponse(responseCode = "404", description = "Grade not found")
     })
     @GetMapping("/{id}")
-    public CompletableFuture<ResponseEntity<GradeResponseDTO>> readById(@PathVariable UUID id) {
-        return gradeS.readByIdAsync(id).thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
+    public ResponseEntity<GradeResponseDTO> readById(@PathVariable UUID id) {
+        return new ResponseEntity<>(gradeS.readByIdAsync(id), HttpStatus.OK);
     }    
-    
+
     @Operation(
         summary = "Update grade by ID",
         description = "Updates the details of a grade identified by the provided ID. Only the specified fields will be updated. <br>If any field is passed as null in the request, it will not be changed"
@@ -83,8 +82,8 @@ public class GradeController {
         @ApiResponse(responseCode = "404", description = "Grade not found")
     })
     @PatchMapping("/{id}")
-    public CompletableFuture<ResponseEntity<String>> update(@PathVariable UUID id, @RequestBody @Valid GradeUpdateDTO data) {
-        return gradeS.updateAsync(id, data).thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
+    public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid GradeUpdateDTO data) {
+        return new ResponseEntity<>(gradeS.updateAsync(id, data), HttpStatus.OK);
     }
 
     @Operation(
@@ -96,8 +95,8 @@ public class GradeController {
         @ApiResponse(responseCode = "404", description = "Grade not found")
     })
     @DeleteMapping("/{id}")
-    public CompletableFuture<ResponseEntity<String>> delete(@PathVariable UUID id) {
-        return gradeS.deleteAsync(id).thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
+    public ResponseEntity<String> delete(@PathVariable UUID id) {
+        return new ResponseEntity<>(gradeS.deleteAsync(id), HttpStatus.OK);
     }
 
 }

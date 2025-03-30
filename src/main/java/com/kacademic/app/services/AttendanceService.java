@@ -2,11 +2,11 @@ package com.kacademic.app.services;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
+// import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.annotation.Async;
+// import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -25,16 +25,14 @@ public class AttendanceService {
     private final EnrolleeRepository enrolleeR;
     private final LessonRepository lessonR;
     
-    private final String entity = "Attendance";
-
     public AttendanceService(AttendanceRepository attendanceR, EnrolleeRepository enrolleeR, LessonRepository lessonR) {
         this.attendanceR = attendanceR;
         this.enrolleeR = enrolleeR;
         this.lessonR = lessonR;
     }
     
-    @Async
-    public CompletableFuture<String> createAsync(AttendanceRequestDTO data) {
+    // @Async
+    public String createAsync(AttendanceRequestDTO data) {
 
         Attendance attendance = new Attendance(
             enrolleeR.findById(data.enrollee()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee not Found")),
@@ -43,14 +41,16 @@ public class AttendanceService {
         );
         
         attendanceR.save(attendance);
-        return CompletableFuture.completedFuture("Created " + entity);
+        // return CompletableFuture.completedFuture("Created Attendance");
+        return "Created Attendace";
 
     }
 
-    @Async
-    public CompletableFuture<List<AttendanceResponseDTO>> readAllAsync() {
+    // @Async
+    public List<AttendanceResponseDTO> readAllAsync() {
 
-        return CompletableFuture.completedFuture(
+        // return CompletableFuture.completedFuture(
+        return(
             attendanceR.findAll().stream()
             .map(attendance -> new AttendanceResponseDTO(
                 attendance.getId(),
@@ -62,13 +62,14 @@ public class AttendanceService {
 
     }
 
-    @Async
-    public CompletableFuture<AttendanceResponseDTO> readByIdAsync(UUID id) {
+    // @Async
+    public AttendanceResponseDTO readByIdAsync(UUID id) {
 
         Attendance attendance = attendanceR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found"));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Attendance not Found"));
         
-        return CompletableFuture.completedFuture(
+        // return CompletableFuture.completedFuture(
+        return(
             new AttendanceResponseDTO(
                 attendance.getId(),
                 attendance.getEnrollee().getId(),
@@ -78,25 +79,27 @@ public class AttendanceService {
 
     }
 
-    @Async
-    public CompletableFuture<String> updateAsync(UUID id, AttendanceUpdateDTO data) {
+    // @Async
+    public String updateAsync(UUID id, AttendanceUpdateDTO data) {
 
         Attendance attendance = attendanceR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found"));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Attendance not Found"));
             
         attendanceR.save(attendance);
-        return CompletableFuture.completedFuture("Updated " + entity);
+        // return CompletableFuture.completedFuture("Updated Attendance");
+        return "Updated Attendance";
         
     }
 
-    @Async
-    public CompletableFuture<String> deleteAsync(UUID id) {
+    // @Async
+    public String deleteAsync(UUID id) {
 
         if (!attendanceR.findById(id).isPresent()) 
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Attendance not Found");
         
         attendanceR.deleteById(id);
-        return CompletableFuture.completedFuture("Deleted " + entity);
+        // return CompletableFuture.completedFuture("Deleted Attendance");
+        return "Deleted Attendance";
 
     }
 

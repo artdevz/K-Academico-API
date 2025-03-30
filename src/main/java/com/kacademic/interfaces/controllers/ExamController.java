@@ -2,7 +2,6 @@ package com.kacademic.interfaces.controllers;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,8 +44,8 @@ public class ExamController {
         @ApiResponse(responseCode = "404", description = "Resource not found. The provided ID(s) do not match any existing record(s) in the system.")
     })
     @PostMapping
-    public CompletableFuture<ResponseEntity<String>> create(@RequestBody @Valid ExamRequestDTO request) {
-        return examS.createAsync(request).thenApply(response -> new ResponseEntity<>(response, HttpStatus.CREATED));
+    public ResponseEntity<String> create(@RequestBody @Valid ExamRequestDTO request) {
+        return new ResponseEntity<>(examS.createAsync(request), HttpStatus.CREATED);
     }
     
     @Operation(
@@ -57,34 +56,34 @@ public class ExamController {
         @ApiResponse(responseCode = "200", description = "Exams successfully retrieved")
     })
     @GetMapping    
-    public CompletableFuture<ResponseEntity<List<ExamResponseDTO>>> readAll() {
-        return examS.readAllAsync().thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
+    public ResponseEntity<List<ExamResponseDTO>> readAll() {
+        return new ResponseEntity<>(examS.readAllAsync(), HttpStatus.OK);
     }
 
     @Operation(
-        summary = "Get exams details by ID",
-        description = "Retrieves the details of a specific exams identified by the provided ID"
+        summary = "Get exam details by ID",
+        description = "Retrieves the details of a specific exam identified by the provided ID"
     )
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Exam found and retrieved successfully"),
         @ApiResponse(responseCode = "404", description = "Exam not found")
     })
     @GetMapping("/{id}")
-    public CompletableFuture<ResponseEntity<ExamResponseDTO>> readById(@PathVariable UUID id) {
-        return examS.readByIdAsync(id).thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
+    public ResponseEntity<ExamResponseDTO> readById(@PathVariable UUID id) {
+        return new ResponseEntity<>(examS.readByIdAsync(id), HttpStatus.OK);
     }    
-    
+
     @Operation(
         summary = "Update exam by ID",
-        description = "Updates the details of a exam identified by the provided ID. Only the specified fields will be updated. <br>If any field is passed as null in the request, it will not be changed"
+        description = "Updates the details of an exam identified by the provided ID. Only the specified fields will be updated. <br>If any field is passed as null in the request, it will not be changed"
     )
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Exam successfully updated"),
         @ApiResponse(responseCode = "404", description = "Exam not found")
     })
     @PatchMapping("/{id}")
-    public CompletableFuture<ResponseEntity<String>> update(@PathVariable UUID id, @RequestBody @Valid ExamUpdateDTO data) {
-        return examS.updateAsync(id, data).thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
+    public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid ExamUpdateDTO data) {
+        return new ResponseEntity<>(examS.updateAsync(id, data), HttpStatus.OK);
     }
 
     @Operation(
@@ -96,8 +95,8 @@ public class ExamController {
         @ApiResponse(responseCode = "404", description = "Exam not found")
     })
     @DeleteMapping("/{id}")
-    public CompletableFuture<ResponseEntity<String>> delete(@PathVariable UUID id) {
-        return examS.deleteAsync(id).thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
+    public ResponseEntity<String> delete(@PathVariable UUID id) {
+        return new ResponseEntity<>(examS.deleteAsync(id), HttpStatus.OK);
     }
 
 }

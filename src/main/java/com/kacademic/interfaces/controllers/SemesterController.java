@@ -1,6 +1,6 @@
 package com.kacademic.interfaces.controllers;
 
-import java.util.concurrent.CompletableFuture;
+// import java.util.concurrent.CompletableFuture;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,10 +36,11 @@ public class SemesterController {
         @ApiResponse(responseCode = "200", description = "Finalizes all the grades of the semester and updates the enrollees' status (Approved/Failed).")
     })
     @PostMapping("/{semester}")
-    public CompletableFuture<ResponseEntity<String>> finalSubmit(
+    public ResponseEntity<String> finalSubmit(
         @Parameter(description = "The semester to be finalized. <br>E.g: 25.1", required = true)
         @PathVariable @Semester String semester) {
-        return semesterS.finalSubmitAsync(semester).thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
+        // return semesterS.finalSubmitAsync(semester).thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
+        return new ResponseEntity<>(semesterS.finalSubmitAsync(semester), HttpStatus.OK);
     }
 
 }

@@ -4,11 +4,9 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -21,6 +19,7 @@ import com.kacademic.app.dto.student.StudentUpdateDTO;
 import com.kacademic.domain.models.Course;
 import com.kacademic.domain.models.Student;
 import com.kacademic.domain.repositories.CourseRepository;
+import com.kacademic.domain.repositories.RoleRepository;
 import com.kacademic.domain.repositories.StudentRepository;
 
 @Service
@@ -30,36 +29,36 @@ public class StudentService {
 
     private final StudentRepository studentR;
     private final CourseRepository courseR;
+    private final RoleRepository roleR;
 
-    private final String entity = "Student";
-
-    public StudentService(StudentRepository studentR, CourseRepository courseR) {
+    public StudentService(StudentRepository studentR, CourseRepository courseR, RoleRepository roleR) {
         this.studentR = studentR;
         this.courseR = courseR;
+        this.roleR = roleR;
     }
 
-    @Async
-    public CompletableFuture<String> createAsync(StudentRequestDTO data) {
+    public String createAsync(StudentRequestDTO data) {
 
         Student student = new Student(
             data.user().name(),
             data.user().email(),
             passwordEncoder.encode(data.user().password()),
-            data.user().roles(),
+            data.user().roles().stream()
+                .map(roleId -> roleR.findById(roleId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not Found")))
+                .collect(Collectors.toSet()),
             courseR.findById(data.course()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found")),
             generateEnrollment(courseR.findById(data.course()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found")))
         );
 
         studentR.save(student);
-        return CompletableFuture.completedFuture("Created " + entity);
+        return "Created Student";
         
     }
 
-    @Async
-    public CompletableFuture<List<StudentResponseDTO>> readAllAsync() {
+    public List<StudentResponseDTO> readAllAsync() {
 
-        return CompletableFuture.completedFuture(
-            studentR.findAll().stream()
+        return studentR.findAll().stream()
             .map(student -> new StudentResponseDTO(
                 student.getId(),                
                 student.getCourse().getId(),
@@ -68,55 +67,51 @@ public class StudentService {
                 student.getEmail(),
                 student.getAverage()
             ))
-            .collect(Collectors.toList()));
+            .collect(Collectors.toList());
     }
 
-    @Async
-    public CompletableFuture<StudentDetailsDTO> readByIdAsync(UUID id) {
+    public StudentDetailsDTO readByIdAsync(UUID id) {
 
         Student student = studentR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found"));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not Found"));
         
-        return CompletableFuture.completedFuture(
-            new StudentDetailsDTO(
-                new StudentResponseDTO(
-                    student.getId(),            
-                    student.getCourse().getId(),
-                    student.getEnrollment(),
-                    student.getName(),
-                    student.getEmail(),
-                    student.getAverage()
-                    ),
-                student.getEnrollees().stream().map(enrollee -> new EnrolleeResponseDTO(
-                    enrollee.getId(),
-                    enrollee.getStudent().getId(),
-                    enrollee.getGrade().getId(),
-                    enrollee.getAbsences(),
-                    enrollee.getAverage(),
-                    enrollee.getStatus()
-                    )).collect(Collectors.toList())
-        ));
+        return new StudentDetailsDTO(
+            new StudentResponseDTO(
+                student.getId(),            
+                student.getCourse().getId(),
+                student.getEnrollment(),
+                student.getName(),
+                student.getEmail(),
+                student.getAverage()
+            ),
+            student.getEnrollees().stream().map(enrollee -> new EnrolleeResponseDTO(
+                enrollee.getId(),
+                enrollee.getStudent().getId(),
+                enrollee.getGrade().getId(),
+                enrollee.getAbsences(),
+                enrollee.getAverage(),
+                enrollee.getStatus()
+            )).collect(Collectors.toList())
+        );
     }
 
-    @Async
-    public CompletableFuture<String> updateAsync(UUID id, StudentUpdateDTO data) {
+    public String updateAsync(UUID id, StudentUpdateDTO data) {
 
         Student student = studentR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found"));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not Found"));
             
         studentR.save(student);
-        return CompletableFuture.completedFuture("Updated " + entity);
+        return "Updated Student";
         
     }
 
-    @Async
-    public CompletableFuture<String> deleteAsync(UUID id) {
+    public String deleteAsync(UUID id) {
 
         if (!studentR.findById(id).isPresent()) 
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not Found");
         
         studentR.deleteById(id);
-        return CompletableFuture.completedFuture("Deleted " + entity);
+        return "Deleted Student";
 
     }
 

@@ -2,9 +2,9 @@ package com.kacademic.app.services;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
+// import java.util.concurrent.CompletableFuture;
 
-import org.springframework.scheduling.annotation.Async;
+// import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.kacademic.domain.enums.EEnrollee;
@@ -35,8 +35,8 @@ public class SemesterService {
     }
 
     // PRE AF
-    @Async
-    public CompletableFuture<String> partialSubmitAsync(UUID id) {
+    // @Async
+    public String partialSubmitAsync(UUID id) {
         
         Grade grade = gradeR.findById(id).get();
 
@@ -48,13 +48,14 @@ public class SemesterService {
 
         }
 
-        return CompletableFuture.completedFuture("Partially completed the Grade Activities");
+        // return CompletableFuture.completedFuture("Partially completed the Grade Activities");
+        return "Partially completed the Grade Activities";
         
     }
 
     // POS AF
-    @Async
-    public CompletableFuture<String> finalSubmitAsync(@Semester String semester) {
+    // @Async
+    public String finalSubmitAsync(@Semester String semester) {
      
         List<Grade> grades = gradeR.findAll();
 
@@ -75,7 +76,8 @@ public class SemesterService {
         }
 
         this.updateAvarage();
-        return CompletableFuture.completedFuture("All Grades have been completed for Semester ");
+        // return CompletableFuture.completedFuture("All Grades have been completed for Semester ");
+        return "All Grades have been completed for Semester ";
 
     }
 

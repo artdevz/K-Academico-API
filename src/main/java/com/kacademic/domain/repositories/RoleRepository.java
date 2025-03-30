@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import com.kacademic.domain.models.Role;
 
 @Repository
-public interface AppRoleRepository extends JpaRepository<Role, UUID> {
+public interface RoleRepository extends JpaRepository<Role, UUID> {
 
     Optional<Role> findByName(String name);
 

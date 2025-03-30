@@ -1,3 +1,12 @@
 package com.kacademic.app.dto.auth;
 
-public record AuthRequestDTO(String email, String password) {}
+import jakarta.validation.constraints.Email;
+
+public record AuthRequestDTO(
+
+    @Email
+    String email,
+    
+    String password
+
+) {}

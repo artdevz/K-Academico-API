@@ -2,11 +2,9 @@ package com.kacademic.app.services;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -23,16 +21,12 @@ public class ExamService {
     private final ExamRepository examR;
     private final GradeRepository gradeR;
 
-    private final String entity = "Exam";
-
     public ExamService(ExamRepository examR, GradeRepository gradeR) {
         this.examR = examR;
         this.gradeR = gradeR;
     }
 
-    @Async
-    public CompletableFuture<String> createAsync(ExamRequestDTO data) {
-
+    public String createAsync(ExamRequestDTO data) {
         Exam exam = new Exam(
             gradeR.findById(data.grade()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Grade not Found")),
             data.name(),
@@ -41,14 +35,11 @@ public class ExamService {
         );
 
         examR.save(exam);
-        return CompletableFuture.completedFuture("Created " + entity);
-        
+        return "Created Exam";
     }
 
-    @Async
-    public CompletableFuture<List<ExamResponseDTO>> readAllAsync() {
-
-        return CompletableFuture.completedFuture(
+    public List<ExamResponseDTO> readAllAsync() {
+        return (
             examR.findAll().stream()
             .map(exam -> new ExamResponseDTO(
                 exam.getId(),
@@ -60,13 +51,11 @@ public class ExamService {
             .collect(Collectors.toList()));
     }
 
-    @Async
-    public CompletableFuture<ExamResponseDTO> readByIdAsync(UUID id) {
-
+    public ExamResponseDTO readByIdAsync(UUID id) {
         Exam exam = examR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found"));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exam not Found"));
         
-        return CompletableFuture.completedFuture(
+        return (
             new ExamResponseDTO(
                 exam.getId(),
                 exam.getGrade().getId(),
@@ -76,26 +65,19 @@ public class ExamService {
         ));
     }
 
-    @Async
-    public CompletableFuture<String> updateAsync(UUID id, ExamUpdateDTO data) {
-
+    public String updateAsync(UUID id, ExamUpdateDTO data) {
         Exam exam = examR.findById(id)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found"));
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exam not Found"));
             
         examR.save(exam);
-        return CompletableFuture.completedFuture("Updated " + entity);
-                
+        return "Updated Exam";
     }
 
-    @Async
-    public CompletableFuture<String> deleteAsync(UUID id) {
-
+    public String deleteAsync(UUID id) {
         if (!examR.findById(id).isPresent()) 
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Exam not Found");
         
         examR.deleteById(id);
-        return CompletableFuture.completedFuture("Deleted " + entity);
-
+        return "Deleted Exam";
     }
-
 }
