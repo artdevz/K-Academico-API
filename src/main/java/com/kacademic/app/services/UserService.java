@@ -31,7 +31,7 @@ public class UserService {
 
     public String createAsync(UserRequestDTO data) {
          
-        validateEmail(data.email());
+        ensureEmailIsUnique(data.email());
 
         User user = new User(            
             data.name(),
@@ -88,13 +88,8 @@ public class UserService {
         userR.deleteById(id);
         return "Deleted User";
     }
-
-    public String createUserTesterSync() {
-        userR.save(new User());
-        return "Created User Tester";
-    }
     
-    private void validateEmail(String email) {
+    private void ensureEmailIsUnique(String email) {
         if (userR.findByEmail(email).isPresent()) 
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already being used");
     }
