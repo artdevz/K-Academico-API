@@ -1,13 +1,13 @@
-package com.kacademic.repositories;
+// package com.kacademic.repositories;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.test.context.ActiveProfiles;
+// import org.junit.jupiter.api.Test;
+// import org.springframework.test.context.ActiveProfiles;
 
-@ActiveProfiles("test")
-public class EnrolleeRepositoryTest {
+// @ActiveProfiles("test")
+// public class EnrolleeRepositoryTest {
 
-    @Test
-    void testRemoveGradeFromEnrollees() {
+//     @Test
+//     void testRemoveGradeFromEnrollees() {
 
-    }
-}
+//     }
+// }

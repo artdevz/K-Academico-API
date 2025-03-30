@@ -1,6 +1,6 @@
 package com.kacademic.infra.configs;
 
-import java.util.List;
+import java.util.Arrays;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,15 +16,15 @@ public class CorsConfig {
 
         CorsConfiguration config = new CorsConfiguration();
 
-        config.addAllowedOrigin("*");//List.of("http://localhost:4200"));
-        config.addAllowedMethod("*");//List.of("GET", "POST", "PATCH", "DELETE", "OPTIONS"));
-        config.addAllowedHeader("*");//List.of("Authorization", "Content-Type"));
+        config.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "Accept"));
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
 
-        System.out.println("Cors configado com sucesso!");
+        System.out.println("[infra.configs.CorsConfig.INFO]: Configuração Cors registrada com sucesso!");
         return new CorsFilter(source);
 
     }

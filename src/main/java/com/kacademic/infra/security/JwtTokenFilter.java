@@ -1,6 +1,7 @@
 package com.kacademic.infra.security;
 
 import java.io.IOException;
+import java.util.Collections;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +17,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Component
 public class JwtTokenFilter extends OncePerRequestFilter {
-    private static final Logger logger = LoggerFactory.getLogger(JwtTokenFilter.class); // REMOVER
+
+    private static final Logger log = LoggerFactory.getLogger(JwtTokenFilter.class);
     private final JwtTokenProvider jwtTokenProvider;
 
     public JwtTokenFilter(JwtTokenProvider jwtTokenProvider) {
@@ -27,26 +29,36 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        logger.debug("Interceptando requisição para: {}", request.getRequestURI());
+        log.debug("[infra.security.JwtTokenFilter]: Interceptando requisição para: {} | Método: {}", request.getRequestURI(), request.getMethod());
+        log.debug("[infra.security.JwtTokenFilter]: Cabeçalhos recebidos: {}", Collections.list(request.getHeaderNames()));
 
         String token = jwtTokenProvider.resolveToken(request);
 
-        if (token != null) logger.debug("Token encontrado: {}", token); // Remover
-        else logger.debug("Nenhum token encontrado no cabeçalho Authorization");
+        if (token != null) {
+            if (jwtTokenProvider.validateToken(token)) {
 
-        if (token != null && jwtTokenProvider.validateToken(token)) {
-            Authentication auth = jwtTokenProvider.getAuthentication(token);
-            if (auth != null) {
-                logger.debug("Usuário autenticado: {}", auth.getName());
-                SecurityContextHolder.getContext().setAuthentication(auth);
+                Authentication auth = jwtTokenProvider.getAuthentication(token);
+
+                if (auth != null) {
+                    log.debug("[infra.security.JwtTokenFilter]: Usuário autenticado: {}", auth.getName());
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+                } else {
+                    logger.warn("[infra.security.JwtTokenFilter]: Falha ao obter autenticação do token");
+                }
             } else {
-                logger.warn("Falha ao obter autenticação do token");
+                log.warn("[infra.security.JwtTokenFilter]: Token inválido ou expirado");
             }
         } else {
-            logger.warn("Token inválido ou expirado");
+            log.debug("[infra.security.JwtTokenFilter]: Nenhum token encontrado no cabeçalho Authorization");
         }
 
         filterChain.doFilter(request, response);
+        
+        /*
+        if (token != null && jwtTokenProvider.validateToken(token)) {
+            Authentication auth = jwtTokenProvider.getAuthentication(token);
+            if (auth != null) SecurityContextHolder.getContext().setAuthentication(auth);
+        } */
 
     }
 

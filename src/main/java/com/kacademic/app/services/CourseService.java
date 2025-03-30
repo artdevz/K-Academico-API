@@ -23,23 +23,25 @@ public class CourseService {
     
     private final CourseRepository courseR;
 
-    private final String entity = "Course";
+    // private final Executor asyncExecutor;
 
-    public CourseService(CourseRepository courseR) {
+    public CourseService(CourseRepository courseR) { //, @Qualifier("asyncExecutor") Executor asyncExecutor) {
         this.courseR = courseR;
+        // this.asyncExecutor = asyncExecutor;
     }
 
     @Async
     public CompletableFuture<String> createAsync(CourseRequestDTO data) {
-         
+        System.out.println("[app.services.CourseService]: Criando Course...");
         Course course = new Course(
             data.name(),
             data.code(),
             data.description()
         );
-        
+
         courseR.save(course);
-        return CompletableFuture.completedFuture("Created " + entity);
+        System.out.println("[app.services.CrouseService]: Course!");
+        return CompletableFuture.completedFuture("Created Course");
 
     }
 
@@ -62,7 +64,7 @@ public class CourseService {
     public CompletableFuture<CourseDetailsDTO> readByIdAsync(UUID id) {
 
         Course course = courseR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found"));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found"));
         
         return CompletableFuture.completedFuture(
             new CourseDetailsDTO(
@@ -90,13 +92,13 @@ public class CourseService {
     public CompletableFuture<String> updateAsync(UUID id, CourseUpdateDTO data) {
 
         Course course = courseR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found"));        
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found"));        
         
         data.name().ifPresent(course::setName);
         data.description().ifPresent(course::setDescription);
 
         courseR.save(course);
-        return CompletableFuture.completedFuture("Updated " + entity);
+        return CompletableFuture.completedFuture("Updated Course");
         
     }
 
@@ -104,10 +106,10 @@ public class CourseService {
     public CompletableFuture<String> deleteAsync(UUID id) {
 
         if (!courseR.findById(id).isPresent()) 
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, entity + " not Found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found");
         
         courseR.deleteById(id);
-        return CompletableFuture.completedFuture("Deleted " + entity);
+        return CompletableFuture.completedFuture("Deleted Course");
 
     }
 

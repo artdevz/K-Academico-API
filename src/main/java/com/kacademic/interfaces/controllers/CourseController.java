@@ -45,7 +45,6 @@ public class CourseController {
         @ApiResponse(responseCode = "400", description = "Invalid data format"),
         @ApiResponse(responseCode = "404", description = "Resource not found. The provided ID(s) do not match any existing record(s) in the system.")
     })
-    // @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public CompletableFuture<ResponseEntity<String>> create(@RequestBody @Valid CourseRequestDTO request) {
         System.out.println("Creating Course...");

@@ -1,5 +1,7 @@
 package com.kacademic.infra.configs;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -7,25 +9,41 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+// import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.filter.CorsFilter;
 
 import com.kacademic.infra.security.JwtTokenFilter;
-import com.kacademic.infra.security.UserAuthService;
+
+// import jakarta.annotation.PostConstruct;
+
+import com.kacademic.infra.security.CustomUserDetailsService;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
     
+    private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
+
     private final JwtTokenFilter jwtF;
     private final CorsFilter corsF;
-    private final UserAuthService userAuthS;
+    private final CustomUserDetailsService userDetailsS;
 
-    public SecurityConfig(JwtTokenFilter jwtF, CorsFilter corsF, UserAuthService userAuthS) {
+    public SecurityConfig(JwtTokenFilter jwtF, CorsFilter corsF, CustomUserDetailsService userDetailsS) {
         this.jwtF = jwtF;
         this.corsF = corsF;
-        this.userAuthS = userAuthS;
+        this.userDetailsS = userDetailsS;
+
+        log.info("[infra.configs.SecurityConfig]: SecurityConfig Initialized");
+        log.debug("[infra.configs.SecurityConfig]: DEBUG MODE actived for SecurityConfig");
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
@@ -38,23 +56,26 @@ public class SecurityConfig {
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/init/*", "/error").permitAll() // DEV MODE
                 .requestMatchers("/auth/login").permitAll()
                 .requestMatchers("/**").hasAuthority("ADMIN")
-                // .anyRequest().authenticated()
+                .anyRequest().authenticated()
             )
             .addFilterBefore(jwtF, UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(corsF, JwtTokenFilter.class);
-        System.out.println("SecurityFilterChain carregado corretamente!");
+
+        log.info("[infra.configs.SecurityConfig]: SecurityFilterChain configurado com sucesso!");
         return http.build();
 
     }
 
     @Bean
     AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-        
         AuthenticationManagerBuilder authBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
-        authBuilder.userDetailsService(userAuthS);
-
+        authBuilder.userDetailsService(userDetailsS);
         return authBuilder.build();
-
     }
+
+    // @PostConstruct
+    // void enableSecurityContextPropagation() {
+    //     SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
+    // }
 
 }
