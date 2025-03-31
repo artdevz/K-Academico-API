@@ -31,8 +31,11 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         log.debug("[infra.security.JwtTokenFilter]: Interceptando requisição para: {} | Método: {}", request.getRequestURI(), request.getMethod());
         log.debug("[infra.security.JwtTokenFilter]: Cabeçalhos recebidos: {}", Collections.list(request.getHeaderNames()));
+        System.out.println("[infra.security.JwtTokenFilter]: Interceptando requisição para: " + request.getRequestURI() + " | Método: " + request.getMethod());
+        System.out.println("[infra.security.JwtTokenFilter]: Cabeçalhos recebidos: " + Collections.list(request.getHeaderNames()));
 
         String token = jwtTokenProvider.resolveToken(request);
+        System.out.println("[infra.security.JwtTokenFilter]: Token recebido no filtro: " + token);
 
         if (token != null) {
             if (jwtTokenProvider.validateToken(token)) {
@@ -41,15 +44,19 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
                 if (auth != null) {
                     log.debug("[infra.security.JwtTokenFilter]: Usuário autenticado: {}", auth.getName());
+                    System.out.println("[infra.security.JwtTokenFilter]: Usuário autenticado: " + auth.getName());
                     SecurityContextHolder.getContext().setAuthentication(auth);
                 } else {
                     logger.warn("[infra.security.JwtTokenFilter]: Falha ao obter autenticação do token");
+                    System.out.println("[infra.security.JwtTokenFilter]: Falha ao obter autenticação do token");
                 }
             } else {
                 log.warn("[infra.security.JwtTokenFilter]: Token inválido ou expirado");
+                System.out.println("[infra.security.JwtTokenFilter]: Token inválido ou expirado");
             }
         } else {
             log.debug("[infra.security.JwtTokenFilter]: Nenhum token encontrado no cabeçalho Authorization");
+            System.out.println("[infra.security.JwtTokenFilter]: Nenhum token encontrado no cabeçalho Authorization");
         }
 
         filterChain.doFilter(request, response);

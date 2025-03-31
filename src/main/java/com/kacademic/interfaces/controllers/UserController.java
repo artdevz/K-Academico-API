@@ -46,6 +46,8 @@ public class UserController {
     })    
     @PostMapping
     public ResponseEntity<String> create(@RequestBody @Valid UserRequestDTO request) {
+        System.out.println("[interfaces.controllers.UserController]: Requisição recebida!");
+        System.out.println("Dados do Request: " + request);
         return new ResponseEntity<>(userS.createAsync(request), HttpStatus.CREATED);
     }
     
