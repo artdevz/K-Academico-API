@@ -1,8 +1,12 @@
 package com.kacademic.app.services;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 
 import com.kacademic.app.dto.role.RoleRequestDTO;
+import com.kacademic.app.dto.role.RoleResponseDTO;
 import com.kacademic.domain.models.Role;
 import com.kacademic.domain.repositories.RoleRepository;
 
@@ -24,6 +28,18 @@ public class RoleService {
 
         roleR.save(role);
         return "Created Role";
+
+    }
+
+    public List<RoleResponseDTO> readAllAsync() {
+
+        return roleR.findAll().stream()
+            .map(role -> new RoleResponseDTO(
+                role.getId(),
+                role.getName(),
+                role.getDescription()
+            ))
+            .collect(Collectors.toList());
 
     }
 

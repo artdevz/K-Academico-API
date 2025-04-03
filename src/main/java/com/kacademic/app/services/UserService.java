@@ -1,6 +1,7 @@
 package com.kacademic.app.services;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -12,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.kacademic.app.dto.user.UserRequestDTO;
 import com.kacademic.app.dto.user.UserResponseDTO;
 import com.kacademic.app.dto.user.UserUpdateDTO;
+import com.kacademic.domain.models.Role;
 import com.kacademic.domain.models.User;
 import com.kacademic.domain.repositories.RoleRepository;
 import com.kacademic.domain.repositories.UserRepository;
@@ -27,6 +29,22 @@ public class UserService {
     public UserService(UserRepository userR, RoleRepository roleR) {
         this.userR = userR;
         this.roleR = roleR;
+    }
+
+    public String createInitialAdmin() {
+
+        Role adminRole = roleR.findByName("ADMIN").orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Role ADMIN isn't created yet"));
+
+        User admin = new User(
+            "K-Academic Admin",
+            "admin@gmail.com",
+            passwordEncoder.encode("4bcdefG!"),
+            Set.of(adminRole)
+        );
+
+        userR.save(admin);
+        return "Created Admin";
+
     }
 
     public String createAsync(UserRequestDTO data) {

@@ -1,3 +1,9 @@
 package com.kacademic.app.dto.role;
 
-public record RoleResponseDTO() {}
+import java.util.UUID;
+
+public record RoleResponseDTO(
+    UUID id,
+    String name,
+    String description
+) {}
