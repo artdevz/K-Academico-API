@@ -25,11 +25,11 @@ public class Evaluation {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "enrollee_id", referencedColumnName = "id")
     private Enrollee enrollee;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "exam_id", referencedColumnName = "id")
     private Exam exam;
 

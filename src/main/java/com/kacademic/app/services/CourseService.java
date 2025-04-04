@@ -40,7 +40,7 @@ public class CourseService {
             );
 
             courseR.save(course);
-            return "Created Course";
+            return "Course successfully Created: " + course.getId();
         }, taskExecutor);
     }
 
@@ -61,12 +61,12 @@ public class CourseService {
         }, taskExecutor);
     }
 
-    @Async("taskExecutor")
     @Transactional
+    @Async("taskExecutor")
     public CompletableFuture<CourseDetailsDTO> readByIdAsync(UUID id) {
         return CompletableFuture.supplyAsync(() -> {
             Course course = courseR.findByIdWithSubjects(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found"));
         
             return (
                 new CourseDetailsDTO(

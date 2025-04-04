@@ -18,6 +18,7 @@ import com.kacademic.domain.models.Exam;
 import com.kacademic.domain.repositories.ExamRepository;
 import com.kacademic.domain.repositories.GradeRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -29,6 +30,7 @@ public class ExamService {
 
     private final AsyncTaskExecutor taskExecutor;
 
+    @Transactional
     @Async("taskExecutor")
     public CompletableFuture<String> createAsync(ExamRequestDTO data) {
         return CompletableFuture.supplyAsync(() -> {

@@ -18,6 +18,7 @@ import com.kacademic.app.dto.course.CourseRequestDTO;
 import com.kacademic.app.dto.course.CourseResponseDTO;
 import com.kacademic.app.dto.course.CourseUpdateDTO;
 import com.kacademic.app.services.CourseService;
+import com.kacademic.shared.utils.AsyncUnwrapper;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -67,7 +68,7 @@ public class CourseController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<CourseDetailsDTO> readById(@PathVariable UUID id) {
-        return ResponseEntity.ok(courseS.readByIdAsync(id).join());
+        return ResponseEntity.ok(AsyncUnwrapper.unwrapExceptions(courseS.readByIdAsync(id)));
     } 
     
     

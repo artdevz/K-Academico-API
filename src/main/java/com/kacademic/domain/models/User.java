@@ -70,8 +70,6 @@ public class User implements UserDetails {
         List<GrantedAuthority> authorities = roles.stream()
             .map(role -> new SimpleGrantedAuthority(role.getName()))
             .collect(Collectors.toList());
-        
-        System.out.println("model.user: Authorities atribuidas ao usuário: " + authorities);
 
         return authorities;
     }

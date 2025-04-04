@@ -58,6 +58,7 @@ public class GlobalHandlerException {
 
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<ApiResponse> handleResponseStatusException(ResponseStatusException e, WebRequest request) {
+        System.out.println("RSE!!!!!!!!!!!!!!!!!!!!!!");
         ApiResponse response = new ApiResponse(
             e.getStatusCode().toString(),
             e.getReason(),

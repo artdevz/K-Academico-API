@@ -54,11 +54,12 @@ public class GradeService {
         }, taskExecutor);
     }
 
+    @Transactional
     @Async("taskExecutor")
     public CompletableFuture<List<GradeResponseDTO>> readAllAsync() {
         return CompletableFuture.supplyAsync(() -> {
             return (
-                gradeR.findAll().stream()
+                gradeR.findAllWithTimetables().stream()
                 .map(grade -> new GradeResponseDTO(
                     grade.getId(),
                     grade.getSubject().getId(),
@@ -75,10 +76,11 @@ public class GradeService {
         }, taskExecutor);
     }
 
+    @Transactional
     @Async("taskExecutor")
     public CompletableFuture<GradeResponseDTO> readByIdAsync(UUID id) {
         return CompletableFuture.supplyAsync(() -> {
-            Grade grade = gradeR.findById(id)
+            Grade grade = gradeR.findByIdWithTimetables(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Grade not Found"));
             
             return (
@@ -97,14 +99,15 @@ public class GradeService {
         }, taskExecutor);
     }
 
+    @Transactional
     @Async("taskExecutor")
     public CompletableFuture<String> updateAsync(UUID id, GradeUpdateDTO data) {
         return CompletableFuture.supplyAsync(() -> {
-            Grade grade = gradeR.findById(id)
+            Grade grade = gradeR.findByIdWithEnrollees(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Grade not Found"));
         
             data.status().ifPresent(grade::setStatus);
-            if (data.status().isPresent() && data.status().get().equals(EGrade.FINISHED)) semesterS.partialSubmitAsync(id);
+            if (data.status().isPresent() && data.status().get().equals(EGrade.FINAL)) semesterS.processPartialResults(id);
     
             grade.setCurrentStudents(grade.getEnrollees().size()); // Atualiza o Número de Estudantes.
             

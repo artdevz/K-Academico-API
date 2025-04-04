@@ -14,6 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.kacademic.app.dto.subject.SubjectRequestDTO;
 import com.kacademic.app.dto.subject.SubjectResponseDTO;
 import com.kacademic.app.dto.subject.SubjectUpdateDTO;
+import com.kacademic.domain.models.Course;
 import com.kacademic.domain.models.Subject;
 import com.kacademic.domain.repositories.CourseRepository;
 import com.kacademic.domain.repositories.SubjectRepository;
@@ -33,7 +34,7 @@ public class SubjectService {
     public CompletableFuture<String> createAsync(SubjectRequestDTO data) {
         return CompletableFuture.supplyAsync(() -> {
             Subject subject = new Subject(
-                courseR.findById(data.course()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found")),
+                courseR.findByIdWithSubjects(data.course()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found")),
                 data.name(),
                 data.description(),
                 data.duration(),
@@ -41,7 +42,7 @@ public class SubjectService {
                 data.prerequisites()
             );
             
-            subject.getCourse().setDuration(subject.getCourse().getDuration() + data.duration()); // Adiciona no Curso as Horas dessa Disciplina.
+            updateCourseDuration(courseR.findByIdWithSubjects(data.course()).get(), data.duration());
             
             subjectR.save(subject);
             return "Created Subject";
@@ -93,8 +94,8 @@ public class SubjectService {
             data.type().ifPresent(subject::setType);
             data.name().ifPresent(subject::setName);
             data.description().ifPresent(subject::setDescription);
-            data.duration().ifPresent(subject::setDuration);
-            data.semester().ifPresent(subject::setSemester);
+            // data.duration().ifPresent(subject::setDuration);
+            // data.semester().ifPresent(subject::setSemester);
     
             subjectR.save(subject);
             return "Updated Subject";
@@ -104,16 +105,19 @@ public class SubjectService {
     @Async("taskExecutor")
     public CompletableFuture<String> deleteAsync(UUID id) {
         return CompletableFuture.supplyAsync(() -> {
-            if (!subjectR.findById(id).isPresent()) 
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Subject not Found");
+            Subject subject = subjectR.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subject not Found"));
     
-            subjectR.findById(id).get().getCourse().setDuration(        // Remove no Curso as Horas dessa Disciplina.
-                subjectR.findById(id).get().getCourse().getDuration() - // Duração do Curso
-                subjectR.findById(id).get().getDuration() );            // Duração da Disciplina
+            updateCourseDuration(subject.getCourse(), subject.getDuration() * (-1)); // -1 for REMOVE
     
             subjectR.deleteById(id);
             return "Deleted Subject";
         }, taskExecutor);
+    }
+
+    private void updateCourseDuration(Course course, int duration) {
+        course.setDuration(course.getDuration() + duration);
+        courseR.save(course);
     }
 
 }

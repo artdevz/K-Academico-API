@@ -14,7 +14,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -39,12 +38,11 @@ public class Course implements Serializable {
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = false)
     private List<Student> students = new ArrayList<>();
 
-    @NotBlank(message="Nome do Curso não deve está em branco.")
-    @Size(min=4, max=160, message="Nome do Curso deve conter entre 4 e 160 caractéres.")
+    @Size(min=4, max=160, message="Course name must be between 4 and 160 characters")
     private String name;
 
-    @Pattern(regexp = "^\\d+$", message = "O Código do Curso deve ser composto apenas por números.")
-    @Size(min=2, max=2, message="O Código do Curso deve conter apenas 2 caractéres.")
+    @Pattern(regexp = "^\\d+$", message = "Course code must contain only numbers")
+    @Size(min=2, max=2, message="Course code must contain exactly 2 characters")
     private String code;
     
     private int duration; // In Hours.

@@ -36,7 +36,7 @@ public class Exam implements Serializable {
     @OneToMany(mappedBy = "exam")
     private Set<Evaluation> evaluations = new HashSet<>();
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     @JoinColumn(name = "grade_id", nullable = false)
     private Grade grade;
 

@@ -33,7 +33,7 @@ public class SemesterController {
     public ResponseEntity<String> finalSubmit(
         @Parameter(description = "The semester to be finalized. <br>E.g: 25.1", required = true)
         @PathVariable @Semester String semester) {
-        return ResponseEntity.ok(semesterS.finalSubmitAsync(semester).join());
+        return ResponseEntity.ok(semesterS.finalizeSemester(semester).join());
     }
 
 }

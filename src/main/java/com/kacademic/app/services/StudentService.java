@@ -25,6 +25,7 @@ import com.kacademic.domain.repositories.CourseRepository;
 import com.kacademic.domain.repositories.RoleRepository;
 import com.kacademic.domain.repositories.StudentRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -77,9 +78,10 @@ public class StudentService {
     }
 
     @Async("taskExecutor")
+    @Transactional
     public CompletableFuture<StudentDetailsDTO> readByIdAsync(UUID id) {
         return CompletableFuture.supplyAsync(() -> {
-            Student student = studentR.findById(id)
+            Student student = studentR.findByIdWithEnrollees(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not Found"));
             
             return new StudentDetailsDTO(

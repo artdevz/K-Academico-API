@@ -24,9 +24,9 @@ public class Timetable {
     private DayOfWeek day;
 
     @JsonFormat(pattern = "HH:mm")
-    private LocalTime start;
+    private LocalTime startTime;
 
     @JsonFormat(pattern = "HH:mm")
-    private LocalTime end;
+    private LocalTime endTime;
 
 }

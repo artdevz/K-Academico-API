@@ -15,7 +15,9 @@ import org.springframework.web.server.ResponseStatusException;
 import com.kacademic.app.dto.evaluation.EvaluationRequestDTO;
 import com.kacademic.app.dto.evaluation.EvaluationResponseDTO;
 import com.kacademic.app.dto.evaluation.EvaluationUpdateDTO;
+import com.kacademic.domain.models.Enrollee;
 import com.kacademic.domain.models.Evaluation;
+import com.kacademic.domain.models.Exam;
 import com.kacademic.domain.repositories.EnrolleeRepository;
 import com.kacademic.domain.repositories.EvaluationRepository;
 import com.kacademic.domain.repositories.ExamRepository;
@@ -35,9 +37,18 @@ public class EvaluationService {
     @Async("taskExecutor")
     public CompletableFuture<String> createAsync(EvaluationRequestDTO data) {
         return CompletableFuture.supplyAsync(() -> {
+            Enrollee enrollee = enrolleeR.findByIdWithEvaluationsAndAttendances(data.enrollee())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee not Found"));
+            
+            Exam exam = examR.findByIdWithGrade(data.exam())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exam not found"));
+
+            if (!belongsToSameGrade(enrollee, exam)) throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Enrollee and Exam must belong to the same Grade");
+            if (evaluationR.existsByEnrolleeIdAndExamId(enrollee.getId(), exam.getId())) throw new ResponseStatusException(HttpStatus.CONFLICT, "Evaluation already exists for this Enrollee and Exam");
+
             Evaluation evaluation = new Evaluation(
-                enrolleeR.findById(data.enrollee()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee not Found")),
-                examR.findById(data.exam()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exam not Found")),
+                enrollee,
+                exam,
                 data.score()
             );
             
@@ -110,8 +121,13 @@ public class EvaluationService {
     }
 
     private void addEvaluation(Evaluation evaluation) {
-        evaluation.getEnrollee().getEvaluations().add(evaluation);
-        evaluation.getEnrollee().setAverage(updateAverage(evaluation.getEnrollee().getEvaluations()));
+        Enrollee enrollee = enrolleeR.findByIdWithEvaluationsAndAttendances(evaluation.getEnrollee().getId())
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee not Found"));
+        
+        enrollee.getEvaluations().add(evaluation);
+        enrollee.setAverage(updateAverage(enrollee.getEvaluations()));
+
+        enrolleeR.save(enrollee);
     }
 
     private void editEvaluation(Evaluation evaluation) {
@@ -119,16 +135,25 @@ public class EvaluationService {
     }    
 
     private void removeEvaluation(Evaluation evaluation) {
-        for (Evaluation currentEvaluation : evaluation.getEnrollee().getEvaluations()) {
-            if (currentEvaluation.equals(evaluation)) evaluation.getEnrollee().getEvaluations().remove(evaluation);
-        }
-        evaluation.getEnrollee().setAverage(updateAverage(evaluation.getEnrollee().getEvaluations()));
+        Enrollee enrollee = enrolleeR.findByIdWithEvaluationsAndAttendances(evaluation.getEnrollee().getId())
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee not Found"));
+
+        enrollee.getEvaluations().removeIf(currentEvaluation -> currentEvaluation.equals(evaluation));
+
+        enrollee.setAverage(updateAverage(enrollee.getEvaluations()));
+
+        enrolleeR.save(enrollee);
     }
 
     private float updateAverage(Set<Evaluation> evaluations) {
         float sum = 0;
-        for (Evaluation evaluation : evaluations) sum += evaluation.getScore();           
-        
+        for (Evaluation evaluation : evaluations) sum += evaluation.getScore();
+
         return evaluations.isEmpty() ? 0 : sum / evaluations.size();
     }
+
+    private boolean belongsToSameGrade(Enrollee enrollee, Exam exam) {
+        return enrollee.getGrade().getId().equals(exam.getGrade().getId()); 
+    }
+
 }

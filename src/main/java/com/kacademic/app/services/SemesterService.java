@@ -24,9 +24,9 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class SemesterService {
     
-    private final float APPROVED = 7f;
-    private final float PARTIAL = 5f;
-    private final float FINAL = 3f;
+    private final float APPROVED_THRESHOLD = 7f;
+    private final float PARTIAL_THRESHOLD = 5f;
+    private final float FINAL_THRESHOLD = 3f;
 
     private final GradeRepository gradeR;
     private final StudentRepository studentR;
@@ -34,74 +34,82 @@ public class SemesterService {
 
     private final AsyncTaskExecutor taskExecutor;
 
-    // PRE AF
+    /** 
+     * Updates the students' statuses based on their partial results
+     * Average >= 7 -> APROVED
+     * 7 > Avarege >= 3 -> FINAL EXAM
+     * 3 > Avarege -> FAILED
+     */ 
     @Async("taskExecutor")
-    public CompletableFuture<String> partialSubmitAsync(UUID id) {
+    public CompletableFuture<String> processPartialResults(UUID id) {
         return CompletableFuture.supplyAsync(() -> {
-            Grade grade = gradeR.findById(id).get();
+            Grade grade = gradeR.findByIdWithEnrollees(id).get();
     
-            for (Enrollee enrollee : grade.getEnrollees()) {
-                if (enrollee.getStatus().equals(EEnrollee.ENROLLED)) enrollee.setStatus( getPartialResult(enrollee.getAverage() ));
-                // SUSPENDED... (Disciplina Trancada)?
-                enrolleeR.save(enrollee);
-            }
+            grade.getEnrollees().forEach(this::updatePartialStatus);
     
-            // return CompletableFuture.completedFuture("Partially completed the Grade Activities");
-            return "Partially completed the Grade Activities";
+            return "Partial results processed successfully";
         }, taskExecutor);
     }
 
-    // POS AF
+    /**
+     * Finalizes the semester by updating grades and students' final statuses
+     * Average >= 5 -> APROVED (POST FINAL EXAM)
+     * 5 > Average -> FAILED
+     */
     @Async("taskExecutor")
-    public CompletableFuture<String> finalSubmitAsync(@Semester String semester) {
+    public CompletableFuture<String> finalizeSemester(@Semester String semester) {
         return CompletableFuture.supplyAsync(() -> {
-            List<Grade> grades = gradeR.findAll();
+            List<Grade> grades = gradeR.findAllWithEnrolleesBySemesterAndStatus(semester, EGrade.FINAL);
     
-            for (Grade grade : grades) {
-                if (grade.getStatus().equals(EGrade.ONGOING) && grade.getSemester().equals(semester)) grade.setStatus(EGrade.FINISHED);
-    
-                for (Enrollee enrollee : grade.getEnrollees()) {
-                    if (enrollee.getStatus().equals(EEnrollee.FINAL_EXAM)) enrollee.setStatus( getFinalResult(enrollee.getAverage()) );
-                    
-                    enrolleeR.save(enrollee);
-                }
-                gradeR.save(grade);
-            }
-    
-            this.updateAvarage();
-            // return CompletableFuture.completedFuture("All Grades have been completed for Semester ");
-            return "All Grades have been completed for Semester ";
+            grades.forEach(this::finalizeGrade);
+            updateStudentsAvarage();
+
+            return "Semester finalized successfully";
         }, taskExecutor);
     }
 
-    // Result
-    private EEnrollee getPartialResult(float avarage) {
-        if (avarage < FINAL) return EEnrollee.FAILED;
-        if (avarage >= APPROVED) return EEnrollee.APPROVED;
-
-        return EEnrollee.FINAL_EXAM;
-    }
-
-    private EEnrollee getFinalResult(float avarage) {
-        if (avarage < PARTIAL) return EEnrollee.FAILED;
-
-        return EEnrollee.APPROVED;
-    }
-
-    // Avarage
-    private void updateAvarage() {
-        for (Student student : studentR.findAll() ) { 
-            student.setAverage(calculateAvarage(student));
-
-            studentR.save(student);
+    private void updatePartialStatus(Enrollee enrollee) {
+        if (enrollee.getStatus().equals(EEnrollee.ENROLLED)) {
+            enrollee.setStatus(determinePartialResult(enrollee.getAverage()));
+            enrolleeR.save(enrollee);
         }
     }
 
-    private float calculateAvarage(Student student) {
-        float sum = 0;
-        for (Enrollee enrollee : student.getEnrollees() ) sum += enrollee.getAverage();
-        
-        return sum / student.getEnrollees().size();
+    private void finalizeGrade(Grade grade) {
+        grade.setStatus(EGrade.FINISHED);
+        grade.getEnrollees().forEach(this::finalizeEnrollee);
+        gradeR.save(grade);
+    }
+
+    private void finalizeEnrollee(Enrollee enrollee) {
+        if (enrollee.getStatus() == EEnrollee.FINAL_EXAM) {
+            enrollee.setStatus(determineFinalResult(enrollee.getAverage()));
+            enrolleeR.save(enrollee);
+        }
+    }
+
+    private EEnrollee determinePartialResult(float avarage) {
+        if (avarage < FINAL_THRESHOLD) return EEnrollee.FAILED;
+        if (avarage >= APPROVED_THRESHOLD) return EEnrollee.APPROVED;
+        return EEnrollee.FINAL_EXAM;
+    }
+
+    private EEnrollee determineFinalResult(float avarage) {
+        return (avarage < PARTIAL_THRESHOLD) ? EEnrollee.FAILED : EEnrollee.APPROVED;
+    }
+
+    private void updateStudentsAvarage() {
+        studentR.findAllWithEnrollees().forEach(this::updateStudentAvarage);
+    }
+
+    private void updateStudentAvarage(Student student) {
+        double average = student.getEnrollees().stream()
+            .mapToDouble(Enrollee::getAverage)
+            .average()
+            .orElse(0.0);
+
+        student.setAverage((float)average);
+        studentR.save(student);
     }
 
 }
