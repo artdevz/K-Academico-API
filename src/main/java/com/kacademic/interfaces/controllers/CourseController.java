@@ -54,7 +54,7 @@ public class CourseController {
     })
     @GetMapping    
     public ResponseEntity<List<CourseResponseDTO>> readAll() {
-        return ResponseEntity.ok(courseS.readAllAsync());
+        return ResponseEntity.ok(courseS.readAllAsync().join());
     }
 
 
@@ -67,7 +67,7 @@ public class CourseController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<CourseDetailsDTO> readById(@PathVariable UUID id) {
-        return ResponseEntity.ok(courseS.readByIdAsync(id));
+        return ResponseEntity.ok(courseS.readByIdAsync(id).join());
     } 
     
     
@@ -80,7 +80,7 @@ public class CourseController {
     })
     @PatchMapping("/{id}")
     public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid CourseUpdateDTO data) {
-        return ResponseEntity.ok(courseS.updateAsync(id, data));
+        return ResponseEntity.ok(courseS.updateAsync(id, data).join());
     }
 
 
@@ -93,7 +93,7 @@ public class CourseController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable UUID id) {
-        return ResponseEntity.ok(courseS.deleteAsync(id));
+        return ResponseEntity.ok(courseS.deleteAsync(id).join());
     }
 
 

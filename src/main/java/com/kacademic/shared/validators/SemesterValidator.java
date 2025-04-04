@@ -11,10 +11,8 @@ public class SemesterValidator implements ConstraintValidator<Semester, String> 
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
-        
         if (value == null) return false;
         return value.matches(SEMESTER_REGEX);
-
     }
 
 }

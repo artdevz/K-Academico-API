@@ -12,11 +12,9 @@ public class OptionalPasswordValidator implements ConstraintValidator<Password, 
     private static final String PASSWORD_REGEX = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,32}$";
 
     @Override
-    public boolean isValid(Optional<String> value, ConstraintValidatorContext context) {
-        
+    public boolean isValid(Optional<String> value, ConstraintValidatorContext context) {        
         if (!value.isPresent()) return true;
-        return value.get().matches(PASSWORD_REGEX);
-        
+        return value.get().matches(PASSWORD_REGEX);        
     }
 
 }

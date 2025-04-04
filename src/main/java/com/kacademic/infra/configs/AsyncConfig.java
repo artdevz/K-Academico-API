@@ -7,8 +7,6 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.task.DelegatingSecurityContextAsyncTaskExecutor;
 
-import jakarta.annotation.PostConstruct;
-
 @EnableAsync
 @Configuration
 public class AsyncConfig {
@@ -23,11 +21,6 @@ public class AsyncConfig {
         executor.initialize();
 
         return new DelegatingSecurityContextAsyncTaskExecutor(executor);
-    }
-
-    @PostConstruct
-    public void init() {
-        System.out.println("[infra.configs.AsyncConfig]: AsyncConfig carregado com sucesso! taskExecutor configurado.");
     }
 
 }
