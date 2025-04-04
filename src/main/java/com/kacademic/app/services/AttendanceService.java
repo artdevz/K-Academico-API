@@ -2,11 +2,12 @@ package com.kacademic.app.services;
 
 import java.util.List;
 import java.util.UUID;
-// import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.http.HttpStatus;
-// import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -18,6 +19,9 @@ import com.kacademic.domain.repositories.AttendanceRepository;
 import com.kacademic.domain.repositories.EnrolleeRepository;
 import com.kacademic.domain.repositories.LessonRepository;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @Service
 public class AttendanceService {
     
@@ -25,74 +29,76 @@ public class AttendanceService {
     private final EnrolleeRepository enrolleeR;
     private final LessonRepository lessonR;
     
-    public AttendanceService(AttendanceRepository attendanceR, EnrolleeRepository enrolleeR, LessonRepository lessonR) {
-        this.attendanceR = attendanceR;
-        this.enrolleeR = enrolleeR;
-        this.lessonR = lessonR;
-    }
+    private final AsyncTaskExecutor taskExecutor;
     
-    // @Async
-    public String createAsync(AttendanceRequestDTO data) {
-        Attendance attendance = new Attendance(
-            enrolleeR.findById(data.enrollee()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee not Found")),
-            lessonR.findById(data.lesson()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not Found")),
-            data.isAbsent()
-        );
-        
-        attendanceR.save(attendance);
-        // return CompletableFuture.completedFuture("Created Attendance");
-        return "Created Attendace";
-    }
-
-    // @Async
-    public List<AttendanceResponseDTO> readAllAsync() {
-        // return CompletableFuture.completedFuture(
-        return(
-            attendanceR.findAll().stream()
-            .map(attendance -> new AttendanceResponseDTO(
-                attendance.getId(),
-                attendance.getEnrollee().getId(),
-                attendance.getLesson().getId(),
-                attendance.isAbsent()
-            ))
-            .collect(Collectors.toList())
-        );
-    }
-
-    // @Async
-    public AttendanceResponseDTO readByIdAsync(UUID id) {
-        Attendance attendance = attendanceR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Attendance not Found"));
-        
-        // return CompletableFuture.completedFuture(
-        return(
-            new AttendanceResponseDTO(
-                attendance.getId(),
-                attendance.getEnrollee().getId(),
-                attendance.getLesson().getId(),
-                attendance.isAbsent()
-            )
-        );
-    }
-
-    // @Async
-    public String updateAsync(UUID id, AttendanceUpdateDTO data) {
-        Attendance attendance = attendanceR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Attendance not Found"));
+    @Async("taskExecutor")
+    public CompletableFuture<String> createAsync(AttendanceRequestDTO data) {
+        return CompletableFuture.supplyAsync(() -> {
+            Attendance attendance = new Attendance(
+                enrolleeR.findById(data.enrollee()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee not Found")),
+                lessonR.findById(data.lesson()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not Found")),
+                data.isAbsent()
+            );
             
-        attendanceR.save(attendance);
-        // return CompletableFuture.completedFuture("Updated Attendance");
-        return "Updated Attendance";
+            attendanceR.save(attendance);
+            return "Created Attendace";
+
+        }, taskExecutor);
     }
 
-    // @Async
-    public String deleteAsync(UUID id) {
-        if (!attendanceR.findById(id).isPresent()) 
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Attendance not Found");
-        
-        attendanceR.deleteById(id);
-        // return CompletableFuture.completedFuture("Deleted Attendance");
-        return "Deleted Attendance";
+    @Async("taskExecutor")
+    public CompletableFuture<List<AttendanceResponseDTO>> readAllAsync() {
+        return CompletableFuture.supplyAsync(() -> {
+            return(
+                attendanceR.findAll().stream()
+                .map(attendance -> new AttendanceResponseDTO(
+                    attendance.getId(),
+                    attendance.getEnrollee().getId(),
+                    attendance.getLesson().getId(),
+                    attendance.isAbsent()
+                ))
+                .collect(Collectors.toList())
+            );
+        }, taskExecutor);
+    }
+
+    @Async("taskExecutor")
+    public CompletableFuture<AttendanceResponseDTO> readByIdAsync(UUID id) {
+        return CompletableFuture.supplyAsync(() -> {
+            Attendance attendance = attendanceR.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Attendance not Found"));
+            
+            return(
+                new AttendanceResponseDTO(
+                    attendance.getId(),
+                    attendance.getEnrollee().getId(),
+                    attendance.getLesson().getId(),
+                    attendance.isAbsent()
+                )
+            );
+        }, taskExecutor);
+    }
+
+    @Async("taskExecutor")
+    public CompletableFuture<String> updateAsync(UUID id, AttendanceUpdateDTO data) {
+        return CompletableFuture.supplyAsync(() -> {
+            Attendance attendance = attendanceR.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Attendance not Found"));
+                
+            attendanceR.save(attendance);
+            return "Updated Attendance";
+        }, taskExecutor);
+    }
+
+    @Async("taskExecutor")
+    public CompletableFuture<String> deleteAsync(UUID id) {
+        return CompletableFuture.supplyAsync(() -> {
+            if (!attendanceR.findById(id).isPresent()) 
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Attendance not Found");
+            
+            attendanceR.deleteById(id);
+            return "Deleted Attendance";
+        }, taskExecutor);
     }
 
 }

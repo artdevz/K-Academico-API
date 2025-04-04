@@ -2,9 +2,10 @@ package com.kacademic.app.services;
 
 import java.util.List;
 import java.util.UUID;
-// import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletableFuture;
 
-// import org.springframework.scheduling.annotation.Async;
+import org.springframework.core.task.AsyncTaskExecutor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.kacademic.domain.enums.EEnrollee;
@@ -17,6 +18,9 @@ import com.kacademic.domain.repositories.GradeRepository;
 import com.kacademic.domain.repositories.StudentRepository;
 import com.kacademic.shared.utils.Semester;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @Service
 public class SemesterService {
     
@@ -28,64 +32,64 @@ public class SemesterService {
     private final StudentRepository studentR;
     private final EnrolleeRepository enrolleeR;
 
-    public SemesterService(GradeRepository gradeR, StudentRepository studentR, EnrolleeRepository enrolleeR) {
-        this.gradeR = gradeR;
-        this.studentR = studentR;
-        this.enrolleeR = enrolleeR;
-    }
+    private final AsyncTaskExecutor taskExecutor;
 
     // PRE AF
-    // @Async
-    public String partialSubmitAsync(UUID id) {
-        Grade grade = gradeR.findById(id).get();
-
-        for (Enrollee enrollee : grade.getEnrollees()) {
-            if (enrollee.getStatus().equals(EEnrollee.ENROLLED)) enrollee.setStatus( getPartialResult(enrollee.getAverage() ));
-            // SUSPENDED... (Disciplina Trancada)?
-            enrolleeR.save(enrollee);
-        }
-
-        // return CompletableFuture.completedFuture("Partially completed the Grade Activities");
-        return "Partially completed the Grade Activities";
+    @Async("taskExecutor")
+    public CompletableFuture<String> partialSubmitAsync(UUID id) {
+        return CompletableFuture.supplyAsync(() -> {
+            Grade grade = gradeR.findById(id).get();
+    
+            for (Enrollee enrollee : grade.getEnrollees()) {
+                if (enrollee.getStatus().equals(EEnrollee.ENROLLED)) enrollee.setStatus( getPartialResult(enrollee.getAverage() ));
+                // SUSPENDED... (Disciplina Trancada)?
+                enrolleeR.save(enrollee);
+            }
+    
+            // return CompletableFuture.completedFuture("Partially completed the Grade Activities");
+            return "Partially completed the Grade Activities";
+        }, taskExecutor);
     }
 
     // POS AF
-    // @Async
-    public String finalSubmitAsync(@Semester String semester) {
-        List<Grade> grades = gradeR.findAll();
-
-        for (Grade grade : grades) {
-            if (grade.getStatus().equals(EGrade.ONGOING) && grade.getSemester().equals(semester)) grade.setStatus(EGrade.FINISHED);
-
-            for (Enrollee enrollee : grade.getEnrollees()) {
-                if (enrollee.getStatus().equals(EEnrollee.FINAL_EXAM)) enrollee.setStatus( getFinalResult(enrollee.getAverage()) );
-                
-                enrolleeR.save(enrollee);
+    @Async("taskExecutor")
+    public CompletableFuture<String> finalSubmitAsync(@Semester String semester) {
+        return CompletableFuture.supplyAsync(() -> {
+            List<Grade> grades = gradeR.findAll();
+    
+            for (Grade grade : grades) {
+                if (grade.getStatus().equals(EGrade.ONGOING) && grade.getSemester().equals(semester)) grade.setStatus(EGrade.FINISHED);
+    
+                for (Enrollee enrollee : grade.getEnrollees()) {
+                    if (enrollee.getStatus().equals(EEnrollee.FINAL_EXAM)) enrollee.setStatus( getFinalResult(enrollee.getAverage()) );
+                    
+                    enrolleeR.save(enrollee);
+                }
+                gradeR.save(grade);
             }
-            gradeR.save(grade);
-        }
-
-        this.updateAvarage();
-        // return CompletableFuture.completedFuture("All Grades have been completed for Semester ");
-        return "All Grades have been completed for Semester ";
+    
+            this.updateAvarage();
+            // return CompletableFuture.completedFuture("All Grades have been completed for Semester ");
+            return "All Grades have been completed for Semester ";
+        }, taskExecutor);
     }
 
     // Result
-    public EEnrollee getPartialResult(float avarage) {
+    private EEnrollee getPartialResult(float avarage) {
         if (avarage < FINAL) return EEnrollee.FAILED;
         if (avarage >= APPROVED) return EEnrollee.APPROVED;
 
         return EEnrollee.FINAL_EXAM;
     }
 
-    public EEnrollee getFinalResult(float avarage) {
+    private EEnrollee getFinalResult(float avarage) {
         if (avarage < PARTIAL) return EEnrollee.FAILED;
 
         return EEnrollee.APPROVED;
     }
 
     // Avarage
-    public void updateAvarage() {
+    private void updateAvarage() {
         for (Student student : studentR.findAll() ) { 
             student.setAverage(calculateAvarage(student));
 

@@ -42,7 +42,7 @@ public class EvaluationController {
     })
     @PostMapping
     public ResponseEntity<String> create(@RequestBody @Valid EvaluationRequestDTO request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(evaluationS.createAsync(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(evaluationS.createAsync(request).join());
     }
 
 
@@ -54,7 +54,7 @@ public class EvaluationController {
     })
     @GetMapping    
     public ResponseEntity<List<EvaluationResponseDTO>> readAll() {
-        return ResponseEntity.ok(evaluationS.readAllAsync());
+        return ResponseEntity.ok(evaluationS.readAllAsync().join());
     }
 
 
@@ -67,7 +67,7 @@ public class EvaluationController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<EvaluationResponseDTO> readById(@PathVariable UUID id) {
-        return ResponseEntity.ok(evaluationS.readByIdAsync(id));
+        return ResponseEntity.ok(evaluationS.readByIdAsync(id).join());
     }
     
     
@@ -80,7 +80,7 @@ public class EvaluationController {
     })
     @PatchMapping("/{id}")
     public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid EvaluationUpdateDTO data) {
-        return ResponseEntity.ok(evaluationS.updateAsync(id, data));
+        return ResponseEntity.ok(evaluationS.updateAsync(id, data).join());
     }
 
 
@@ -93,7 +93,7 @@ public class EvaluationController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable UUID id) {
-        return ResponseEntity.ok(evaluationS.deleteAsync(id));
+        return ResponseEntity.ok(evaluationS.deleteAsync(id).join());
     }
 
 

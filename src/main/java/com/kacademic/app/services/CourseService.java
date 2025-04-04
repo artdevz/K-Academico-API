@@ -20,17 +20,15 @@ import com.kacademic.domain.models.Course;
 import com.kacademic.domain.repositories.CourseRepository;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @Service
 public class CourseService {
     
     private final CourseRepository courseR;
+    
     private final AsyncTaskExecutor taskExecutor;
-
-    public CourseService(CourseRepository courseR, AsyncTaskExecutor taskExecutor) {
-        this.courseR = courseR;
-        this.taskExecutor = taskExecutor;
-    }
 
     @Async("taskExecutor")
     public CompletableFuture<String> createAsync(CourseRequestDTO data) {

@@ -43,7 +43,7 @@ public class EnrolleeController {
     })
     @PostMapping
     public ResponseEntity<String> create(@RequestBody @Valid EnrolleeRequestDTO request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(enrolleeS.createAsync(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(enrolleeS.createAsync(request).join());
     }
 
 
@@ -55,7 +55,7 @@ public class EnrolleeController {
     })
     @GetMapping    
     public ResponseEntity<List<EnrolleeResponseDTO>> readAll() {
-        return ResponseEntity.ok(enrolleeS.readAllAsync());
+        return ResponseEntity.ok(enrolleeS.readAllAsync().join());
     }
 
 
@@ -68,7 +68,7 @@ public class EnrolleeController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<EnrolleeDetailsDTO> readById(@PathVariable UUID id) {
-        return ResponseEntity.ok(enrolleeS.readByIdAsync(id));
+        return ResponseEntity.ok(enrolleeS.readByIdAsync(id).join());
     }  
     
     
@@ -81,7 +81,7 @@ public class EnrolleeController {
     })
     @PatchMapping("/{id}")
     public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid EnrolleeUpdateDTO data) {
-        return ResponseEntity.ok(enrolleeS.updateAsync(id, data));
+        return ResponseEntity.ok(enrolleeS.updateAsync(id, data).join());
     }
 
 
@@ -94,7 +94,7 @@ public class EnrolleeController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable UUID id) {
-        return ResponseEntity.ok(enrolleeS.deleteAsync(id));
+        return ResponseEntity.ok(enrolleeS.deleteAsync(id).join());
     }
 
 
