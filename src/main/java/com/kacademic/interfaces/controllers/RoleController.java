@@ -15,25 +15,27 @@ import com.kacademic.app.dto.role.RoleResponseDTO;
 import com.kacademic.app.services.RoleService;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
-@RequestMapping("/role")
+@RequiredArgsConstructor
 @RestController
+@RequestMapping("/role")
 public class RoleController {
     
     private final RoleService roleS;
 
-    public RoleController(RoleService roleS) {
-        this.roleS = roleS;
-    }
 
     @PostMapping
     public ResponseEntity<String> create(@RequestBody @Valid RoleRequestDTO request) {
-        return new ResponseEntity<>(roleS.createAsync(request), HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(roleS.createAsync(request).join());
     }
+
+
 
     @GetMapping
     public ResponseEntity<List<RoleResponseDTO>> read() {
-        return new ResponseEntity<>(roleS.readAllAsync(), HttpStatus.OK);
+        return ResponseEntity.ok(roleS.readAllAsync().join());
     }
+
 
 }

@@ -24,21 +24,18 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
-@RequestMapping("/professor")
+@RequiredArgsConstructor
 @RestController
+@RequestMapping("/professor")
 public class ProfessorController {
     
     private final ProfessorService professorS;
 
-    public ProfessorController(ProfessorService professorS) {
-        this.professorS = professorS;
-    }
 
-    @Operation(
-        summary = "Create a new professor",
-        description = "Create a new professor in the system with the provided parameters. <br>(Wage in cents)"
-    )
+    @Operation(summary = "Create a new professor",
+                description = "Create a new professor in the system with the provided parameters. <br>(Wage in cents)")
     @ApiResponses({
         @ApiResponse(responseCode = "201", description = "Professor successfully created"),
         @ApiResponse(responseCode = "400", description = "Invalid email or wage"),
@@ -47,59 +44,60 @@ public class ProfessorController {
     })
     @PostMapping
     public ResponseEntity<String> create(@RequestBody @Valid ProfessorRequestDTO request) {
-        return new ResponseEntity<>(professorS.createAsync(request), HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(professorS.createAsync(request).join());
     }
+
+
     
-    @Operation(
-        summary = "Get all professors",
-        description = "Retrieves a list of all professors in the system."
-    )
+    @Operation(summary = "Get all professors",
+                description = "Retrieves a list of all professors in the system.")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Professors successfully retrieved")
     })
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping    
     public ResponseEntity<List<ProfessorResponseDTO>> readAll() {
-        return new ResponseEntity<>(professorS.readAllAsync(), HttpStatus.OK);
+        return ResponseEntity.ok(professorS.readAllAsync().join());
     }
 
-    @Operation(
-        summary = "Get professor details by ID",
-        description = "Retrieves the details of a specific professor identified by the provided ID."
-    )
+
+
+    @Operation(summary = "Get professor details by ID",
+                description = "Retrieves the details of a specific professor identified by the provided ID.")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Professor found and retrieved successfully"),
         @ApiResponse(responseCode = "404", description = "Professor not found")
     })
     @GetMapping("/{id}")
     public ResponseEntity<ProfessorResponseDTO> readById(@PathVariable UUID id) {
-        return new ResponseEntity<>(professorS.readByIdAsync(id), HttpStatus.OK);
+        return ResponseEntity.ok(professorS.readByIdAsync(id).join());
     }    
+
+
     
-    @Operation(
-        summary = "Update professor by ID",
-        description = "Updates the details of a professor identified by the provided ID. Only the specified fields will be updated. <br>If any field is passed as null in the request, it will not be changed. <br>(Wage in cents)"
-    )
+    @Operation(summary = "Update professor by ID",
+                description = "Updates the details of a professor identified by the provided ID. Only the specified fields will be updated. <br>If any field is passed as null in the request, it will not be changed. <br>(Wage in cents)")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Professor successfully updated"),
         @ApiResponse(responseCode = "404", description = "Professor not found")
     })
     @PatchMapping("/{id}")
     public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid ProfessorUpdateDTO data) {
-        return new ResponseEntity<>(professorS.updateAsync(id, data), HttpStatus.OK);
+        return ResponseEntity.ok(professorS.updateAsync(id, data).join());
     }
 
-    @Operation(
-        summary = "Delete professor by ID",
-        description = "Deletes the professor identified by the provided ID from the system."
-    )
+
+
+    @Operation(summary = "Delete professor by ID",
+                description = "Deletes the professor identified by the provided ID from the system.")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Professor successfully deleted"),
         @ApiResponse(responseCode = "404", description = "Professor not found")
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable UUID id) {
-        return new ResponseEntity<>(professorS.deleteAsync(id), HttpStatus.OK);
+        return ResponseEntity.ok(professorS.deleteAsync(id).join());
     }
+
 
 }

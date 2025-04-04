@@ -23,21 +23,18 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
-@RequestMapping("/grade")
+@RequiredArgsConstructor
 @RestController
+@RequestMapping("/grade")
 public class GradeController {
     
     private final GradeService gradeS;
 
-    public GradeController(GradeService gradeS) {
-        this.gradeS = gradeS;
-    }
 
-    @Operation(
-        summary = "Create a new grade",
-        description = "Create a new grade in the system with the provided parameters. <br>Note: Timetable it's in HH:mm."
-    )
+    @Operation(summary = "Create a new grade",
+                description = "Create a new grade in the system with the provided parameters. <br>Note: Timetable it's in HH:mm.")
     @ApiResponses({
         @ApiResponse(responseCode = "201", description = "Grade created successfully"),
         @ApiResponse(responseCode = "400", description = "Invalid data format"),
@@ -45,58 +42,59 @@ public class GradeController {
     })
     @PostMapping
     public ResponseEntity<String> create(@RequestBody @Valid GradeRequestDTO request) {
-        return new ResponseEntity<>(gradeS.createAsync(request), HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(gradeS.createAsync(request).join());
     }
+
+
     
-    @Operation(
-        summary = "Get all grades",
-        description = "Retrieves a list of all grades in the system"
-    )
+    @Operation(summary = "Get all grades",
+                description = "Retrieves a list of all grades in the system")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Grades successfully retrieved")
     })
     @GetMapping    
     public ResponseEntity<List<GradeResponseDTO>> readAll() {
-        return new ResponseEntity<>(gradeS.readAllAsync(), HttpStatus.OK);
+        return ResponseEntity.ok(gradeS.readAllAsync().join());
     }
 
-    @Operation(
-        summary = "Get grade details by ID",
-        description = "Retrieves the details of a specific grade identified by the provided ID"
-    )
+
+
+    @Operation(summary = "Get grade details by ID",
+                description = "Retrieves the details of a specific grade identified by the provided ID")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Grade found and retrieved successfully"),
         @ApiResponse(responseCode = "404", description = "Grade not found")
     })
     @GetMapping("/{id}")
     public ResponseEntity<GradeResponseDTO> readById(@PathVariable UUID id) {
-        return new ResponseEntity<>(gradeS.readByIdAsync(id), HttpStatus.OK);
+        return ResponseEntity.ok(gradeS.readByIdAsync(id).join());
     }    
 
-    @Operation(
-        summary = "Update grade by ID",
-        description = "Updates the details of a grade identified by the provided ID. Only the specified fields will be updated. <br>If any field is passed as null in the request, it will not be changed"
-    )
+
+
+    @Operation(summary = "Update grade by ID",
+                description = "Updates the details of a grade identified by the provided ID. Only the specified fields will be updated. <br>If any field is passed as null in the request, it will not be changed")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Grade successfully updated"),
         @ApiResponse(responseCode = "404", description = "Grade not found")
     })
     @PatchMapping("/{id}")
     public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid GradeUpdateDTO data) {
-        return new ResponseEntity<>(gradeS.updateAsync(id, data), HttpStatus.OK);
+        return ResponseEntity.ok(gradeS.updateAsync(id, data).join());
     }
 
-    @Operation(
-        summary = "Delete grade by ID",
-        description = "Deletes the grade identified by the provided ID from the system"
-    )
+
+
+    @Operation(summary = "Delete grade by ID",
+                description = "Deletes the grade identified by the provided ID from the system")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Grade successfully deleted"),
         @ApiResponse(responseCode = "404", description = "Grade not found")
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable UUID id) {
-        return new ResponseEntity<>(gradeS.deleteAsync(id), HttpStatus.OK);
+        return ResponseEntity.ok(gradeS.deleteAsync(id).join());
     }
+
 
 }

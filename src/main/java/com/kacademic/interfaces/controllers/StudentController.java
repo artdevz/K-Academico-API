@@ -25,21 +25,18 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
-@RequestMapping("/student")
+@RequiredArgsConstructor
 @RestController
+@RequestMapping("/student")
 public class StudentController {
     
     private final StudentService studentS;
 
-    public StudentController(StudentService studentS) {
-        this.studentS = studentS;
-    }
     
-    @Operation(
-        summary = "Create a new student",
-        description = "Create a new student in the system with the provided parameters."
-    )
+    @Operation(summary = "Create a new student",
+                description = "Create a new student in the system with the provided parameters.")
     @ApiResponses({
         @ApiResponse(responseCode = "201", description = "Student created successfully"),
         @ApiResponse(responseCode = "400", description = "Invalid email or enrollment format"),
@@ -49,58 +46,60 @@ public class StudentController {
     }) 
     @PostMapping
     public ResponseEntity<String> create(@RequestBody @Valid StudentRequestDTO request) {
-        return new ResponseEntity<>(studentS.createAsync(request), HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(studentS.createAsync(request).join());
     }
+
+
     
-    @Operation(
-        summary = "Get all students",
-        description = "Retrieves a list of all students in the system"
-    )
+    @Operation(summary = "Get all students",
+                description = "Retrieves a list of all students in the system")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Students successfully retrieved")
     })
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping    
     public ResponseEntity<List<StudentResponseDTO>> readAll() {
-        return new ResponseEntity<>(studentS.readAllAsync(), HttpStatus.OK);
+        return ResponseEntity.ok(studentS.readAllAsync().join());
     }
 
-    @Operation(
-        summary = "Get student details by ID",
-        description = "Retrieves the details of a specific student identified by the provided ID"
-    )
+
+
+    @Operation(summary = "Get student details by ID",
+                description = "Retrieves the details of a specific student identified by the provided ID")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Student found and retrieved successfully"),
         @ApiResponse(responseCode = "404", description = "Student not found")
     })
     @GetMapping("/{id}")
     public ResponseEntity<StudentDetailsDTO> readById(@PathVariable UUID id) {
-        return new ResponseEntity<>(studentS.readByIdAsync(id), HttpStatus.OK);
+        return ResponseEntity.ok(studentS.readByIdAsync(id).join());
     }    
+
+
     
-    @Operation(
-        summary = "Update student by ID",
-        description = "Updates the details of a student identified by the provided ID. Only the specified fields will be updated. <br>If any field is passed as null in the request, it will not be changed"
-    )
+    @Operation(summary = "Update student by ID",
+                description = "Updates the details of a student identified by the provided ID. Only the specified fields will be updated. <br>If any field is passed as null in the request, it will not be changed")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Student successfully updated"),
         @ApiResponse(responseCode = "404", description = "Student not found")
     })
     @PatchMapping("/{id}")
     public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid StudentUpdateDTO data) {
-        return new ResponseEntity<>(studentS.updateAsync(id, data), HttpStatus.OK);
+        return ResponseEntity.ok(studentS.updateAsync(id, data).join());
     }
 
-    @Operation(
-        summary = "Delete student by ID",
-        description = "Deletes the student identified by the provided ID from the system"
-    )
+
+
+    @Operation(summary = "Delete student by ID",
+                description = "Deletes the student identified by the provided ID from the system")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Student successfully deleted"),
         @ApiResponse(responseCode = "404", description = "Student not found")
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable UUID id) {
-        return new ResponseEntity<>(studentS.deleteAsync(id), HttpStatus.OK);
+        return ResponseEntity.ok(studentS.deleteAsync(id).join());
     }
+
+
 }

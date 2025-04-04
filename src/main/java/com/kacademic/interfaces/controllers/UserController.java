@@ -23,21 +23,18 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
-@RequestMapping("/user")
+@RequiredArgsConstructor
 @RestController
+@RequestMapping("/user")
 public class UserController {
 
     private final UserService userS;
 
-    public UserController(UserService userS) {
-        this.userS = userS;
-    }
     
-    @Operation(
-        summary = "Create a new user",
-        description = "Create a new user in the system with the provided parameters."
-    )
+    @Operation(summary = "Create a new user",
+                description = "Create a new user in the system with the provided parameters.")
     @ApiResponses({
         @ApiResponse(responseCode = "201", description = "User created successfully"),
         @ApiResponse(responseCode = "400", description = "Invalid email"),
@@ -46,60 +43,60 @@ public class UserController {
     })    
     @PostMapping
     public ResponseEntity<String> create(@RequestBody @Valid UserRequestDTO request) {
-        System.out.println("[interfaces.controllers.UserController]: Requisição recebida!");
-        System.out.println("Dados do Request: " + request);
-        return new ResponseEntity<>(userS.createAsync(request), HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(userS.createAsync(request).join());
     }
+
+
     
-    @Operation(
-        summary = "Get all users",
-        description = "Retrieves a list of all users in the system"
-    )
+    @Operation(summary = "Get all users",
+                description = "Retrieves a list of all users in the system")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Users successfully retrieved")
     })    
     @GetMapping    
     public ResponseEntity<List<UserResponseDTO>> readAll() {
-        return new ResponseEntity<>(userS.readAllAsync(), HttpStatus.OK);
+        return ResponseEntity.ok(userS.readAllAsync().join());
     }
 
-    @Operation(
-        summary = "Get user details by ID",
-        description = "Retrieves the details of a specific user identified by the provided ID"
-    )
+
+
+    @Operation(summary = "Get user details by ID",
+                description = "Retrieves the details of a specific user identified by the provided ID")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "User found and retrieved successfully"),
         @ApiResponse(responseCode = "404", description = "User not found")
     })
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDTO> readById(@PathVariable UUID id) {
-        return new ResponseEntity<>(userS.readByIdAsync(id), HttpStatus.OK);
+        return ResponseEntity.ok(userS.readByIdAsync(id).join());
     }    
+
+
     
-    @Operation(
-        summary = "Update user by ID",
-        description = "Updates the details of a user identified by the provided ID. Only the specified fields will be updated. <br>If any field is passed as null in the request, it will not be changed."
-    )
+    @Operation(summary = "Update user by ID",
+                description = "Updates the details of a user identified by the provided ID. Only the specified fields will be updated. <br>If any field is passed as null in the request, it will not be changed.")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "User successfully updated"),
         @ApiResponse(responseCode = "404", description = "User not found")
     })
     @PatchMapping("/{id}")
     public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid UserUpdateDTO data) {
-        return new ResponseEntity<>(userS.updateAsync(id, data), HttpStatus.OK);
+        return ResponseEntity.ok(userS.updateAsync(id, data).join());
     }
 
-    @Operation(
-        summary = "Delete user by ID",
-        description = "Deletes the user identified by the provided ID from the system"
-    )
+
+
+    @Operation(summary = "Delete user by ID",
+                description = "Deletes the user identified by the provided ID from the system")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "User successfully deleted"),
         @ApiResponse(responseCode = "404", description = "User not found")
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable UUID id) {
-        return new ResponseEntity<>(userS.deleteAsync(id), HttpStatus.OK);
+        return ResponseEntity.ok(userS.deleteAsync(id).join());
     }
+
+
 
 }

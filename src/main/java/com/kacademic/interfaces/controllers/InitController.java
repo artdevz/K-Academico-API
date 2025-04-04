@@ -8,19 +8,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.kacademic.app.services.UserService;
 
-@RequestMapping("/init")
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @RestController
+@RequestMapping("/init")
 public class InitController {
 
     private final UserService userS;
-
-    public InitController(UserService userS) {
-        this.userS = userS;
-    }
     
     @PostMapping
     public ResponseEntity<String> initAdmin() {
-        return new ResponseEntity<>(userS.createInitialAdmin(), HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(userS.createInitialAdmin().join());
     }
 
 }
