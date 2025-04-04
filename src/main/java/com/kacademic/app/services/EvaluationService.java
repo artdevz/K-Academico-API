@@ -52,7 +52,8 @@ public class EvaluationService {
                 evaluation.getExam().getId(),
                 evaluation.getScore()
             ))
-            .collect(Collectors.toList()));
+            .collect(Collectors.toList())
+        );
     }
 
     public EvaluationResponseDTO readByIdAsync(UUID id) {
@@ -66,7 +67,8 @@ public class EvaluationService {
                 evaluation.getExam().getGrade().getId(),
                 evaluation.getExam().getId(),
                 evaluation.getScore()
-        ));
+            )
+        );
     }
 
     public String updateAsync(UUID id, EvaluationUpdateDTO data) {
@@ -85,6 +87,7 @@ public class EvaluationService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Evaluation not Found");
         
         removeEvaluation(evaluationR.findById(id).get());
+        
         evaluationR.deleteById(id);
         return "Deleted Evaluation";
     }

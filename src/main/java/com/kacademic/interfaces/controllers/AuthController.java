@@ -2,7 +2,6 @@ package com.kacademic.interfaces.controllers;
 
 // import java.util.concurrent.CompletableFuture;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,21 +15,18 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
-@RequestMapping("/auth")
+@RequiredArgsConstructor
 @RestController
+@RequestMapping("/auth")
 public class AuthController {
     
     private final AuthService authS;
 
-    public AuthController(AuthService authS) {
-        this.authS = authS;
-    }
 
-    @Operation(
-        summary = "User login",
-        description = "Authenticates a user by validating the provided credentials. <br>If successful, returns an authentication token. Otherwise, returns an error message."
-    )
+    @Operation(summary = "User login",
+                description = "Authenticates a user by validating the provided credentials. <br>If successful, returns an authentication token. Otherwise, returns an error message.")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Login successful. Authentication token returned."),
         @ApiResponse(responseCode = "400", description = "Bad Request: Invalid input or request format"),
@@ -38,8 +34,8 @@ public class AuthController {
     })
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody @Valid AuthRequestDTO request) {
-        // return authS.login(request).thenApply(token -> ResponseEntity.ok(token));
-        return new ResponseEntity<>(authS.login(request), HttpStatus.OK);
+        return ResponseEntity.ok(authS.login(request));
     }
+    
 
 }

@@ -33,7 +33,6 @@ public class AttendanceService {
     
     // @Async
     public String createAsync(AttendanceRequestDTO data) {
-
         Attendance attendance = new Attendance(
             enrolleeR.findById(data.enrollee()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee not Found")),
             lessonR.findById(data.lesson()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not Found")),
@@ -43,12 +42,10 @@ public class AttendanceService {
         attendanceR.save(attendance);
         // return CompletableFuture.completedFuture("Created Attendance");
         return "Created Attendace";
-
     }
 
     // @Async
     public List<AttendanceResponseDTO> readAllAsync() {
-
         // return CompletableFuture.completedFuture(
         return(
             attendanceR.findAll().stream()
@@ -58,13 +55,12 @@ public class AttendanceService {
                 attendance.getLesson().getId(),
                 attendance.isAbsent()
             ))
-            .collect(Collectors.toList()));
-
+            .collect(Collectors.toList())
+        );
     }
 
     // @Async
     public AttendanceResponseDTO readByIdAsync(UUID id) {
-
         Attendance attendance = attendanceR.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Attendance not Found"));
         
@@ -75,32 +71,28 @@ public class AttendanceService {
                 attendance.getEnrollee().getId(),
                 attendance.getLesson().getId(),
                 attendance.isAbsent()
-    ));
-
+            )
+        );
     }
 
     // @Async
     public String updateAsync(UUID id, AttendanceUpdateDTO data) {
-
         Attendance attendance = attendanceR.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Attendance not Found"));
             
         attendanceR.save(attendance);
         // return CompletableFuture.completedFuture("Updated Attendance");
         return "Updated Attendance";
-        
     }
 
     // @Async
     public String deleteAsync(UUID id) {
-
         if (!attendanceR.findById(id).isPresent()) 
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Attendance not Found");
         
         attendanceR.deleteById(id);
         // return CompletableFuture.completedFuture("Deleted Attendance");
         return "Deleted Attendance";
-
     }
 
 }

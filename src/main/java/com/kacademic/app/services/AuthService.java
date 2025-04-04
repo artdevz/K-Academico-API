@@ -24,13 +24,11 @@ public class AuthService {
 
     // @Async
     public String login(AuthRequestDTO data) {
-
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(data.email(), data.password()));
 
         // return CompletableFuture.completedFuture(jwtTokenProvider.generateToken(authentication));
         return jwtProvider.generateToken(authentication);
-
     }
 
 }

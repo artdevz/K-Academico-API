@@ -66,7 +66,8 @@ public class GradeService {
                 grade.getLocate(),
                 grade.getTimetables()
             ))
-            .collect(Collectors.toList()));
+            .collect(Collectors.toList())
+        );
     }
 
     public GradeResponseDTO readByIdAsync(UUID id) {
@@ -84,7 +85,8 @@ public class GradeService {
                 grade.getStatus(),
                 grade.getLocate(),
                 grade.getTimetables()
-        ));
+            )
+        );
     }
 
     public String updateAsync(UUID id, GradeUpdateDTO data) {
@@ -92,9 +94,7 @@ public class GradeService {
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Grade not Found"));
     
         data.status().ifPresent(grade::setStatus);
-        if (data.status().isPresent() && data.status().get().equals(EGrade.FINISHED)) {
-            semesterS.partialSubmitAsync(id);
-        }
+        if (data.status().isPresent() && data.status().get().equals(EGrade.FINISHED)) semesterS.partialSubmitAsync(id);
 
         grade.setCurrentStudents(grade.getEnrollees().size()); // Atualiza o Número de Estudantes.
         

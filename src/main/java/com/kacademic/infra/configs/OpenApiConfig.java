@@ -20,26 +20,24 @@ public class OpenApiConfig {
 
     @Bean
     public OpenAPI customOpenAPI() {
-
         return new OpenAPI()
             .info(new Info()
                 .title(API_TITLE)
                 .version(API_VERSION)
-                .description(API_DESCRPTION))
+                .description(API_DESCRPTION)
+            )
             .addSecurityItem(new SecurityRequirement().addList(SECURITY_SCHEME_NAME))
             .components(new Components()
-                .addSecuritySchemes(SECURITY_SCHEME_NAME, createJwtSecurityScheme()));
-
+                .addSecuritySchemes(SECURITY_SCHEME_NAME, createJwtSecurityScheme())
+        );
     }
 
     private SecurityScheme createJwtSecurityScheme() {
-        
         return new SecurityScheme()
             .name(AUTH_HEADER_NAME)
             .type(SecurityScheme.Type.HTTP)
             .scheme("bearer")
             .bearerFormat("JWT");
-
     }
 
 }

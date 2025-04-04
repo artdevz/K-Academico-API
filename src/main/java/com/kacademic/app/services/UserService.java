@@ -32,7 +32,6 @@ public class UserService {
     }
 
     public String createInitialAdmin() {
-
         Role adminRole = roleR.findByName("ADMIN").orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Role ADMIN isn't created yet"));
 
         User admin = new User(
@@ -44,11 +43,9 @@ public class UserService {
 
         userR.save(admin);
         return "Created Admin";
-
     }
 
     public String createAsync(UserRequestDTO data) {
-         
         ensureEmailIsUnique(data.email());
 
         User user = new User(            
@@ -73,7 +70,8 @@ public class UserService {
                 user.getEmail(),
                 user.getRoles()
             ))
-            .collect(Collectors.toList());
+            .collect(Collectors.toList()
+        );
     }
 
     public UserResponseDTO readByIdAsync(UUID id) {

@@ -8,6 +8,4 @@ import org.springframework.stereotype.Repository;
 import com.kacademic.domain.models.Course;
 
 @Repository
-public interface CourseRepository extends JpaRepository<Course, UUID> {
-    
-}
+public interface CourseRepository extends JpaRepository<Course, UUID> {}

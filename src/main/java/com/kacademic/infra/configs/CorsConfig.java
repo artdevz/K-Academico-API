@@ -13,7 +13,6 @@ public class CorsConfig {
 
     @Bean
     public CorsFilter corsFilter() {
-
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
@@ -24,9 +23,7 @@ public class CorsConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
 
-        System.out.println("[infra.configs.CorsConfig.INFO]: Configuração Cors registrada com sucesso!");
         return new CorsFilter(source);
-
     }
 
 }

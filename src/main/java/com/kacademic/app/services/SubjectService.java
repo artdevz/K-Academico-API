@@ -27,7 +27,6 @@ public class SubjectService {
     }
 
     public String createAsync(SubjectRequestDTO data) {        
-
         Subject subject = new Subject(
             courseR.findById(data.course()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found")),
             data.name(),
@@ -38,12 +37,12 @@ public class SubjectService {
         );
         
         subject.getCourse().setDuration(subject.getCourse().getDuration() + data.duration()); // Adiciona no Curso as Horas dessa Disciplina.
+        
         subjectR.save(subject);
         return "Created Subject";
     }
 
     public List<SubjectResponseDTO> readAllAsync() {
-
         return subjectR.findAll().stream()
             .map(subject -> new SubjectResponseDTO(
                 subject.getId(),
@@ -54,11 +53,11 @@ public class SubjectService {
                 subject.getSemester(),
                 subject.getPrerequisites()
             ))
-            .collect(Collectors.toList());
+            .collect(Collectors.toList()
+        );
     }
 
     public SubjectResponseDTO readByIdAsync(UUID id) {
-
         Subject subject = subjectR.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subject not Found."));
         
@@ -74,7 +73,6 @@ public class SubjectService {
     }
 
     public String updateAsync(UUID id, SubjectUpdateDTO data) {
-
         Subject subject = subjectR.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subject not Found"));
             
@@ -89,7 +87,6 @@ public class SubjectService {
     }
 
     public String deleteAsync(UUID id) {
-
         if (!subjectR.findById(id).isPresent()) 
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Subject not Found");
 

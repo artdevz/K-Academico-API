@@ -45,12 +45,14 @@ public class LessonService {
                 lesson.getDate(),
                 lesson.getStatus()
             ))
-            .collect(Collectors.toList());
+            .collect(Collectors.toList()
+        );
     }
 
     public LessonResponseDTO readByIdAsync(UUID id) {
         Lesson lesson = lessonR.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not Found"));
+
         return new LessonResponseDTO(
             lesson.getId(),
             lesson.getGrade().getId(),
@@ -63,14 +65,15 @@ public class LessonService {
     public String updateAsync(UUID id, LessonUpdateDTO data) {
         Lesson lesson = lessonR.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not Found"));
+
         lessonR.save(lesson);
         return "Updated Lesson";
     }
 
     public String deleteAsync(UUID id) {
-        if (!lessonR.findById(id).isPresent()) {
+        if (!lessonR.findById(id).isPresent()) 
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not Found");
-        }
+        
         lessonR.deleteById(id);
         return "Deleted Lesson";
     }

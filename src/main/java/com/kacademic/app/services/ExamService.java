@@ -48,7 +48,8 @@ public class ExamService {
                 exam.getMaximum(),
                 exam.getDate()
             ))
-            .collect(Collectors.toList()));
+            .collect(Collectors.toList())
+        );
     }
 
     public ExamResponseDTO readByIdAsync(UUID id) {
@@ -62,7 +63,8 @@ public class ExamService {
                 exam.getName(),            
                 exam.getMaximum(),
                 exam.getDate()
-        ));
+            )
+        );
     }
 
     public String updateAsync(UUID id, ExamUpdateDTO data) {

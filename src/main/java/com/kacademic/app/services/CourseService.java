@@ -2,10 +2,12 @@ package com.kacademic.app.services;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.http.HttpStatus;
-// import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -17,33 +19,35 @@ import com.kacademic.app.dto.subject.SubjectResponseDTO;
 import com.kacademic.domain.models.Course;
 import com.kacademic.domain.repositories.CourseRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class CourseService {
     
     private final CourseRepository courseR;
+    private final AsyncTaskExecutor taskExecutor;
 
-    public CourseService(CourseRepository courseR) {
+    public CourseService(CourseRepository courseR, AsyncTaskExecutor taskExecutor) {
         this.courseR = courseR;
+        this.taskExecutor = taskExecutor;
     }
 
-    // @Async
-    public String createAsync(CourseRequestDTO data) {
-        System.out.println("[app.services.CourseService]: Criando Course...");
-        Course course = new Course(
-            data.name(),
-            data.code(),
-            data.description()
-        );
+    @Async("taskExecutor")
+    public CompletableFuture<String> createAsync(CourseRequestDTO data) {
+        return CompletableFuture.supplyAsync(() -> {
+            Course course = new Course(
+                data.name(),
+                data.code(),
+                data.description()
+            );
 
-        courseR.save(course);
-        System.out.println("[app.services.CourseService]: Course criado!");
-        // return CompletableFuture.completedFuture("Created Course");
-        return "Created Course";
+            courseR.save(course);
+            return "Created Course";
+        }, taskExecutor);
     }
 
     // @Async
     public List<CourseResponseDTO> readAllAsync() {
-
         return (
             courseR.findAll().stream()
             .map(course -> new CourseResponseDTO(
@@ -53,13 +57,13 @@ public class CourseService {
                 course.getDuration(),
                 course.getDescription()
             ))
-            .collect(Collectors.toList()));
-            
+            .collect(Collectors.toList())
+        );
     }
 
     // @Async
+    @Transactional
     public CourseDetailsDTO readByIdAsync(UUID id) {
-
         Course course = courseR.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found"));
         
@@ -81,12 +85,12 @@ public class CourseService {
                     subject.getSemester(),
                     subject.getPrerequisites()
                 )).collect(Collectors.toList())
-        ));
+            )
+        );
     }
 
     // @Async
     public String updateAsync(UUID id, CourseUpdateDTO data) {
-
         Course course = courseR.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found"));        
         
@@ -100,7 +104,6 @@ public class CourseService {
 
     // @Async
     public String deleteAsync(UUID id) {
-
         if (!courseR.findById(id).isPresent()) 
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found");
         

@@ -8,6 +8,4 @@ import org.springframework.stereotype.Repository;
 import com.kacademic.domain.models.Evaluation;
 
 @Repository
-public interface EvaluationRepository extends JpaRepository<Evaluation, UUID> {
-    
-}
+public interface EvaluationRepository extends JpaRepository<Evaluation, UUID> {}

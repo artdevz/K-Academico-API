@@ -24,21 +24,18 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
-@RequestMapping("/attendance")
+@RequiredArgsConstructor
 @RestController
+@RequestMapping("/attendance")
 public class AttendanceController {
     
     private final AttendanceService attendanceS;
 
-    public AttendanceController(AttendanceService attendanceS) {
-        this.attendanceS = attendanceS;
-    }
 
-    @Operation(
-        summary = "Create a new attendance",
-        description = "Create a new attendance in the system with the provided parameters."
-    )
+    @Operation(summary = "Create a new attendance",
+                description = "Create a new attendance in the system with the provided parameters.")
     @ApiResponses({
         @ApiResponse(responseCode = "201", description = "Attendance created successfully"),
         @ApiResponse(responseCode = "400", description = "Invalid data format"),
@@ -46,63 +43,59 @@ public class AttendanceController {
     })
     @PostMapping
     public ResponseEntity<String> create(@RequestBody @Valid AttendanceRequestDTO request) {
-        // return attendanceS.createAsync(request).thenApply(response -> new ResponseEntity<>(response, HttpStatus.CREATED));
-        return new ResponseEntity<>(attendanceS.createAsync(request), HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(attendanceS.createAsync(request));
     }
     
-    @Operation(
-        summary = "Get all attendances",
-        description = "Retrieves a list of all attendances in the system"
-    )
+
+    
+    @Operation(summary = "Get all attendances",
+                description = "Retrieves a list of all attendances in the system")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Attendances successfully retrieved")
     })
     @GetMapping    
     public ResponseEntity<List<AttendanceResponseDTO>> readAll() {
-        // return attendanceS.readAllAsync().thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
-        return new ResponseEntity<>(attendanceS.readAllAsync(), HttpStatus.OK);
+        return ResponseEntity.ok(attendanceS.readAllAsync());
     }
 
-    @Operation(
-        summary = "Get attendance details by ID",
-        description = "Retrieves the details of a specific attendance identified by the provided ID"
-    )
+
+
+    @Operation(summary = "Get attendance details by ID",
+                description = "Retrieves the details of a specific attendance identified by the provided ID")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Attendance found and retrieved successfully"),
         @ApiResponse(responseCode = "404", description = "Attendance not found")
     })
     @GetMapping("/{id}")
     public ResponseEntity<AttendanceResponseDTO> readById(@PathVariable UUID id) {
-        // return attendanceS.readByIdAsync(id).thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
-        return new ResponseEntity<>(attendanceS.readByIdAsync(id), HttpStatus.OK);
-    }    
+        return ResponseEntity.ok(attendanceS.readByIdAsync(id));
+    }
+
+
     
-    @Operation(
-        summary = "Update attendance by ID",
-        description = "Updates the details of a attendance identified by the provided ID. Only the specified fields will be updated. <br>If any field is passed as null in the request, it will not be changed"
-    )
+    @Operation(summary = "Update attendance by ID",
+                description = "Updates the details of a attendance identified by the provided ID. Only the specified fields will be updated. <br>If any field is passed as null in the request, it will not be changed")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Attendance successfully updated"),
         @ApiResponse(responseCode = "404", description = "Attendance not found")
     })
     @PatchMapping("/{id}")
     public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid AttendanceUpdateDTO data) {
-        // return attendanceS.updateAsync(id, data).thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
-        return new ResponseEntity<>(attendanceS.updateAsync(id, data), HttpStatus.OK);
+        return ResponseEntity.ok(attendanceS.updateAsync(id, data));
     }
 
-    @Operation(
-        summary = "Delete attendance by ID",
-        description = "Deletes the attendance identified by the provided ID from the system"
-    )
+
+
+    @Operation(summary = "Delete attendance by ID",
+                description = "Deletes the attendance identified by the provided ID from the system")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Attendance successfully deleted"),
         @ApiResponse(responseCode = "404", description = "Attendance not found")
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable UUID id) {
-        // return attendanceS.deleteAsync(id).thenApply(response -> new ResponseEntity<>(response, HttpStatus.OK));
-        return new ResponseEntity<>(attendanceS.deleteAsync(id), HttpStatus.OK);
+        return ResponseEntity.ok(attendanceS.deleteAsync(id));
     }
+
 
 }

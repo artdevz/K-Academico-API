@@ -40,6 +40,7 @@ public class ProfessorService {
                 .collect(Collectors.toSet()),
             data.wage()
         );
+
         professorR.save(professor);
         return "Created Professor";
     }
@@ -52,12 +53,14 @@ public class ProfessorService {
                 professor.getEmail(),
                 professor.getWage()
             ))
-            .collect(Collectors.toList());
+            .collect(Collectors.toList()
+        );
     }
 
     public ProfessorResponseDTO readByIdAsync(UUID id) {
         Professor professor = professorR.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Professor not Found"));
+
         return new ProfessorResponseDTO(
             professor.getId(),
             professor.getName(),
@@ -69,15 +72,17 @@ public class ProfessorService {
     public String updateAsync(UUID id, ProfessorUpdateDTO data) {
         Professor professor = professorR.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Professor not Found"));
+
         data.wage().ifPresent(professor::setWage);
+        
         professorR.save(professor);
         return "Updated Professor";
     }
 
     public String deleteAsync(UUID id) {
-        if (!professorR.findById(id).isPresent()) {
+        if (!professorR.findById(id).isPresent())
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Professor not Found");
-        }
+        
         professorR.deleteById(id);
         return "Deleted Professor";
     }

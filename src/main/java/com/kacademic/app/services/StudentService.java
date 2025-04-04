@@ -38,7 +38,6 @@ public class StudentService {
     }
 
     public String createAsync(StudentRequestDTO data) {
-
         Student student = new Student(
             data.user().name(),
             data.user().email(),
@@ -53,11 +52,9 @@ public class StudentService {
 
         studentR.save(student);
         return "Created Student";
-        
     }
 
     public List<StudentResponseDTO> readAllAsync() {
-
         return studentR.findAll().stream()
             .map(student -> new StudentResponseDTO(
                 student.getId(),                
@@ -67,11 +64,11 @@ public class StudentService {
                 student.getEmail(),
                 student.getAverage()
             ))
-            .collect(Collectors.toList());
+            .collect(Collectors.toList()
+        );
     }
 
     public StudentDetailsDTO readByIdAsync(UUID id) {
-
         Student student = studentR.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not Found"));
         
@@ -96,50 +93,37 @@ public class StudentService {
     }
 
     public String updateAsync(UUID id, StudentUpdateDTO data) {
-
         Student student = studentR.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not Found"));
             
         studentR.save(student);
         return "Updated Student";
-        
     }
 
     public String deleteAsync(UUID id) {
-
         if (!studentR.findById(id).isPresent()) 
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not Found");
         
         studentR.deleteById(id);
         return "Deleted Student";
-
     }
 
     // Enrollment
     private String generateEnrollment(Course course) {
-
-        // Year + Semester + CourseId + ShiftId + RandomNumber        
-        return getYear() + getSemester() + course.getCode() + "999" + getRandomNumber();
-
+        return getYear() + getSemester() + course.getCode() + "999" + getRandomNumber(); // Year + Semester + CourseId + ShiftId + RandomNumber 
     }
 
     private String getYear() {
-
         return LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy"));
-
     }
 
     private String getSemester() {
-
         final int MID_OF_YEAR = 6;
         return (LocalDate.now().getMonthValue() <= MID_OF_YEAR) ? "1" : "2";
-
     }
 
     private String getRandomNumber() {
-
         return "0000";
-
     }
 
 }

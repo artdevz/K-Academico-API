@@ -35,7 +35,6 @@ public class EnrolleeService {
     
     // @Async
     public String createAsync(EnrolleeRequestDTO data) {
-
         Enrollee enrollee = new Enrollee(
             studentR.findById(data.student()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not Found")),
             gradeR.findById(data.grade()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Grade not Found"))
@@ -44,6 +43,7 @@ public class EnrolleeService {
         enrollee.getGrade().setCurrentStudents(
             enrollee.getGrade().getCurrentStudents() + 1 
         );
+        
         enrolleeR.save(enrollee);
         return "Created Enrollee";
     }
@@ -60,12 +60,12 @@ public class EnrolleeService {
                 enrollee.getAverage(),
                 enrollee.getStatus()
             ))
-            .collect(Collectors.toList()));
+            .collect(Collectors.toList())
+        );
     }
 
     // @Async
     public EnrolleeDetailsDTO readByIdAsync(UUID id) {
-
         Enrollee enrollee = enrolleeR.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee not Found"));
         
@@ -92,12 +92,12 @@ public class EnrolleeService {
                     attendance.getLesson().getId(),
                     attendance.isAbsent()
                 )).collect(Collectors.toList())
-        ));
+            )
+        );
     }
 
     // @Async
     public String updateAsync(UUID id, EnrolleeUpdateDTO data) {
-
         Enrollee enrollee = enrolleeR.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee not Found"));
             
@@ -107,13 +107,13 @@ public class EnrolleeService {
 
     // @Async
     public String deleteAsync(UUID id) {
-
         if (!enrolleeR.findById(id).isPresent()) 
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee not Found");
 
         enrolleeR.findById(id).get().getGrade().setCurrentStudents(
             enrolleeR.findById(id).get().getGrade().getCurrentStudents() - 1
         );
+        
         enrolleeR.deleteById(id);
         return "Deleted Enrollee";
     }

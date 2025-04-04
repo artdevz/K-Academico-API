@@ -20,7 +20,6 @@ public class RoleService {
     }
 
     public String createAsync(RoleRequestDTO data) {
-
         Role role = new Role(
             data.name(),
             data.description()
@@ -28,19 +27,17 @@ public class RoleService {
 
         roleR.save(role);
         return "Created Role";
-
     }
 
     public List<RoleResponseDTO> readAllAsync() {
-
         return roleR.findAll().stream()
             .map(role -> new RoleResponseDTO(
                 role.getId(),
                 role.getName(),
                 role.getDescription()
             ))
-            .collect(Collectors.toList());
-
+            .collect(Collectors.toList()
+        );
     }
 
 }
