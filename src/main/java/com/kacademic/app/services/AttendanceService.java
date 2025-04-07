@@ -15,6 +15,8 @@ import com.kacademic.app.dto.attendance.AttendanceRequestDTO;
 import com.kacademic.app.dto.attendance.AttendanceResponseDTO;
 import com.kacademic.app.dto.attendance.AttendanceUpdateDTO;
 import com.kacademic.domain.models.Attendance;
+import com.kacademic.domain.models.Enrollee;
+import com.kacademic.domain.models.Lesson;
 import com.kacademic.domain.repositories.AttendanceRepository;
 import com.kacademic.domain.repositories.EnrolleeRepository;
 import com.kacademic.domain.repositories.LessonRepository;
@@ -34,12 +36,22 @@ public class AttendanceService {
     @Async("taskExecutor")
     public CompletableFuture<String> createAsync(AttendanceRequestDTO data) {
         return CompletableFuture.supplyAsync(() -> {
+            Enrollee enrollee = enrolleeR.findByIdWithEvaluationsAndAttendances(data.enrollee())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee not Found"));
+
+            Lesson lesson = lessonR.findById(data.lesson())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not Found"));
+
+            if (!belongsToSameGrade(enrollee, lesson)) throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Enrollee and Lesson must belong to the same Grade");
+            if (attendanceR.existsByEnrolleeIdAndLessonId(enrollee.getId(), lesson.getId()));
+
             Attendance attendance = new Attendance(
-                enrolleeR.findById(data.enrollee()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee not Found")),
-                lessonR.findById(data.lesson()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not Found")),
+                enrollee,
+                lesson,
                 data.isAbsent()
             );
             
+            addAbsent(attendance);
             attendanceR.save(attendance);
             return "Created Attendace";
 
@@ -97,8 +109,27 @@ public class AttendanceService {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Attendance not Found");
             
             attendanceR.deleteById(id);
+            // removeAbsent(attendanceR.findById(id).get());
             return "Deleted Attendance";
         }, taskExecutor);
+    }
+
+    private boolean belongsToSameGrade(Enrollee enrollee, Lesson lesson) {
+        return enrollee.getGrade().getId().equals(lesson.getGrade().getId());
+    }
+
+    private void addAbsent(Attendance attendance) {
+        Enrollee enrollee = attendance.getEnrollee();
+        enrollee.getAttendances().add(attendance);
+        enrolleeR.save(enrollee);
+    }
+
+    private void editAbsent() {}
+
+    private void removeAbsent(Attendance attendance) {
+        Enrollee enrollee = attendance.getEnrollee();
+        enrollee.getAttendances().remove(attendance);
+        enrolleeR.save(enrollee);
     }
 
 }

@@ -41,7 +41,7 @@ public class EvaluationService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee not Found"));
             
             Exam exam = examR.findByIdWithGrade(data.exam())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exam not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exam not Found"));
 
             if (!belongsToSameGrade(enrollee, exam)) throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Enrollee and Exam must belong to the same Grade");
             if (evaluationR.existsByEnrolleeIdAndExamId(enrollee.getId(), exam.getId())) throw new ResponseStatusException(HttpStatus.CONFLICT, "Evaluation already exists for this Enrollee and Exam");

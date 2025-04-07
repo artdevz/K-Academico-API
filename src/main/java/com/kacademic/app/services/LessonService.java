@@ -37,6 +37,7 @@ public class LessonService {
                 data.topic(),
                 data.date()
             );
+            
             lessonR.save(lesson);
             return "Created Lesson";
         }, taskExecutor);

@@ -37,7 +37,7 @@ public class Lesson implements Serializable {
     @OneToMany(mappedBy = "lesson")
     private Set<Attendance> attendances = new HashSet<>();
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     @JoinColumn(name = "grade.id", nullable = false)
     private Grade grade;
     

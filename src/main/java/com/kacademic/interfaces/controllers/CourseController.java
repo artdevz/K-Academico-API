@@ -68,7 +68,7 @@ public class CourseController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<CourseDetailsDTO> readById(@PathVariable UUID id) {
-        return ResponseEntity.ok(AsyncUnwrapper.unwrapExceptions(courseS.readByIdAsync(id)));
+        return ResponseEntity.ok(AsyncUnwrapper.await(courseS.readByIdAsync(id)));
     } 
     
     

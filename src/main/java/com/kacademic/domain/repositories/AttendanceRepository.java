@@ -6,4 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.kacademic.domain.models.Attendance;
 
-public interface AttendanceRepository extends JpaRepository<Attendance, UUID> {}
+public interface AttendanceRepository extends JpaRepository<Attendance, UUID> {
+
+    boolean existsByEnrolleeIdAndLessonId(UUID enrolleeId, UUID lessonId);
+
+}

@@ -8,7 +8,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 public class AsyncUnwrapper {
 
-    public static <T> T unwrapExceptions(CompletableFuture<T> future) {
+    public static <T> T await(CompletableFuture<T> future) {
         try {
             return future.join();
         } 
