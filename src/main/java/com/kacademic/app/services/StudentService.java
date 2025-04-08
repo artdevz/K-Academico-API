@@ -1,7 +1,5 @@
 package com.kacademic.app.services;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -38,6 +36,8 @@ public class StudentService {
     private final CourseRepository courseR;
     private final RoleRepository roleR;
 
+    private final EnrollmentGeneratorService enrolleeGS;
+
     private final AsyncTaskExecutor taskExecutor;
 
     @Async("taskExecutor")
@@ -51,10 +51,10 @@ public class StudentService {
                     .map(roleId -> roleR.findById(roleId)
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not Found")))
                     .collect(Collectors.toSet()),
-                courseR.findById(data.course()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found")),
-                generateEnrollment(courseR.findById(data.course()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found")))
+                findCourse(data.course()),
+                enrolleeGS.generate(findCourse(data.course()).getCode())
             );
-    
+
             studentR.save(student);
             return "Student successfully Created: " + student.getId();
         }, taskExecutor);
@@ -67,7 +67,7 @@ public class StudentService {
                 .map(student -> new StudentResponseDTO(
                     student.getId(),                
                     student.getCourse().getId(),
-                    student.getEnrollment(),
+                    student.getEnrollment().getValue(),
                     student.getName(),
                     student.getEmail(),
                     student.getAverage()
@@ -88,7 +88,7 @@ public class StudentService {
                 new StudentResponseDTO(
                     student.getId(),            
                     student.getCourse().getId(),
-                    student.getEnrollment(),
+                    student.getEnrollment().getValue(),
                     student.getName(),
                     student.getEmail(),
                     student.getAverage()
@@ -127,22 +127,8 @@ public class StudentService {
         }, taskExecutor);
     }
 
-    // Enrollment
-    private String generateEnrollment(Course course) {
-        return getYear() + getSemester() + course.getCode() + "999" + getRandomNumber(); // Year + Semester + CourseId + ShiftId + RandomNumber 
-    }
-
-    private String getYear() {
-        return LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy"));
-    }
-
-    private String getSemester() {
-        final int MID_OF_YEAR = 6;
-        return (LocalDate.now().getMonthValue() <= MID_OF_YEAR) ? "1" : "2";
-    }
-
-    private String getRandomNumber() {
-        return "0000";
+    private Course findCourse(UUID id) {
+        return courseR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found"));
     }
 
 }

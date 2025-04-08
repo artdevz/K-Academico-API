@@ -12,6 +12,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -46,6 +47,7 @@ public class User implements UserDetails {
     @Size(min=3, max=48, message="Name must be between 3 and 48 characters")
     private String name;
 
+    @Column(unique = true, nullable = false)
     @Email(message = "Must be a well-formed email address")
     private String email;
     

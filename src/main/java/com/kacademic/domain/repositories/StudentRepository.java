@@ -2,6 +2,7 @@ package com.kacademic.domain.repositories;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,6 +14,9 @@ import com.kacademic.domain.models.Student;
 
 @Repository
 public interface StudentRepository extends JpaRepository<Student, UUID> {
+
+    @Query("SELECT s.enrollment.value FROM Student s WHERE s.enrollment.value LIKE CONCAT(:prefix, '%')")
+    Set<String> findAllEnrollmentsByPrefix(@Param("prefix") String prefix);
 
     @Query("SELECT s FROM Student s LEFT JOIN FETCH s.enrollees")
     List<Student> findAllWithEnrollees();

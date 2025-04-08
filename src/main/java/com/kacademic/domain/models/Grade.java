@@ -8,8 +8,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.kacademic.domain.enums.EGrade;
+import com.kacademic.domain.models.values.Timetable;
 import com.kacademic.shared.utils.Semester;
-import com.kacademic.shared.utils.Timetable;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;

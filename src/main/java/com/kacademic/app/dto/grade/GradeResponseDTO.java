@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.kacademic.domain.enums.EGrade;
-import com.kacademic.shared.utils.Timetable;
+import com.kacademic.domain.models.values.Timetable;
 
 public record GradeResponseDTO(
     UUID id,

@@ -8,7 +8,8 @@ public record CourseRequestDTO(
     String name,
 
     @Pattern(regexp = "^\\d+$", message = "Course code must contain only numbers")
-    @Size(min=2, max=2, message="Course code must contain exactly 2 characters")    String code,
+    @Size(min=3, max=3, message="Course code must contain exactly 3 characters")
+    String code,
 
     @Size(max=256)
     String description

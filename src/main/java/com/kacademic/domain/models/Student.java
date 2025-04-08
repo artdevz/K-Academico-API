@@ -3,16 +3,18 @@ package com.kacademic.domain.models;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.kacademic.domain.models.values.Enrollment;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -32,13 +34,13 @@ public class Student extends User {
     @OneToMany(mappedBy = "student", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     private Set<Enrollee> enrollees = new HashSet<>();
 
-    @NotEmpty
-    @Size(max=14, min=14, message="Matrícula deve conter 14 dígitos.")
-    private String enrollment; // Year + Semester + CourseCode + ShiftCode + RandomNumbers = xxxx.x.xx.xxx.xxxx
+    @NotNull
+    @Embedded
+    private Enrollment enrollment;
 
     private float average;
         
-    public Student(String name, String email, String password, Set<Role> roles, Course course, String enrollment) {
+    public Student(String name, String email, String password, Set<Role> roles, Course course, Enrollment enrollment) {
         super(name, email, password, roles);
         this.course = course;
         this.enrollment = enrollment;

@@ -19,7 +19,9 @@ public class AsyncUnwrapper {
             // if (cause instanceof AccessDeniedException) throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access Denied", cause);
             if (cause instanceof ResponseStatusException rse) throw rse;
             if (cause instanceof AuthenticationException) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid Credentials");
-            System.out.println("Exception: " + e);
+            
+            // Fallback Log
+            System.out.println("Unhadled Async Exception: " + e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected async error", e);
         }
     }

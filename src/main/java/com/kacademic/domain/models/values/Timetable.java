@@ -1,4 +1,4 @@
-package com.kacademic.shared.utils;
+package com.kacademic.domain.models.values;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
