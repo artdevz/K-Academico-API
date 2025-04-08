@@ -4,6 +4,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.server.ResponseStatusException;
 
 public class AsyncUnwrapper {
@@ -12,10 +13,14 @@ public class AsyncUnwrapper {
         try {
             return future.join();
         } 
-        catch (CompletionException ex) {
-            Throwable cause = ex.getCause();
+        catch (CompletionException e) {
+            Throwable cause = e.getCause();
+
+            // if (cause instanceof AccessDeniedException) throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access Denied", cause);
             if (cause instanceof ResponseStatusException rse) throw rse;
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected async error", ex);
+            if (cause instanceof AuthenticationException) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid Credentials");
+            System.out.println("Exception: " + e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected async error", e);
         }
     }
     

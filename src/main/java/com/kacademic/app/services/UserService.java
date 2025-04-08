@@ -47,7 +47,7 @@ public class UserService {
             );
     
             userR.save(admin);
-            return "Created Admin";
+            return "Admin successfully Created: " + admin.getId();
         }, taskExecutor);
     }
 
@@ -67,7 +67,7 @@ public class UserService {
             );
             
             userR.save(user);
-            return "Created User";
+            return "User successfully Created: " + user.getId();
         }, taskExecutor);
     }
 

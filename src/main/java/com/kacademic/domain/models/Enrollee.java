@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import com.kacademic.domain.enums.EEnrollee;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -31,7 +32,7 @@ public class Enrollee implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "grade_id", referencedColumnName = "id", nullable = true)
     private Grade grade;
 
@@ -56,8 +57,8 @@ public class Enrollee implements Serializable {
         this.student = student;
         this.grade = grade;
         this.status = EEnrollee.ENROLLED; // Default Status
-        this.absences = 0; // Inicia-se com 0
-        this.average = 0; // Inicia-se com 0
+        this.absences = 0; // Default Value = 0
+        this.average = 0; // Default Value = 0
     }
 
 }

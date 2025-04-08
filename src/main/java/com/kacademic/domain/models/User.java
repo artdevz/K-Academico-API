@@ -25,7 +25,6 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -47,10 +46,9 @@ public class User implements UserDetails {
     @Size(min=3, max=48, message="Name must be between 3 and 48 characters")
     private String name;
 
-    @Email
+    @Email(message = "Must be a well-formed email address")
     private String email;
     
-    @NotBlank
     private String password;
 
     @ManyToMany(fetch = FetchType.EAGER)

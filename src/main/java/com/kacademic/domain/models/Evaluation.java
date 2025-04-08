@@ -10,6 +10,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -33,6 +35,8 @@ public class Evaluation {
     @JoinColumn(name = "exam_id", referencedColumnName = "id")
     private Exam exam;
 
+    @Min(0)
+    @Max(10)
     private float score;
 
     public Evaluation(Enrollee enrollee, Exam exam, float score) {

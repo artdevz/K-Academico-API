@@ -1,3 +1,7 @@
 package com.kacademic.app.dto.attendance;
 
-public record AttendanceUpdateDTO() {}
+import java.util.Optional;
+
+public record AttendanceUpdateDTO(
+    Optional<Boolean> isAbsent
+) {}

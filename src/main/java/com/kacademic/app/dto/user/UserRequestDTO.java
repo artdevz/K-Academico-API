@@ -13,7 +13,7 @@ public record UserRequestDTO(
     @Size(min=3, max=48, message="Name must be between 3 and 48 characters")
     String name,
 
-    @Email
+    @Email(message = "Must be a well-formed email address")
     String email,
 
     @Password 

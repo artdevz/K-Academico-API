@@ -45,7 +45,7 @@ public class SubjectService {
             updateCourseDuration(courseR.findByIdWithSubjects(data.course()).get(), data.duration());
             
             subjectR.save(subject);
-            return "Created Subject";
+            return "Subject successfully Created: " + subject.getId();
         }, taskExecutor);        
     }
 

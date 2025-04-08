@@ -47,7 +47,7 @@ public class Grade implements Serializable {
     @JoinColumn(name = "professor_id", nullable = true)
     private Professor professor;
 
-    @OneToMany(mappedBy = "grade", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "grade", cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
     private Set<Enrollee> enrollees = new HashSet<>();
 
     @OneToMany(mappedBy = "grade", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)

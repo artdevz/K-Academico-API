@@ -1,10 +1,11 @@
 package com.kacademic.shared.exceptions;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 public record ApiResponse(
-    String code,
+    Instant timestamp,
+    int status,
+    String error,
     String message,
-    LocalDateTime timestamp,
     String path
 ) {}

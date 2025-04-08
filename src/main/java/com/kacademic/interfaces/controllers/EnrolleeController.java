@@ -19,6 +19,7 @@ import com.kacademic.app.dto.enrollee.EnrolleeRequestDTO;
 import com.kacademic.app.dto.enrollee.EnrolleeResponseDTO;
 import com.kacademic.app.dto.enrollee.EnrolleeUpdateDTO;
 import com.kacademic.app.services.EnrolleeService;
+import com.kacademic.shared.utils.AsyncUnwrapper;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -43,7 +44,7 @@ public class EnrolleeController {
     })
     @PostMapping
     public ResponseEntity<String> create(@RequestBody @Valid EnrolleeRequestDTO request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(enrolleeS.createAsync(request).join());
+        return ResponseEntity.status(HttpStatus.CREATED).body(AsyncUnwrapper.await(enrolleeS.createAsync(request)));
     }
 
 
@@ -68,7 +69,7 @@ public class EnrolleeController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<EnrolleeDetailsDTO> readById(@PathVariable UUID id) {
-        return ResponseEntity.ok(enrolleeS.readByIdAsync(id).join());
+        return ResponseEntity.ok(AsyncUnwrapper.await(enrolleeS.readByIdAsync(id)));
     }  
     
     
@@ -81,7 +82,7 @@ public class EnrolleeController {
     })
     @PatchMapping("/{id}")
     public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid EnrolleeUpdateDTO data) {
-        return ResponseEntity.ok(enrolleeS.updateAsync(id, data).join());
+        return ResponseEntity.ok(AsyncUnwrapper.await(enrolleeS.updateAsync(id, data)));
     }
 
 
@@ -94,7 +95,7 @@ public class EnrolleeController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable UUID id) {
-        return ResponseEntity.ok(enrolleeS.deleteAsync(id).join());
+        return ResponseEntity.ok(AsyncUnwrapper.await(enrolleeS.deleteAsync(id)));
     }
 
 

@@ -20,6 +20,7 @@ import com.kacademic.app.dto.student.StudentRequestDTO;
 import com.kacademic.app.dto.student.StudentResponseDTO;
 import com.kacademic.app.dto.student.StudentUpdateDTO;
 import com.kacademic.app.services.StudentService;
+import com.kacademic.shared.utils.AsyncUnwrapper;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -46,7 +47,7 @@ public class StudentController {
     }) 
     @PostMapping
     public ResponseEntity<String> create(@RequestBody @Valid StudentRequestDTO request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(studentS.createAsync(request).join());
+        return ResponseEntity.status(HttpStatus.CREATED).body(AsyncUnwrapper.await(studentS.createAsync(request)));
     }
 
 

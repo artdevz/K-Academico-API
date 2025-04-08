@@ -47,7 +47,7 @@ public class ProfessorService {
             );
     
             professorR.save(professor);
-            return "Created Professor";
+            return "Professor successfully Created: " + professor.getId();
         }, taskExecutor);
     }
 

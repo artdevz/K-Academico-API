@@ -20,6 +20,7 @@ import com.kacademic.app.dto.evaluation.EvaluationResponseDTO;
 import com.kacademic.domain.enums.EGrade;
 import com.kacademic.domain.models.Enrollee;
 import com.kacademic.domain.models.Grade;
+import com.kacademic.domain.models.Student;
 import com.kacademic.domain.repositories.EnrolleeRepository;
 import com.kacademic.domain.repositories.GradeRepository;
 import com.kacademic.domain.repositories.StudentRepository;
@@ -41,15 +42,16 @@ public class EnrolleeService {
     public CompletableFuture<String> createAsync(EnrolleeRequestDTO data) {
         return CompletableFuture.supplyAsync(() -> {
             Enrollee enrollee = new Enrollee(
-                studentR.findById(data.student()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not Found")),
-                gradeR.findById(data.grade()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Grade not Found"))
+                findStudent(data.student()),
+                findGradeWithDetails(data.grade())
             );
     
             validateGradeStatus(enrollee.getGrade());
-            updateGradeCurrentStudents(enrollee.getGrade(), true);
+            ensureStudentIsUnique(enrollee.getStudent());
             
             enrolleeR.save(enrollee);
-            return "Created Enrollee";
+            updateGrade(enrollee.getGrade());
+            return "Enrollee successfully Created: " + enrollee.getId();
         }, taskExecutor);
     }
 
@@ -75,8 +77,7 @@ public class EnrolleeService {
     @Async("taskExecutor")
     public CompletableFuture<EnrolleeDetailsDTO> readByIdAsync(UUID id) {
         return CompletableFuture.supplyAsync(() -> {
-            Enrollee enrollee = enrolleeR.findByIdWithEvaluationsAndAttendances(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee not Found"));
+            Enrollee enrollee = findEnrolleeWithDetails(id);
             
             return (
                 new EnrolleeDetailsDTO(
@@ -109,8 +110,7 @@ public class EnrolleeService {
     @Async("taskExecutor")
     public CompletableFuture<String> updateAsync(UUID id, EnrolleeUpdateDTO data) {
         return CompletableFuture.supplyAsync(() -> {
-            Enrollee enrollee = enrolleeR.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee not Found"));
+            Enrollee enrollee = findEnrollee(id);
                 
             enrolleeR.save(enrollee);
             return "Updated Enrollee";
@@ -120,22 +120,42 @@ public class EnrolleeService {
     @Async("taskExecutor")
     public CompletableFuture<String> deleteAsync(UUID id) {
         return CompletableFuture.supplyAsync(() -> {
-            Enrollee enrollee = enrolleeR.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee not Found"));
-    
-            updateGradeCurrentStudents(enrollee.getGrade(), false);
+            Enrollee enrollee = findEnrolleeWithDetails(id);
             
             enrolleeR.deleteById(id);
+            updateGrade(enrollee.getGrade());
             return "Deleted Enrollee";
         }, taskExecutor);
+    }
+
+    private Enrollee findEnrollee(UUID id) {
+        return enrolleeR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee not Found"));
+    }
+
+    private Enrollee findEnrolleeWithDetails(UUID id) {
+        return enrolleeR.findByIdWithEvaluationsAndAttendances(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee not Found"));
+    }
+
+    private Student findStudent(UUID id) {
+        return studentR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not Found"));
+    }
+
+    private Grade findGradeWithDetails(UUID id) {
+        return gradeR.findByIdWithEnrollees(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Grade not Found"));
     }
 
     private void validateGradeStatus(Grade grade) {
         if(grade.getStatus() == EGrade.FINISHED) throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Cannot enroll a student in a finished class");
     }
 
-    private void updateGradeCurrentStudents(Grade grade, boolean isAdding) {
-        grade.setCurrentStudents(grade.getCurrentStudents() + (isAdding? 1 : -1));
+    private void ensureStudentIsUnique(Student student) {
+        if(studentR.findById(student.getId()).isPresent()) throw new ResponseStatusException(HttpStatus.CONFLICT, "Student already exists for this Grade");
+    }
+
+    private void updateGrade(Grade grade) {
+        grade.setCurrentStudents( (int)grade.getEnrollees().stream().count());
+        System.out.println("Grade Current Students: " + grade.getCurrentStudents());
+        System.out.println("GradeEnrollees: " + (int)grade.getEnrollees().stream().count());
         gradeR.save(grade);
     }
 

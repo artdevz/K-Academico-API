@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.kacademic.app.dto.auth.AuthRequestDTO;
 import com.kacademic.app.services.AuthService;
+import com.kacademic.shared.utils.AsyncUnwrapper;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -32,7 +33,7 @@ public class AuthController {
     })
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody @Valid AuthRequestDTO request) {
-        return ResponseEntity.ok(authS.login(request).join());
+        return ResponseEntity.ok(AsyncUnwrapper.await(authS.login(request)));
     }
     
 

@@ -1,7 +1,6 @@
 package com.kacademic.app.services;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -37,14 +36,11 @@ public class EvaluationService {
     @Async("taskExecutor")
     public CompletableFuture<String> createAsync(EvaluationRequestDTO data) {
         return CompletableFuture.supplyAsync(() -> {
-            Enrollee enrollee = enrolleeR.findByIdWithEvaluationsAndAttendances(data.enrollee())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee not Found"));
-            
-            Exam exam = examR.findByIdWithGrade(data.exam())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exam not Found"));
+            Enrollee enrollee = findEnrolleeWithDetails(data.enrollee());
+            Exam exam = findExamWithGrade(data.exam());
 
-            if (!belongsToSameGrade(enrollee, exam)) throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Enrollee and Exam must belong to the same Grade");
-            if (evaluationR.existsByEnrolleeIdAndExamId(enrollee.getId(), exam.getId())) throw new ResponseStatusException(HttpStatus.CONFLICT, "Evaluation already exists for this Enrollee and Exam");
+            ensureEvaluationNotExists(enrollee, exam);
+            ensureSameGrade(enrollee, exam);
 
             Evaluation evaluation = new Evaluation(
                 enrollee,
@@ -52,9 +48,9 @@ public class EvaluationService {
                 data.score()
             );
             
-            addEvaluation(evaluation);
             evaluationR.save(evaluation);
-            return "Created Evaluation";
+            updateAverage(enrollee);
+            return "Evaluation successfully Created: " + evaluation.getId();
         }, taskExecutor);
     }
 
@@ -100,7 +96,7 @@ public class EvaluationService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Evaluation not Found"));
             
             data.score().ifPresent(evaluation::setScore);
-            if (data.score().isPresent()) editEvaluation(evaluation);
+            if (data.score().isPresent()) updateAverage(evaluation.getEnrollee());
                 
             evaluationR.save(evaluation);
             return "Updated Evaluation";
@@ -110,50 +106,38 @@ public class EvaluationService {
     @Async("taskExecutor")
     public CompletableFuture<String> deleteAsync(UUID id) {
         return CompletableFuture.supplyAsync(() -> {
-            if (!evaluationR.findById(id).isPresent()) 
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Evaluation not Found");
-            
-            removeEvaluation(evaluationR.findById(id).get());
+            Evaluation evaluation = evaluationR.findById(id) 
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Evaluation not Found"));
             
             evaluationR.deleteById(id);
+            updateAverage(evaluation.getEnrollee());
             return "Deleted Evaluation";
         }, taskExecutor);
     }
 
-    private void addEvaluation(Evaluation evaluation) {
-        Enrollee enrollee = enrolleeR.findByIdWithEvaluationsAndAttendances(evaluation.getEnrollee().getId())
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee not Found"));
-        
-        enrollee.getEvaluations().add(evaluation);
-        enrollee.setAverage(updateAverage(enrollee.getEvaluations()));
+    private Enrollee findEnrolleeWithDetails(UUID enrolleeId) {
+        return enrolleeR.findByIdWithEvaluationsAndAttendances(enrolleeId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee Not Found"));
+    }
 
+    private Exam findExamWithGrade(UUID examId) {
+        return examR.findByIdWithGrade(examId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exam not Found"));
+    }
+
+    private void ensureEvaluationNotExists(Enrollee enrollee, Exam exam) {
+        if (evaluationR.existsByEnrolleeIdAndExamId(enrollee.getId(), exam.getId()))
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Evaluation already exists for this Enrollee and Exam");
+    }
+
+    private void ensureSameGrade(Enrollee enrollee, Exam exam) {
+        if (!(enrollee.getGrade().getId().equals(exam.getGrade().getId())))
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Enrollee and Exam must belong to the same Grade");
+    }
+    
+    private void updateAverage(Enrollee enrollee) {
+        enrollee.setAverage( (float)enrollee.getEvaluations().stream().mapToDouble(Evaluation::getScore).average().orElse(0.0));
         enrolleeR.save(enrollee);
-    }
-
-    private void editEvaluation(Evaluation evaluation) {
-        evaluation.getEnrollee().setAverage(updateAverage(evaluation.getEnrollee().getEvaluations()));
-    }    
-
-    private void removeEvaluation(Evaluation evaluation) {
-        Enrollee enrollee = enrolleeR.findByIdWithEvaluationsAndAttendances(evaluation.getEnrollee().getId())
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee not Found"));
-
-        enrollee.getEvaluations().removeIf(currentEvaluation -> currentEvaluation.equals(evaluation));
-
-        enrollee.setAverage(updateAverage(enrollee.getEvaluations()));
-
-        enrolleeR.save(enrollee);
-    }
-
-    private float updateAverage(Set<Evaluation> evaluations) {
-        float sum = 0;
-        for (Evaluation evaluation : evaluations) sum += evaluation.getScore();
-
-        return evaluations.isEmpty() ? 0 : sum / evaluations.size();
-    }
-
-    private boolean belongsToSameGrade(Enrollee enrollee, Exam exam) {
-        return enrollee.getGrade().getId().equals(exam.getGrade().getId()); 
     }
 
 }

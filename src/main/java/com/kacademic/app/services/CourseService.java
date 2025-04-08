@@ -65,9 +65,8 @@ public class CourseService {
     @Async("taskExecutor")
     public CompletableFuture<CourseDetailsDTO> readByIdAsync(UUID id) {
         return CompletableFuture.supplyAsync(() -> {
-            Course course = courseR.findByIdWithSubjects(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found"));
-        
+            Course course = findCourseWithDetails(id);
+            
             return (
                 new CourseDetailsDTO(
                     new CourseResponseDTO(
@@ -94,8 +93,7 @@ public class CourseService {
     @Async("taskExecutor")
     public CompletableFuture<String> updateAsync(UUID id, CourseUpdateDTO data) {
         return CompletableFuture.supplyAsync(() -> {
-            Course course = courseR.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found"));        
+            Course course = findCourse(id);
         
             data.name().ifPresent(course::setName);
             data.description().ifPresent(course::setDescription);
@@ -109,11 +107,19 @@ public class CourseService {
     @Async("taskExecutor")
     public CompletableFuture<String> deleteAsync(UUID id) {
         return CompletableFuture.supplyAsync(() -> {
-            if (!courseR.findById(id).isPresent()) 
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found");
+            findCourse(id);
             
             courseR.deleteById(id);
             return "Deleted Course";
         }, taskExecutor);
     }
+
+    private Course findCourse(UUID id) {
+        return courseR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found"));
+    }
+
+    private Course findCourseWithDetails(UUID id) {
+        return courseR.findByIdWithSubjects(id).get();
+    }
+
 }

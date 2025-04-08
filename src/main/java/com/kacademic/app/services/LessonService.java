@@ -39,7 +39,7 @@ public class LessonService {
             );
             
             lessonR.save(lesson);
-            return "Created Lesson";
+            return "Lesson successfully Created: " + lesson.getId();
         }, taskExecutor);
     }
 

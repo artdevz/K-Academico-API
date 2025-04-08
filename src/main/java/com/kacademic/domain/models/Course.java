@@ -32,10 +32,10 @@ public class Course implements Serializable {
     private UUID id;
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = false)
+    @OneToMany(mappedBy = "course", cascade = CascadeType.MERGE, orphanRemoval = false)
     private List<Subject> subjects = new ArrayList<>();
     
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = false)
+    @OneToMany(mappedBy = "course", cascade = CascadeType.MERGE, orphanRemoval = false)
     private List<Student> students = new ArrayList<>();
 
     @Size(min=4, max=160, message="Course name must be between 4 and 160 characters")

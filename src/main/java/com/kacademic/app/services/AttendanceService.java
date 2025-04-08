@@ -36,14 +36,11 @@ public class AttendanceService {
     @Async("taskExecutor")
     public CompletableFuture<String> createAsync(AttendanceRequestDTO data) {
         return CompletableFuture.supplyAsync(() -> {
-            Enrollee enrollee = enrolleeR.findByIdWithEvaluationsAndAttendances(data.enrollee())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee not Found"));
+            Enrollee enrollee = findEnrolleeWithDetails(data.enrollee());
+            Lesson lesson = findLesson(data.lesson());
 
-            Lesson lesson = lessonR.findById(data.lesson())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not Found"));
-
-            if (!belongsToSameGrade(enrollee, lesson)) throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Enrollee and Lesson must belong to the same Grade");
-            if (attendanceR.existsByEnrolleeIdAndLessonId(enrollee.getId(), lesson.getId()));
+            ensureAttendanceNotExists(enrollee, lesson);
+            ensureSameGrade(enrollee, lesson);
 
             Attendance attendance = new Attendance(
                 enrollee,
@@ -51,9 +48,9 @@ public class AttendanceService {
                 data.isAbsent()
             );
             
-            addAbsent(attendance);
             attendanceR.save(attendance);
-            return "Created Attendace";
+            updateAbsences(attendance.getEnrollee());
+            return "Attendance successfully Created: " + attendance.getId();
 
         }, taskExecutor);
     }
@@ -77,8 +74,7 @@ public class AttendanceService {
     @Async("taskExecutor")
     public CompletableFuture<AttendanceResponseDTO> readByIdAsync(UUID id) {
         return CompletableFuture.supplyAsync(() -> {
-            Attendance attendance = attendanceR.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Attendance not Found"));
+            Attendance attendance = findAttendance(id);
             
             return(
                 new AttendanceResponseDTO(
@@ -94,9 +90,11 @@ public class AttendanceService {
     @Async("taskExecutor")
     public CompletableFuture<String> updateAsync(UUID id, AttendanceUpdateDTO data) {
         return CompletableFuture.supplyAsync(() -> {
-            Attendance attendance = attendanceR.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Attendance not Found"));
-                
+            Attendance attendance = findAttendance(id);
+            
+            data.isAbsent().ifPresent(attendance::setAbsent);
+            if (data.isAbsent().isPresent()) updateAbsences(attendance.getEnrollee());
+
             attendanceR.save(attendance);
             return "Updated Attendance";
         }, taskExecutor);
@@ -105,30 +103,40 @@ public class AttendanceService {
     @Async("taskExecutor")
     public CompletableFuture<String> deleteAsync(UUID id) {
         return CompletableFuture.supplyAsync(() -> {
-            if (!attendanceR.findById(id).isPresent()) 
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Attendance not Found");
+            Attendance attendance = findAttendance(id);
             
             attendanceR.deleteById(id);
-            // removeAbsent(attendanceR.findById(id).get());
+            updateAbsences(attendance.getEnrollee());
             return "Deleted Attendance";
         }, taskExecutor);
     }
 
-    private boolean belongsToSameGrade(Enrollee enrollee, Lesson lesson) {
-        return enrollee.getGrade().getId().equals(lesson.getGrade().getId());
+    private Attendance findAttendance(UUID id) {
+        return attendanceR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Attendance not Found"));
     }
 
-    private void addAbsent(Attendance attendance) {
-        Enrollee enrollee = attendance.getEnrollee();
-        enrollee.getAttendances().add(attendance);
-        enrolleeR.save(enrollee);
+    private Enrollee findEnrolleeWithDetails(UUID enrolleeId) {
+        return enrolleeR.findByIdWithEvaluationsAndAttendances(enrolleeId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee not Found"));
     }
 
-    private void editAbsent() {}
+    private Lesson findLesson(UUID lessonId) {
+        return lessonR.findById(lessonId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Attendance not Found"));
+    }
 
-    private void removeAbsent(Attendance attendance) {
-        Enrollee enrollee = attendance.getEnrollee();
-        enrollee.getAttendances().remove(attendance);
+    private void ensureAttendanceNotExists(Enrollee enrollee, Lesson lesson) {
+        if (attendanceR.existsByEnrolleeIdAndLessonId(enrollee.getId(), lesson.getId()))
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Attendance already exists for this Enrollee and Exam");
+    }
+
+    private void ensureSameGrade(Enrollee enrollee, Lesson lesson) {
+        if (!(enrollee.getGrade().getId().equals(lesson.getGrade().getId()))) 
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Enrollee and Lesson must belong to the same Grade");
+    }
+
+    private void updateAbsences(Enrollee enrollee) {
+        enrollee.setAbsences( (int)enrollee.getAttendances().stream().filter(Attendance::isAbsent).count());
         enrolleeR.save(enrollee);
     }
 

@@ -42,7 +42,7 @@ public class ExamService {
             );
     
             examR.save(exam);
-            return "Created Exam";
+            return "Exam successfully Created: " + exam.getId();
         }, taskExecutor);
     }
 
