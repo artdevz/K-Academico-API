@@ -19,6 +19,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -41,6 +42,7 @@ public class Lesson implements Serializable {
     @JoinColumn(name = "grade.id", nullable = false)
     private Grade grade;
     
+    @Size(max=32)
     private String topic;
 
     @JsonFormat(pattern = "yyyy-MM-dd")

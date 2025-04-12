@@ -60,10 +60,7 @@ public class UserService {
                 data.name(),
                 data.email(),
                 passwordEncoder.encode(data.password()),
-                data.roles().stream()
-                    .map(roleId -> roleR.findById(roleId)
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not Found")))
-                    .collect(Collectors.toSet())
+                findRoles(data.roles())
             );
             
             userR.save(user);
@@ -89,8 +86,7 @@ public class UserService {
     @Async("taskExecutor")
     public CompletableFuture<UserResponseDTO> readByIdAsync(UUID id) {
         return CompletableFuture.supplyAsync(() -> {
-            User user = userR.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not Found"));
+            User user = findUser(id);
             
             return new UserResponseDTO(
                 user.getId(),            
@@ -104,8 +100,7 @@ public class UserService {
     @Async("taskExecutor")
     public CompletableFuture<String> updateAsync(UUID id, UserUpdateDTO data) {
         return CompletableFuture.supplyAsync(() -> {
-            User user = userR.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not Found"));
+            User user = findUser(id);
             
             data.name().ifPresent(user::setName);
             data.password().ifPresent(password -> user.setPassword(passwordEncoder.encode(password)));
@@ -118,16 +113,27 @@ public class UserService {
     @Async("taskExecutor")
     public CompletableFuture<String> deleteAsync(UUID id) {
         return CompletableFuture.supplyAsync(() -> {
-            if (!userR.findById(id).isPresent()) 
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not Found");
+            findUser(id);
             
             userR.deleteById(id);
             return "Deleted User";
         }, taskExecutor);
+    }
+
+    private User findUser(UUID id) {
+        return userR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not Found"));
+    }
+
+    private Set<Role> findRoles(Set<UUID> roles) {
+        return roles.stream()
+        .map(roleId -> roleR.findById(roleId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not Found")))
+        .collect(Collectors.toSet());
     }
     
     private void ensureEmailIsUnique(String email) {
         if (userR.findByEmail(email).isPresent()) 
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already being used");
     }
+
 }

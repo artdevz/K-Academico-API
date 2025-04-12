@@ -18,6 +18,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -43,8 +44,10 @@ public class Subject implements Serializable {
 
     private ESubject type;
 
+    @Size(max=127)
     private String name;
     
+    @Size(max=255)
     private String description;
     
     @Min(40)
@@ -58,7 +61,6 @@ public class Subject implements Serializable {
 
     // private List<Subject> corequisites;
 
-    // Constructor
     public Subject(Course course, String name, String description, int duration, int semester, List<UUID> prerequisites) {
         this.course = course;
         this.name = name;

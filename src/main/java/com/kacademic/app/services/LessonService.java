@@ -14,6 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.kacademic.app.dto.lesson.LessonRequestDTO;
 import com.kacademic.app.dto.lesson.LessonResponseDTO;
 import com.kacademic.app.dto.lesson.LessonUpdateDTO;
+import com.kacademic.domain.models.Grade;
 import com.kacademic.domain.models.Lesson;
 import com.kacademic.domain.repositories.GradeRepository;
 import com.kacademic.domain.repositories.LessonRepository;
@@ -33,7 +34,7 @@ public class LessonService {
     public CompletableFuture<String> createAsync(LessonRequestDTO data) {
         return CompletableFuture.supplyAsync(() -> {
             Lesson lesson = new Lesson(
-                gradeR.findById(data.grade()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Grade not Found")),
+                findGrade(data.grade()),
                 data.topic(),
                 data.date()
             );
@@ -62,8 +63,7 @@ public class LessonService {
     @Async("taskExecutor")
     public CompletableFuture<LessonResponseDTO> readByIdAsync(UUID id) {
         return CompletableFuture.supplyAsync(() -> {
-            Lesson lesson = lessonR.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not Found"));
+            Lesson lesson = findLesson(id);
     
             return new LessonResponseDTO(
                 lesson.getId(),
@@ -78,8 +78,7 @@ public class LessonService {
     @Async("taskExecutor")
     public CompletableFuture<String> updateAsync(UUID id, LessonUpdateDTO data) {
         return CompletableFuture.supplyAsync(() -> {
-            Lesson lesson = lessonR.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not Found"));
+            Lesson lesson = findLesson(id);
     
             lessonR.save(lesson);
             return "Updated Lesson";
@@ -89,11 +88,19 @@ public class LessonService {
     @Async("taskExecutor")
     public CompletableFuture<String> deleteAsync(UUID id) {
         return CompletableFuture.supplyAsync(() -> {
-            if (!lessonR.findById(id).isPresent()) 
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not Found");
+            findLesson(id);
             
             lessonR.deleteById(id);
             return "Deleted Lesson";
         }, taskExecutor);
     }
+
+    private Lesson findLesson(UUID id) {
+        return lessonR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not Found"));
+    }
+    
+    private Grade findGrade(UUID id) {
+        return gradeR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Grade not Found"));
+    }
+
 }

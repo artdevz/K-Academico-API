@@ -1,6 +1,7 @@
 package com.kacademic.app.services;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -16,6 +17,7 @@ import com.kacademic.app.dto.professor.ProfessorRequestDTO;
 import com.kacademic.app.dto.professor.ProfessorResponseDTO;
 import com.kacademic.app.dto.professor.ProfessorUpdateDTO;
 import com.kacademic.domain.models.Professor;
+import com.kacademic.domain.models.Role;
 import com.kacademic.domain.repositories.ProfessorRepository;
 import com.kacademic.domain.repositories.RoleRepository;
 
@@ -39,10 +41,7 @@ public class ProfessorService {
                 data.user().name(),
                 data.user().email(),
                 passwordEncoder.encode(data.user().password()),
-                data.user().roles().stream()
-                    .map(roleId -> roleR.findById(roleId)
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not Found")))
-                    .collect(Collectors.toSet()),
+                findRoles(data.user().roles()),                
                 data.wage()
             );
     
@@ -69,8 +68,7 @@ public class ProfessorService {
     @Async("taskExecutor")
     public CompletableFuture<ProfessorResponseDTO> readByIdAsync(UUID id) {
         return CompletableFuture.supplyAsync(() -> {
-            Professor professor = professorR.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Professor not Found"));
+            Professor professor = findProfessor(id);
     
             return new ProfessorResponseDTO(
                 professor.getId(),
@@ -84,8 +82,7 @@ public class ProfessorService {
     @Async("taskExecutor")
     public CompletableFuture<String> updateAsync(UUID id, ProfessorUpdateDTO data) {
         return CompletableFuture.supplyAsync(() -> {
-            Professor professor = professorR.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Professor not Found"));
+            Professor professor = findProfessor(id);
     
             data.wage().ifPresent(professor::setWage);
             
@@ -97,11 +94,22 @@ public class ProfessorService {
     @Async("taskExecutor")
     public CompletableFuture<String> deleteAsync(UUID id) {
         return CompletableFuture.supplyAsync(() -> {
-            if (!professorR.findById(id).isPresent())
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Professor not Found");
+            findProfessor(id);
             
             professorR.deleteById(id);
             return "Deleted Professor";
         }, taskExecutor);
     }
+
+    private Professor findProfessor(UUID id) {
+        return professorR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Professor not Found"));
+    }
+
+    private Set<Role> findRoles(Set<UUID> roles) {
+        return roles.stream()
+        .map(roleId -> roleR.findById(roleId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not Found")))
+        .collect(Collectors.toSet());
+    }
+
 }

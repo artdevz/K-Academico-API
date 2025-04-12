@@ -18,6 +18,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -40,6 +41,7 @@ public class Exam implements Serializable {
     @JoinColumn(name = "grade_id", nullable = false)
     private Grade grade;
 
+    @Size(min = 3, max=16, message = "Exam name must be between 3 and 16 characters")
     private String name;
 
     private int maximum;

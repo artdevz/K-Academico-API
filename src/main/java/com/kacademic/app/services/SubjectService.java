@@ -34,7 +34,7 @@ public class SubjectService {
     public CompletableFuture<String> createAsync(SubjectRequestDTO data) {
         return CompletableFuture.supplyAsync(() -> {
             Subject subject = new Subject(
-                courseR.findByIdWithSubjects(data.course()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found")),
+                findCourseDetails(data.course()),
                 data.name(),
                 data.description(),
                 data.duration(),
@@ -70,8 +70,7 @@ public class SubjectService {
     @Async("taskExecutor")
     public CompletableFuture<SubjectResponseDTO> readByIdAsync(UUID id) {
         return CompletableFuture.supplyAsync(() -> {
-            Subject subject = subjectR.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subject not Found."));
+            Subject subject = findSubject(id);
             
             return new SubjectResponseDTO(
                 subject.getId(),
@@ -88,8 +87,7 @@ public class SubjectService {
     @Async("taskExecutor")
     public CompletableFuture<String> updateAsync(UUID id, SubjectUpdateDTO data) {
         return CompletableFuture.supplyAsync(() -> {
-            Subject subject = subjectR.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subject not Found"));
+            Subject subject = findSubject(id);
                 
             data.type().ifPresent(subject::setType);
             data.name().ifPresent(subject::setName);
@@ -105,8 +103,7 @@ public class SubjectService {
     @Async("taskExecutor")
     public CompletableFuture<String> deleteAsync(UUID id) {
         return CompletableFuture.supplyAsync(() -> {
-            Subject subject = subjectR.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subject not Found"));
+            Subject subject = findSubject(id);
     
             updateCourseDuration(subject.getCourse(), subject.getDuration() * (-1)); // -1 for REMOVE
     
@@ -118,6 +115,14 @@ public class SubjectService {
     private void updateCourseDuration(Course course, int duration) {
         course.setDuration(course.getDuration() + duration);
         courseR.save(course);
+    }
+
+    private Subject findSubject(UUID id) {
+        return subjectR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subject not Found"));
+    }
+
+    private Course findCourseDetails(UUID id) {
+        return courseR.findByIdWithSubjects(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found"));
     }
 
 }

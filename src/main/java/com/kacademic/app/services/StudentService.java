@@ -1,6 +1,7 @@
 package com.kacademic.app.services;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -18,6 +19,7 @@ import com.kacademic.app.dto.student.StudentRequestDTO;
 import com.kacademic.app.dto.student.StudentResponseDTO;
 import com.kacademic.app.dto.student.StudentUpdateDTO;
 import com.kacademic.domain.models.Course;
+import com.kacademic.domain.models.Role;
 import com.kacademic.domain.models.Student;
 import com.kacademic.domain.repositories.CourseRepository;
 import com.kacademic.domain.repositories.RoleRepository;
@@ -47,10 +49,7 @@ public class StudentService {
                 data.user().name(),
                 data.user().email(),
                 passwordEncoder.encode(data.user().password()),
-                data.user().roles().stream()
-                    .map(roleId -> roleR.findById(roleId)
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not Found")))
-                    .collect(Collectors.toSet()),
+                findRoles(data.user().roles()),
                 findCourse(data.course()),
                 enrolleeGS.generate(findCourse(data.course()).getCode())
             );
@@ -129,6 +128,13 @@ public class StudentService {
 
     private Course findCourse(UUID id) {
         return courseR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found"));
+    }
+
+    private Set<Role> findRoles(Set<UUID> roles) {
+        return roles.stream()
+        .map(roleId -> roleR.findById(roleId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not Found")))
+        .collect(Collectors.toSet());
     }
 
 }

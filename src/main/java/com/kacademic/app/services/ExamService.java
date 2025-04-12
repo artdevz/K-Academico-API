@@ -15,6 +15,7 @@ import com.kacademic.app.dto.exam.ExamRequestDTO;
 import com.kacademic.app.dto.exam.ExamResponseDTO;
 import com.kacademic.app.dto.exam.ExamUpdateDTO;
 import com.kacademic.domain.models.Exam;
+import com.kacademic.domain.models.Grade;
 import com.kacademic.domain.repositories.ExamRepository;
 import com.kacademic.domain.repositories.GradeRepository;
 
@@ -35,7 +36,7 @@ public class ExamService {
     public CompletableFuture<String> createAsync(ExamRequestDTO data) {
         return CompletableFuture.supplyAsync(() -> {
             Exam exam = new Exam(
-                gradeR.findById(data.grade()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Grade not Found")),
+                findGrade(data.grade()),
                 data.name(),
                 data.maximum(),
                 data.date()
@@ -66,8 +67,7 @@ public class ExamService {
     @Async("taskExecutor")
     public CompletableFuture<ExamResponseDTO> readByIdAsync(UUID id) {
         return CompletableFuture.supplyAsync(() -> {
-            Exam exam = examR.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exam not Found"));
+            Exam exam = findExam(id);
             
             return (
                 new ExamResponseDTO(
@@ -84,8 +84,7 @@ public class ExamService {
     @Async("taskExecutor")
     public CompletableFuture<String> updateAsync(UUID id, ExamUpdateDTO data) {
         return CompletableFuture.supplyAsync(() -> {
-            Exam exam = examR.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exam not Found"));
+            Exam exam = findExam(id);
                 
             examR.save(exam);
             return "Updated Exam";
@@ -95,11 +94,19 @@ public class ExamService {
     @Async("taskExecutor")
     public CompletableFuture<String> deleteAsync(UUID id) {
         return CompletableFuture.supplyAsync(() -> {
-            if (!examR.findById(id).isPresent()) 
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Exam not Found");
+            findExam(id);
             
             examR.deleteById(id);
             return "Deleted Exam";
         }, taskExecutor);
     }
+
+    private Exam findExam(UUID id) {
+        return examR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exam not Found"));
+    }
+
+    private Grade findGrade(UUID id) {
+        return gradeR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Grade not Found"));
+    }
+
 }

@@ -16,6 +16,8 @@ import com.kacademic.app.dto.grade.GradeResponseDTO;
 import com.kacademic.app.dto.grade.GradeUpdateDTO;
 import com.kacademic.domain.enums.EGrade;
 import com.kacademic.domain.models.Grade;
+import com.kacademic.domain.models.Professor;
+import com.kacademic.domain.models.Subject;
 import com.kacademic.domain.repositories.EnrolleeRepository;
 import com.kacademic.domain.repositories.GradeRepository;
 import com.kacademic.domain.repositories.ProfessorRepository;
@@ -41,8 +43,8 @@ public class GradeService {
     public CompletableFuture<String> createAsync(GradeRequestDTO data) {
         return CompletableFuture.supplyAsync(() -> {
             Grade grade = new Grade(
-                subjectR.findById(data.subject()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subject not Found")),
-                professorR.findById(data.professor()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Professor not Found")),
+                findSubject(data.subject()),
+                findProfessor(data.professor()),
                 data.capacity(),
                 data.semester(),
                 data.locate(),
@@ -80,8 +82,7 @@ public class GradeService {
     @Async("taskExecutor")
     public CompletableFuture<GradeResponseDTO> readByIdAsync(UUID id) {
         return CompletableFuture.supplyAsync(() -> {
-            Grade grade = gradeR.findByIdWithTimetables(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Grade not Found"));
+            Grade grade = findGrade(id);
             
             return (
                 new GradeResponseDTO(
@@ -103,8 +104,7 @@ public class GradeService {
     @Async("taskExecutor")
     public CompletableFuture<String> updateAsync(UUID id, GradeUpdateDTO data) {
         return CompletableFuture.supplyAsync(() -> {
-            Grade grade = gradeR.findByIdWithEnrollees(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Grade not Found"));
+            Grade grade = findGrade(id);
         
             data.status().ifPresent(grade::setStatus);
             if (data.status().isPresent() && data.status().get().equals(EGrade.FINAL)) semesterS.processPartialResults(id);
@@ -120,12 +120,24 @@ public class GradeService {
     @Async("taskExecutor")
     public CompletableFuture<String> deleteAsync(UUID id) {
         return CompletableFuture.supplyAsync(() -> {
-            if (!gradeR.findById(id).isPresent()) 
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Grade not Found");
+            findGrade(id);
             
             enrolleeR.removeGradeFromEnrollees(id);
             gradeR.deleteById(id);
             return "Deleted Grade";
         }, taskExecutor);
     }
+
+    private Grade findGrade(UUID id) {
+        return gradeR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Grade not Found"));
+    }
+
+    private Subject findSubject(UUID id) {
+        return subjectR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subject not Found"));
+    }
+
+    private Professor findProfessor(UUID id) {
+        return professorR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Professor not Found"));
+    }
+
 }
