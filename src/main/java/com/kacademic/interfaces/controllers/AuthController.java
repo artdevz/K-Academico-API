@@ -1,13 +1,18 @@
 package com.kacademic.interfaces.controllers;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kacademic.app.dto.auth.AuthRefreshDTO;
 import com.kacademic.app.dto.auth.AuthRequestDTO;
+import com.kacademic.app.dto.auth.AuthResponseDTO;
 import com.kacademic.app.services.AuthService;
+import com.kacademic.app.services.TokenService;
+import com.kacademic.domain.models.User;
 import com.kacademic.shared.utils.AsyncUnwrapper;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 public class AuthController {
     
     private final AuthService authS;
+    private final TokenService tokenS;
 
 
     @Operation(summary = "User login",
@@ -32,9 +38,19 @@ public class AuthController {
         @ApiResponse(responseCode = "401", description = "Unauthorized: Invalid credentials")
     })
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody @Valid AuthRequestDTO request) {
-        return ResponseEntity.ok(AsyncUnwrapper.await(authS.login(request)));
+    public ResponseEntity<AuthResponseDTO> login(@RequestBody @Valid AuthRequestDTO request) {
+        return ResponseEntity.ok(AsyncUnwrapper.await(authS.loginAsync(request)));
     }
-    
+
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponseDTO> refresh(@RequestBody @Valid AuthRefreshDTO request) {
+        return ResponseEntity.ok(authS.refreshSync(request));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@AuthenticationPrincipal User user) {
+        tokenS.deleteByUserId(user.getId());
+        return ResponseEntity.noContent().build();
+    }
 
 }

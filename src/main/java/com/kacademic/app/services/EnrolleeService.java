@@ -43,7 +43,7 @@ public class EnrolleeService {
         return CompletableFuture.supplyAsync(() -> {
             Enrollee enrollee = new Enrollee(
                 findStudent(data.student()),
-                findGradeWithDetails(data.grade())
+                findGradeDetails(data.grade())
             );
     
             validateGradeStatus(enrollee.getGrade());
@@ -77,7 +77,7 @@ public class EnrolleeService {
     @Async("taskExecutor")
     public CompletableFuture<EnrolleeDetailsDTO> readByIdAsync(UUID id) {
         return CompletableFuture.supplyAsync(() -> {
-            Enrollee enrollee = findEnrolleeWithDetails(id);
+            Enrollee enrollee = findEnrolleeDetails(id);
             
             return (
                 new EnrolleeDetailsDTO(
@@ -120,7 +120,7 @@ public class EnrolleeService {
     @Async("taskExecutor")
     public CompletableFuture<String> deleteAsync(UUID id) {
         return CompletableFuture.supplyAsync(() -> {
-            Enrollee enrollee = findEnrolleeWithDetails(id);
+            Enrollee enrollee = findEnrolleeDetails(id);
             
             enrolleeR.deleteById(id);
             updateGrade(enrollee.getGrade());
@@ -132,7 +132,7 @@ public class EnrolleeService {
         return enrolleeR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee not Found"));
     }
 
-    private Enrollee findEnrolleeWithDetails(UUID id) {
+    private Enrollee findEnrolleeDetails(UUID id) {
         return enrolleeR.findByIdWithEvaluationsAndAttendances(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee not Found"));
     }
 
@@ -140,7 +140,7 @@ public class EnrolleeService {
         return studentR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not Found"));
     }
 
-    private Grade findGradeWithDetails(UUID id) {
+    private Grade findGradeDetails(UUID id) {
         return gradeR.findByIdWithEnrollees(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Grade not Found"));
     }
 

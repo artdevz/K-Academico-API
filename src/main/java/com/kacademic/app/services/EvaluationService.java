@@ -74,8 +74,7 @@ public class EvaluationService {
     @Async("taskExecutor")
     public CompletableFuture<EvaluationResponseDTO> readByIdAsync(UUID id) {
         return CompletableFuture.supplyAsync(() -> {
-            Evaluation evaluation = evaluationR.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Evaluation not Found"));
+            Evaluation evaluation =findEvaluation(id);
             
             return (
                 new EvaluationResponseDTO(
@@ -92,8 +91,7 @@ public class EvaluationService {
     @Async("taskExecutor")
     public CompletableFuture<String> updateAsync(UUID id, EvaluationUpdateDTO data) {
         return CompletableFuture.supplyAsync(() -> {
-            Evaluation evaluation = evaluationR.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Evaluation not Found"));
+            Evaluation evaluation = findEvaluation(id);
             
             data.score().ifPresent(evaluation::setScore);
             if (data.score().isPresent()) updateAverage(evaluation.getEnrollee());
@@ -106,8 +104,7 @@ public class EvaluationService {
     @Async("taskExecutor")
     public CompletableFuture<String> deleteAsync(UUID id) {
         return CompletableFuture.supplyAsync(() -> {
-            Evaluation evaluation = evaluationR.findById(id) 
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Evaluation not Found"));
+            Evaluation evaluation = findEvaluation(id);
             
             evaluationR.deleteById(id);
             updateAverage(evaluation.getEnrollee());
@@ -115,14 +112,16 @@ public class EvaluationService {
         }, taskExecutor);
     }
 
+    private Evaluation findEvaluation(UUID id) {
+        return evaluationR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Evaluation not Found"));
+    }
+
     private Enrollee findEnrolleeWithDetails(UUID enrolleeId) {
-        return enrolleeR.findByIdWithEvaluationsAndAttendances(enrolleeId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee Not Found"));
+        return enrolleeR.findByIdWithEvaluationsAndAttendances(enrolleeId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee Not Found"));
     }
 
     private Exam findExamWithGrade(UUID examId) {
-        return examR.findByIdWithGrade(examId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exam not Found"));
+        return examR.findByIdWithGrade(examId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exam not Found"));
     }
 
     private void ensureEvaluationNotExists(Enrollee enrollee, Exam exam) {

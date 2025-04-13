@@ -36,7 +36,7 @@ public class AttendanceService {
     @Async("taskExecutor")
     public CompletableFuture<String> createAsync(AttendanceRequestDTO data) {
         return CompletableFuture.supplyAsync(() -> {
-            Enrollee enrollee = findEnrolleeWithDetails(data.enrollee());
+            Enrollee enrollee = findEnrolleeDetails(data.enrollee());
             Lesson lesson = findLesson(data.lesson());
 
             ensureAttendanceNotExists(enrollee, lesson);
@@ -115,14 +115,12 @@ public class AttendanceService {
         return attendanceR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Attendance not Found"));
     }
 
-    private Enrollee findEnrolleeWithDetails(UUID enrolleeId) {
-        return enrolleeR.findByIdWithEvaluationsAndAttendances(enrolleeId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee not Found"));
+    private Enrollee findEnrolleeDetails(UUID enrolleeId) {
+        return enrolleeR.findByIdWithEvaluationsAndAttendances(enrolleeId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee not Found"));
     }
 
     private Lesson findLesson(UUID lessonId) {
-        return lessonR.findById(lessonId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Attendance not Found"));
+        return lessonR.findById(lessonId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not Found"));
     }
 
     private void ensureAttendanceNotExists(Enrollee enrollee, Lesson lesson) {
