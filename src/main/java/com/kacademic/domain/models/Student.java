@@ -38,12 +38,15 @@ public class Student extends User {
     @Embedded
     private Enrollment enrollment;
 
+    private int credits;
+
     private float average;
         
     public Student(String name, String email, String password, Set<Role> roles, Course course, Enrollment enrollment) {
         super(name, email, password, roles);
         this.course = course;
         this.enrollment = enrollment;
+        this.credits = 0;
         this.average = 0; // Inicia-se com 0
     }
 

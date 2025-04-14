@@ -6,13 +6,15 @@ import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.kacademic.domain.enums.ESubject;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -42,9 +44,7 @@ public class Subject implements Serializable {
     @OneToMany(mappedBy = "subject")
     private List<Grade> grades = new ArrayList<>();
 
-    private ESubject type;
-
-    @Size(max=127)
+    @Size(max=128)
     private String name;
     
     @Size(max=255)
@@ -57,16 +57,23 @@ public class Subject implements Serializable {
     @Min(1)
     private int semester;
 
-    private List<UUID> prerequisites;
+    private boolean isRequired;
 
-    // private List<Subject> corequisites;
+    @ManyToMany(cascade = CascadeType.MERGE)
+    @JoinTable(
+        name = "subject_prerequisite_groups",
+        joinColumns = @JoinColumn(name = "subject_id"),
+        inverseJoinColumns = @JoinColumn(name = "prerequisites_id")
+    )
+    private List<Equivalence> prerequisites = new ArrayList<>();
 
-    public Subject(Course course, String name, String description, int duration, int semester, List<UUID> prerequisites) {
+    public Subject(Course course, String name, String description, int duration, int semester, boolean isRequired, List<Equivalence> prerequisites) {
         this.course = course;
         this.name = name;
         this.description = description;
         this.duration = duration;
-        this.semester = semester;        
+        this.semester = semester;
+        this.isRequired = isRequired;        
         this.prerequisites = prerequisites;
     }    
 

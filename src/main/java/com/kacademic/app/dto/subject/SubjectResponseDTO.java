@@ -1,6 +1,5 @@
 package com.kacademic.app.dto.subject;
 
-import java.util.List;
 import java.util.UUID;
 
 public record SubjectResponseDTO(
@@ -10,5 +9,5 @@ public record SubjectResponseDTO(
     String description,
     int duration,
     int semester,
-    List<UUID> prerequisites
+    boolean isRequired
 ) {}

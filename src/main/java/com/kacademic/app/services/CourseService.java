@@ -83,7 +83,7 @@ public class CourseService {
                         subject.getDescription(),
                         subject.getDuration(),
                         subject.getSemester(),
-                        subject.getPrerequisites()
+                        subject.isRequired()
                     )).collect(Collectors.toList())
                 )
             );

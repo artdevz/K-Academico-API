@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kacademic.app.dto.subject.SubjectDetailsDTO;
 import com.kacademic.app.dto.subject.SubjectRequestDTO;
 import com.kacademic.app.dto.subject.SubjectResponseDTO;
 import com.kacademic.app.dto.subject.SubjectUpdateDTO;
@@ -68,7 +69,7 @@ public class SubjectController {
         @ApiResponse(responseCode = "404", description = "Subject not found")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<SubjectResponseDTO> readById(@PathVariable UUID id) {
+    public ResponseEntity<SubjectDetailsDTO> readById(@PathVariable UUID id) {
         return ResponseEntity.ok(subjectS.readByIdAsync(id).join());
     }    
 

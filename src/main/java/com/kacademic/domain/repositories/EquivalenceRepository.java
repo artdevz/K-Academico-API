@@ -7,12 +7,12 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.kacademic.domain.models.Subject;
+import com.kacademic.domain.models.Equivalence;
 
 @Repository
-public interface SubjectRepository extends JpaRepository<Subject, UUID> {
+public interface EquivalenceRepository extends JpaRepository<Equivalence, UUID> {
 
-    @EntityGraph(attributePaths = {"prerequisites", "prerequisites.subjects"})
-    Optional<Subject> findById(UUID id);
+    @EntityGraph(attributePaths = {"subjects"})
+    Optional<Equivalence> findById(UUID id);
 
 }

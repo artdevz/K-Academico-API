@@ -11,7 +11,7 @@ public record SubjectRequestDTO(
 
     UUID course,
 
-    @Size(max=127)
+    @Size(max=128)
     String name,
 
     @Size(max=255)
@@ -23,6 +23,8 @@ public record SubjectRequestDTO(
 
     @Min(1)
     int semester,
+
+    boolean isRequired,
 
     List<UUID> prerequisites
 

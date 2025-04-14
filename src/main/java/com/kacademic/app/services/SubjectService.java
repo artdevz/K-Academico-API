@@ -9,14 +9,19 @@ import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.kacademic.app.dto.equivalence.EquivalenceResponseDTO;
+import com.kacademic.app.dto.subject.SubjectDetailsDTO;
 import com.kacademic.app.dto.subject.SubjectRequestDTO;
 import com.kacademic.app.dto.subject.SubjectResponseDTO;
 import com.kacademic.app.dto.subject.SubjectUpdateDTO;
 import com.kacademic.domain.models.Course;
+import com.kacademic.domain.models.Equivalence;
 import com.kacademic.domain.models.Subject;
 import com.kacademic.domain.repositories.CourseRepository;
+import com.kacademic.domain.repositories.EquivalenceRepository;
 import com.kacademic.domain.repositories.SubjectRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -27,9 +32,11 @@ public class SubjectService {
     
     private final SubjectRepository subjectR;
     private final CourseRepository courseR;
+    private final EquivalenceRepository equivalenceR;
 
     private final AsyncTaskExecutor taskExecutor;
 
+    @Transactional
     @Async("taskExecutor")
     public CompletableFuture<String> createAsync(SubjectRequestDTO data) {
         return CompletableFuture.supplyAsync(() -> {
@@ -39,7 +46,8 @@ public class SubjectService {
                 data.description(),
                 data.duration(),
                 data.semester(),
-                data.prerequisites()
+                data.isRequired(),
+                findEquivalences(data.prerequisites())
             );
             
             updateCourseDuration(courseR.findByIdWithSubjects(data.course()).get(), data.duration());
@@ -60,7 +68,7 @@ public class SubjectService {
                     subject.getDescription(),
                     subject.getDuration(),
                     subject.getSemester(),
-                    subject.getPrerequisites()
+                    subject.isRequired()
                 ))
                 .collect(Collectors.toList()
             );
@@ -68,18 +76,26 @@ public class SubjectService {
     }
 
     @Async("taskExecutor")
-    public CompletableFuture<SubjectResponseDTO> readByIdAsync(UUID id) {
+    public CompletableFuture<SubjectDetailsDTO> readByIdAsync(UUID id) {
         return CompletableFuture.supplyAsync(() -> {
             Subject subject = findSubject(id);
             
-            return new SubjectResponseDTO(
-                subject.getId(),
-                subject.getCourse().getId(),                
-                subject.getName(),
-                subject.getDescription(),
-                subject.getDuration(),
-                subject.getSemester(),
-                subject.getPrerequisites()
+            return (
+                new SubjectDetailsDTO(
+                    new SubjectResponseDTO(
+                        subject.getId(),
+                        subject.getCourse().getId(),                
+                        subject.getName(),
+                        subject.getDescription(),
+                        subject.getDuration(),
+                        subject.getSemester(),
+                        subject.isRequired()
+                    ),
+                    subject.getPrerequisites().stream().map(prerequisites -> new EquivalenceResponseDTO(
+                        prerequisites.getId(),
+                        prerequisites.getName()
+                    )).collect(Collectors.toList())
+                )
             );
         }, taskExecutor);
     }
@@ -89,7 +105,7 @@ public class SubjectService {
         return CompletableFuture.supplyAsync(() -> {
             Subject subject = findSubject(id);
                 
-            data.type().ifPresent(subject::setType);
+            data.isRequired().ifPresent(subject::setRequired);
             data.name().ifPresent(subject::setName);
             data.description().ifPresent(subject::setDescription);
             // data.duration().ifPresent(subject::setDuration);
@@ -123,6 +139,13 @@ public class SubjectService {
 
     private Course findCourseDetails(UUID id) {
         return courseR.findByIdWithSubjects(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found"));
+    }
+
+    private List<Equivalence> findEquivalences(List<UUID> equivalences) {
+        return equivalences.stream()
+        .map(equivalenceId -> equivalenceR.findById(equivalenceId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Equivalence not Found")))
+        .collect(Collectors.toList());
     }
 
 }
