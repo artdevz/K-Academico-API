@@ -41,12 +41,12 @@ public class SubjectService {
     public CompletableFuture<String> createAsync(SubjectRequestDTO data) {
         return CompletableFuture.supplyAsync(() -> {
             Subject subject = new Subject(
-                findCourseDetails(data.course()),
                 data.name(),
                 data.description(),
                 data.duration(),
                 data.semester(),
                 data.isRequired(),
+                findCourseDetails(data.course()),
                 findEquivalences(data.prerequisites())
             );
             

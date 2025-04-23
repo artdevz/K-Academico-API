@@ -34,13 +34,6 @@ public class Exam implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @OneToMany(mappedBy = "exam")
-    private Set<Evaluation> evaluations = new HashSet<>();
-
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-    @JoinColumn(name = "grade_id", nullable = false)
-    private Grade grade;
-
     @Size(min = 3, max=16, message = "Exam name must be between 3 and 16 characters")
     private String name;
 
@@ -49,11 +42,18 @@ public class Exam implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
 
-    public Exam(Grade grade, String name, int maximum, LocalDate date) {
-        this.grade = grade;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+    @JoinColumn(name = "grade_id", nullable = false)
+    private Grade grade;
+
+    @OneToMany(mappedBy = "exam")
+    private Set<Evaluation> evaluations = new HashSet<>();
+
+    public Exam(String name, int maximum, LocalDate date, Grade grade) {
         this.name = name;        
         this.maximum = maximum;
         this.date = date;
+        this.grade = grade;
     }    
 
 }

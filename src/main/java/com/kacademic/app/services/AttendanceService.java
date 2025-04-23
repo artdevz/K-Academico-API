@@ -43,9 +43,9 @@ public class AttendanceService {
             ensureSameGrade(enrollee, lesson);
 
             Attendance attendance = new Attendance(
+                data.isAbsent(),
                 enrollee,
-                lesson,
-                data.isAbsent()
+                lesson
             );
             
             attendanceR.save(attendance);

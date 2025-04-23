@@ -32,6 +32,13 @@ public class Enrollee implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
+    private int absences;
+    
+    @Max(10)
+    private float average;
+    
+    private EEnrollee status; // Student Status (Enrolled, APPROVED, FINAL_EXAM, FAILED) 
+
     @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "grade_id", referencedColumnName = "id", nullable = true)
     private Grade grade;
@@ -46,19 +53,12 @@ public class Enrollee implements Serializable {
     @OneToMany(mappedBy = "enrollee")
     private Set<Attendance> attendances = new HashSet<>();
 
-    private int absences;
-    
-    @Max(10)
-    private float average;
-    
-    private EEnrollee status;
-
-    public Enrollee(Student student, Grade grade) {
-        this.student = student;
-        this.grade = grade;
-        this.status = EEnrollee.ENROLLED; // Default Status
+    public Enrollee(Grade grade, Student student) {
         this.absences = 0; // Default Value = 0
         this.average = 0; // Default Value = 0
+        this.status = EEnrollee.ENROLLED; // Default Status
+        this.grade = grade;
+        this.student = student;
     }
 
 }

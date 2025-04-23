@@ -36,14 +36,6 @@ public class Subject implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;    
 
-    @JsonBackReference
-    @ManyToOne
-    @JoinColumn(name = "course_id")
-    private Course course;
-
-    @OneToMany(mappedBy = "subject")
-    private List<Grade> grades = new ArrayList<>();
-
     @Size(max=128)
     private String name;
     
@@ -59,6 +51,14 @@ public class Subject implements Serializable {
 
     private boolean isRequired;
 
+    @JsonBackReference
+    @ManyToOne
+    @JoinColumn(name = "course_id")
+    private Course course;
+
+    @OneToMany(mappedBy = "subject")
+    private List<Grade> grades = new ArrayList<>();
+
     @ManyToMany(cascade = CascadeType.MERGE)
     @JoinTable(
         name = "subject_prerequisite_groups",
@@ -67,13 +67,13 @@ public class Subject implements Serializable {
     )
     private List<Equivalence> prerequisites = new ArrayList<>();
 
-    public Subject(Course course, String name, String description, int duration, int semester, boolean isRequired, List<Equivalence> prerequisites) {
-        this.course = course;
+    public Subject(String name, String description, int duration, int semester, boolean isRequired, Course course, List<Equivalence> prerequisites) {
         this.name = name;
         this.description = description;
         this.duration = duration;
         this.semester = semester;
         this.isRequired = isRequired;        
+        this.course = course;
         this.prerequisites = prerequisites;
     }    
 

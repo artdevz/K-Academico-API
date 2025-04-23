@@ -31,13 +31,6 @@ public class Course implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @JsonManagedReference
-    @OneToMany(mappedBy = "course", cascade = CascadeType.MERGE, orphanRemoval = false)
-    private List<Subject> subjects = new ArrayList<>();
-    
-    @OneToMany(mappedBy = "course", cascade = CascadeType.MERGE, orphanRemoval = false)
-    private List<Student> students = new ArrayList<>();
-
     @Size(min=4, max=160, message="Course name must be between 4 and 160 characters")
     private String name;
 
@@ -49,6 +42,13 @@ public class Course implements Serializable {
 
     @Size(max=256)
     private String description;
+
+    @OneToMany(mappedBy = "course", cascade = CascadeType.MERGE, orphanRemoval = false)
+    private List<Student> students = new ArrayList<>();
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "course", cascade = CascadeType.MERGE, orphanRemoval = false)
+    private List<Subject> subjects = new ArrayList<>();
 
     public Course(String name, String code, String description) {
         this.name = name;

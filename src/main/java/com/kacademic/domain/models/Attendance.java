@@ -25,6 +25,8 @@ public class Attendance {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
+    private boolean isAbsent;
+
     @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "enrollee_id", referencedColumnName = "id")
     private Enrollee enrollee;
@@ -33,12 +35,10 @@ public class Attendance {
     @JoinColumn(name = "lesson_id", referencedColumnName = "id")
     private Lesson lesson;
 
-    private boolean isAbsent;
-
-    public Attendance(Enrollee enrollee, Lesson lesson, boolean isAbsent) {
+    public Attendance(boolean isAbsent, Enrollee enrollee, Lesson lesson) {
+        this.isAbsent = isAbsent;
         this.enrollee = enrollee;
         this.lesson = lesson;
-        this.isAbsent = isAbsent;
     }
 
 }

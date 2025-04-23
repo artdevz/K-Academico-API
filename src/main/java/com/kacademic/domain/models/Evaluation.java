@@ -27,6 +27,10 @@ public class Evaluation {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
+    @Min(0)
+    @Max(10)
+    private float score;
+
     @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "enrollee_id", referencedColumnName = "id")
     private Enrollee enrollee;
@@ -35,14 +39,10 @@ public class Evaluation {
     @JoinColumn(name = "exam_id", referencedColumnName = "id")
     private Exam exam;
 
-    @Min(0)
-    @Max(10)
-    private float score;
-
-    public Evaluation(Enrollee enrollee, Exam exam, float score) {
+    public Evaluation(float score, Enrollee enrollee, Exam exam) {
+        this.score = score;
         this.enrollee = enrollee;
         this.exam = exam;
-        this.score = score;
     }
 
 }

@@ -43,9 +43,9 @@ public class EvaluationService {
             ensureSameGrade(enrollee, exam);
 
             Evaluation evaluation = new Evaluation(
+                data.score(),
                 enrollee,
-                exam,
-                data.score()
+                exam
             );
             
             evaluationR.save(evaluation);

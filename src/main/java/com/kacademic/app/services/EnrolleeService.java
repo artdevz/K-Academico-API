@@ -42,8 +42,8 @@ public class EnrolleeService {
     public CompletableFuture<String> createAsync(EnrolleeRequestDTO data) {
         return CompletableFuture.supplyAsync(() -> {
             Enrollee enrollee = new Enrollee(
-                findStudent(data.student()),
-                findGradeDetails(data.grade())
+                findGradeDetails(data.grade()),
+                findStudent(data.student())
             );
     
             validateGradeStatus(enrollee.getGrade());

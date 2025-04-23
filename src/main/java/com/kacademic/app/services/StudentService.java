@@ -50,8 +50,8 @@ public class StudentService {
                 data.user().email(),
                 passwordEncoder.encode(data.user().password()),
                 findRoles(data.user().roles()),
-                findCourse(data.course()),
-                enrolleeGS.generate(findCourse(data.course()).getCode())
+                enrolleeGS.generate(findCourse(data.course()).getCode()),
+                findCourse(data.course())
             );
 
             studentR.save(student);

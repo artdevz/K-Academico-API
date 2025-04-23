@@ -27,20 +27,20 @@ public class Token {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-
     @Column(nullable = false, unique = true)
     private String token;
 
     @Column(nullable = false)
     private Date expiryDate;
 
-    public Token(User user, String token, Date expiryDate) {
-        this.user = user;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    public Token(String token, Date expiryDate, User user) {
         this.token = token;
         this.expiryDate = expiryDate;
+        this.user = user;
     }
 
 }

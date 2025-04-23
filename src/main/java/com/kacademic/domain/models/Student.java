@@ -26,6 +26,14 @@ import lombok.Setter;
 @Entity
 @DiscriminatorValue("STUDENT")
 public class Student extends User {
+    
+    private int credits;
+
+    private float average;
+
+    @NotNull
+    @Embedded
+    private Enrollment enrollment;
 
     @ManyToOne
     @JoinColumn(name = "course_id")
@@ -33,21 +41,13 @@ public class Student extends User {
 
     @OneToMany(mappedBy = "student", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     private Set<Enrollee> enrollees = new HashSet<>();
-
-    @NotNull
-    @Embedded
-    private Enrollment enrollment;
-
-    private int credits;
-
-    private float average;
         
-    public Student(String name, String email, String password, Set<Role> roles, Course course, Enrollment enrollment) {
+    public Student(String name, String email, String password, Set<Role> roles, Enrollment enrollment, Course course) {
         super(name, email, password, roles);
-        this.course = course;
-        this.enrollment = enrollment;
         this.credits = 0;
-        this.average = 0; // Inicia-se com 0
+        this.average = 0; // Default Value = 0
+        this.enrollment = enrollment;
+        this.course = course;
     }
 
 }

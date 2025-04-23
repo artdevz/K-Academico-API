@@ -36,10 +36,10 @@ public class ExamService {
     public CompletableFuture<String> createAsync(ExamRequestDTO data) {
         return CompletableFuture.supplyAsync(() -> {
             Exam exam = new Exam(
-                findGrade(data.grade()),
                 data.name(),
                 data.maximum(),
-                data.date()
+                data.date(),
+                findGrade(data.grade())
             );
     
             examR.save(exam);

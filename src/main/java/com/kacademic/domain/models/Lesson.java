@@ -35,26 +35,26 @@ public class Lesson implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @OneToMany(mappedBy = "lesson")
-    private Set<Attendance> attendances = new HashSet<>();
-
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-    @JoinColumn(name = "grade.id", nullable = false)
-    private Grade grade;
-    
     @Size(max=32)
     private String topic;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
 
-    private ELesson status;
+    private ELesson status; // (UPCOMING, PENDING)
 
-    public Lesson(Grade grade, String topic, LocalDate date) {
-        this.grade = grade;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+    @JoinColumn(name = "grade.id", nullable = false)
+    private Grade grade;
+
+    @OneToMany(mappedBy = "lesson")
+    private Set<Attendance> attendances = new HashSet<>();
+
+    public Lesson(String topic, LocalDate date, Grade grade) {
         this.topic = topic;
         this.date = date;
         this.status = ELesson.UPCOMING; // Default Status
+        this.grade = grade;
     }
 
 }

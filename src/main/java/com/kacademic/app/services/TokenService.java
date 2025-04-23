@@ -22,9 +22,9 @@ public class TokenService {
 
     public Token createRefreshToken(User user) {
         Token token = new Token(
-            user,
             UUID.randomUUID().toString(),
-            new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 30)
+            new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 30),
+            user
         );
            
         return tokenR.save(token);

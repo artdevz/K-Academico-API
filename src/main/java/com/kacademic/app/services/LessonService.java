@@ -34,9 +34,9 @@ public class LessonService {
     public CompletableFuture<String> createAsync(LessonRequestDTO data) {
         return CompletableFuture.supplyAsync(() -> {
             Lesson lesson = new Lesson(
-                findGrade(data.grade()),
                 data.topic(),
-                data.date()
+                data.date(),
+                findGrade(data.grade())
             );
             
             lessonR.save(lesson);
