@@ -33,45 +33,40 @@ public class AttendanceService {
     
     private final AsyncTaskExecutor taskExecutor;
     
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<String> createAsync(AttendanceRequestDTO data) {
-        return CompletableFuture.supplyAsync(() -> {
-            Enrollee enrollee = findEnrolleeDetails(data.enrollee());
-            Lesson lesson = findLesson(data.lesson());
+        Enrollee enrollee = findEnrolleeDetails(data.enrollee());
+        Lesson lesson = findLesson(data.lesson());
 
-            ensureAttendanceNotExists(enrollee, lesson);
-            ensureSameGrade(enrollee, lesson);
+        ensureAttendanceNotExists(enrollee, lesson);
+        ensureSameGrade(enrollee, lesson);
 
-            Attendance attendance = new Attendance(
-                data.isAbsent(),
-                enrollee,
-                lesson
-            );
-            
-            attendanceR.save(attendance);
-            updateAbsences(attendance.getEnrollee());
-            return "Attendance successfully Created: " + attendance.getId();
-
-        }, taskExecutor);
+        Attendance attendance = new Attendance(
+            data.isAbsent(),
+            enrollee,
+            lesson
+        );
+        
+        attendanceR.save(attendance);
+        updateAbsences(attendance.getEnrollee());
+        return CompletableFuture.completedFuture("Attendance successfully Created: " + attendance.getId());
     }
 
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<List<AttendanceResponseDTO>> readAllAsync() {
-        return CompletableFuture.supplyAsync(() -> {
-            return(
-                attendanceR.findAll().stream()
-                .map(attendance -> new AttendanceResponseDTO(
-                    attendance.getId(),
-                    attendance.getEnrollee().getId(),
-                    attendance.getLesson().getId(),
-                    attendance.isAbsent()
-                ))
-                .collect(Collectors.toList())
-            );
-        }, taskExecutor);
+        return CompletableFuture.completedFuture(
+            attendanceR.findAll().stream()
+            .map(attendance -> new AttendanceResponseDTO(
+                attendance.getId(),
+                attendance.getEnrollee().getId(),
+                attendance.getLesson().getId(),
+                attendance.isAbsent()
+            ))
+            .collect(Collectors.toList())
+        );
     }
 
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<AttendanceResponseDTO> readByIdAsync(UUID id) {
         return CompletableFuture.supplyAsync(() -> {
             Attendance attendance = findAttendance(id);
@@ -87,7 +82,7 @@ public class AttendanceService {
         }, taskExecutor);
     }
 
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<String> updateAsync(UUID id, AttendanceUpdateDTO data) {
         return CompletableFuture.supplyAsync(() -> {
             Attendance attendance = findAttendance(id);
@@ -100,7 +95,7 @@ public class AttendanceService {
         }, taskExecutor);
     }
 
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<String> deleteAsync(UUID id) {
         return CompletableFuture.supplyAsync(() -> {
             Attendance attendance = findAttendance(id);

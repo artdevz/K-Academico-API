@@ -7,8 +7,10 @@ import org.springframework.stereotype.Component;
 
 import com.kacademic.app.dto.course.CourseResponseDTO;
 import com.kacademic.app.dto.subject.SubjectResponseDTO;
+import com.kacademic.app.dto.user.UserResponseDTO;
 import com.kacademic.domain.models.Course;
 import com.kacademic.domain.models.Subject;
+import com.kacademic.domain.models.User;
 
 @Component
 public class ResponseMapper {
@@ -26,6 +28,21 @@ public class ResponseMapper {
     public List<CourseResponseDTO> toCourseResponseDTOList(List<Course> courses) {
         return courses.stream()
             .map(this::toCourseResponseDTO)
+            .collect(Collectors.toList());
+    }
+
+    public UserResponseDTO toUserResponseDTO(User user) {
+        return new UserResponseDTO(
+            user.getId(),
+            user.getName(),
+            user.getEmail(),
+            user.getRoles()
+        );
+    }
+
+    public List<UserResponseDTO> toUserResponseDTOList(List<User> users) {
+        return users.stream()
+            .map(this::toUserResponseDTO)
             .collect(Collectors.toList());
     }
 

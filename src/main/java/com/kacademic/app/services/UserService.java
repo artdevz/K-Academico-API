@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
@@ -15,6 +14,9 @@ import org.springframework.web.server.ResponseStatusException;
 import com.kacademic.app.dto.user.UserRequestDTO;
 import com.kacademic.app.dto.user.UserResponseDTO;
 import com.kacademic.app.dto.user.UserUpdateDTO;
+import com.kacademic.app.helpers.EntityFinder;
+import com.kacademic.app.mapper.RequestMapper;
+import com.kacademic.app.mapper.ResponseMapper;
 import com.kacademic.domain.models.Role;
 import com.kacademic.domain.models.User;
 import com.kacademic.domain.repositories.RoleRepository;
@@ -29,6 +31,9 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     private final UserRepository userR;
+    private final EntityFinder entityFinder;
+    private final RequestMapper requestMapper;
+    private final ResponseMapper responseMapper;
     private final RoleRepository roleR;
 
     @Async
@@ -37,7 +42,7 @@ public class UserService {
         ensureEmailIsUnique("admin@gmail.com");
 
         User admin = new User(
-            "K-Academic Admin",
+            "K-Academico Admin",
             "admin@gmail.com",
             passwordEncoder.encode("4bcdefG!"),
             Set.of(adminRole)
@@ -51,12 +56,7 @@ public class UserService {
     public CompletableFuture<String> createAsync(UserRequestDTO data) {
         ensureEmailIsUnique(data.email());
 
-        User user = new User(            
-            data.name(),
-            data.email(),
-            passwordEncoder.encode(data.password()),
-            findRoles(data.roles())
-        );
+        User user = requestMapper.toUser(data);
         
         userR.save(user);
         return CompletableFuture.completedFuture("User successfully Created: " + user.getId());
@@ -64,35 +64,19 @@ public class UserService {
 
     @Async
     public CompletableFuture<List<UserResponseDTO>> readAllAsync() {
-        return CompletableFuture.completedFuture(
-            userR.findAll().stream()
-            .map(user -> new UserResponseDTO(
-                user.getId(),                
-                user.getName(),
-                user.getEmail(),
-                user.getRoles()
-            ))
-            .collect(Collectors.toList()
-        ));
+        return CompletableFuture.completedFuture(responseMapper.toUserResponseDTOList(userR.findAll()));
     }
 
     @Async
     public CompletableFuture<UserResponseDTO> readByIdAsync(UUID id) {
-        User user = findUser(id);
+        User user = entityFinder.findByIdOrThrow(userR.findById(id), "User not Found");
         
-        return CompletableFuture.completedFuture(
-            new UserResponseDTO(
-                user.getId(),            
-                user.getName(),
-                user.getEmail(),
-                user.getRoles()
-            )
-        );
+        return CompletableFuture.completedFuture(responseMapper.toUserResponseDTO(user));
     }
 
     @Async
     public CompletableFuture<String> updateAsync(UUID id, UserUpdateDTO data) {
-        User user = findUser(id);
+        User user = entityFinder.findByIdOrThrow(userR.findById(id), "User not Found");
         
         data.name().ifPresent(user::setName);
         data.password().ifPresent(password -> user.setPassword(passwordEncoder.encode(password)));
@@ -103,21 +87,10 @@ public class UserService {
 
     @Async
     public CompletableFuture<String> deleteAsync(UUID id) {
-        findUser(id);
+        entityFinder.findByIdOrThrow(userR.findById(id), "User not Found");
         
         userR.deleteById(id);
         return CompletableFuture.completedFuture("Deleted User");
-    }
-
-    private User findUser(UUID id) {
-        return userR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not Found"));
-    }
-
-    private Set<Role> findRoles(Set<UUID> roles) {
-        return roles.stream()
-        .map(roleId -> roleR.findById(roleId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not Found")))
-        .collect(Collectors.toSet());
     }
     
     private void ensureEmailIsUnique(String email) {
