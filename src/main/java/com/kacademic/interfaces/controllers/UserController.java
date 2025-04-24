@@ -18,7 +18,7 @@ import com.kacademic.app.dto.user.UserRequestDTO;
 import com.kacademic.app.dto.user.UserResponseDTO;
 import com.kacademic.app.dto.user.UserUpdateDTO;
 import com.kacademic.app.services.UserService;
-import com.kacademic.shared.utils.AsyncUnwrapper;
+import com.kacademic.shared.utils.AsyncResultHandler;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -44,7 +44,7 @@ public class UserController {
     })    
     @PostMapping
     public ResponseEntity<String> create(@RequestBody @Valid UserRequestDTO request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(AsyncUnwrapper.await(userS.createAsync(request)));
+        return ResponseEntity.status(HttpStatus.CREATED).body(AsyncResultHandler.await(userS.createAsync(request)));
     }
 
 

@@ -18,7 +18,7 @@ import com.kacademic.app.dto.attendance.AttendanceRequestDTO;
 import com.kacademic.app.dto.attendance.AttendanceResponseDTO;
 import com.kacademic.app.dto.attendance.AttendanceUpdateDTO;
 import com.kacademic.app.services.AttendanceService;
-import com.kacademic.shared.utils.AsyncUnwrapper;
+import com.kacademic.shared.utils.AsyncResultHandler;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -68,7 +68,7 @@ public class AttendanceController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<AttendanceResponseDTO> readById(@PathVariable UUID id) {
-        return ResponseEntity.ok(AsyncUnwrapper.await(attendanceS.readByIdAsync(id)));
+        return ResponseEntity.ok(AsyncResultHandler.await(attendanceS.readByIdAsync(id)));
     }
 
 

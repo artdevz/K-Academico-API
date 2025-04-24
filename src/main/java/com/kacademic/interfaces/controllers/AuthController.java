@@ -13,7 +13,7 @@ import com.kacademic.app.dto.auth.AuthResponseDTO;
 import com.kacademic.app.services.AuthService;
 import com.kacademic.app.services.TokenService;
 import com.kacademic.domain.models.User;
-import com.kacademic.shared.utils.AsyncUnwrapper;
+import com.kacademic.shared.utils.AsyncResultHandler;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -39,7 +39,7 @@ public class AuthController {
     })
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(@RequestBody @Valid AuthRequestDTO request) {
-        return ResponseEntity.ok(AsyncUnwrapper.await(authS.loginAsync(request)));
+        return ResponseEntity.ok(AsyncResultHandler.await(authS.loginAsync(request)));
     }
 
     @PostMapping("/refresh")

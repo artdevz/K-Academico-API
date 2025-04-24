@@ -19,7 +19,7 @@ import com.kacademic.app.dto.equivalence.EquivalenceRequestDTO;
 import com.kacademic.app.dto.equivalence.EquivalenceResponseDTO;
 import com.kacademic.app.dto.equivalence.EquivalenceUpdateDTO;
 import com.kacademic.app.services.EquivalenceService;
-import com.kacademic.shared.utils.AsyncUnwrapper;
+import com.kacademic.shared.utils.AsyncResultHandler;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +34,7 @@ public class EquivalenceController {
 
     @PostMapping
     public ResponseEntity<String> create(@RequestBody @Valid EquivalenceRequestDTO request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(AsyncUnwrapper.await(equivalenceS.createAsync(request)));
+        return ResponseEntity.status(HttpStatus.CREATED).body(AsyncResultHandler.await(equivalenceS.createAsync(request)));
     }
 
 
@@ -48,21 +48,21 @@ public class EquivalenceController {
 
     @GetMapping("/{id}")
     public ResponseEntity<EquivalenceDetailsDTO> readById(@PathVariable UUID id) {
-        return ResponseEntity.ok(AsyncUnwrapper.await(equivalenceS.readByIdAsync(id)));
+        return ResponseEntity.ok(AsyncResultHandler.await(equivalenceS.readByIdAsync(id)));
     }  
     
     
     
     @PatchMapping("/{id}")
     public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid EquivalenceUpdateDTO data) {
-        return ResponseEntity.ok(AsyncUnwrapper.await(equivalenceS.updateAsync(id, data)));
+        return ResponseEntity.ok(AsyncResultHandler.await(equivalenceS.updateAsync(id, data)));
     }
 
 
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable UUID id) {
-        return ResponseEntity.ok(AsyncUnwrapper.await(equivalenceS.deleteAsync(id)));
+        return ResponseEntity.ok(AsyncResultHandler.await(equivalenceS.deleteAsync(id)));
     }
     
 

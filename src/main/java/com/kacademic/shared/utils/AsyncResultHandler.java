@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.server.ResponseStatusException;
 
-public class AsyncUnwrapper {
+public class AsyncResultHandler {
 
     public static <T> T await(CompletableFuture<T> future) {
         try {

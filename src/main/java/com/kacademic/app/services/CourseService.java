@@ -3,9 +3,6 @@ package com.kacademic.app.services;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
-
-import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -15,11 +12,11 @@ import com.kacademic.app.dto.course.CourseDetailsDTO;
 import com.kacademic.app.dto.course.CourseRequestDTO;
 import com.kacademic.app.dto.course.CourseResponseDTO;
 import com.kacademic.app.dto.course.CourseUpdateDTO;
-import com.kacademic.app.dto.subject.SubjectResponseDTO;
+import com.kacademic.app.mapper.RequestMapper;
+import com.kacademic.app.mapper.ResponseMapper;
 import com.kacademic.domain.models.Course;
 import com.kacademic.domain.repositories.CourseRepository;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -27,99 +24,60 @@ import lombok.RequiredArgsConstructor;
 public class CourseService {
     
     private final CourseRepository courseR;
-    
-    private final AsyncTaskExecutor taskExecutor;
+    private final RequestMapper requestMapper;
+    private final ResponseMapper responseMapper;
 
-    @Async("taskExecutor")
+
+    @Async
     public CompletableFuture<String> createAsync(CourseRequestDTO data) {
-        return CompletableFuture.supplyAsync(() -> {
-            Course course = new Course(
-                data.name(),
-                data.code(),
-                data.description()
-            );
+        Course course = requestMapper.toCourse(data);
 
-            courseR.save(course);
-            return "Course successfully Created: " + course.getId();
-        }, taskExecutor);
+        courseR.save(course);
+        return CompletableFuture.completedFuture("Course successfully Created: " + course.getId());
     }
 
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<List<CourseResponseDTO>> readAllAsync() {
-        return CompletableFuture.supplyAsync(() -> {
-            return (
-                courseR.findAll().stream()
-                .map(course -> new CourseResponseDTO(
-                    course.getId(),                
-                    course.getName(),
-                    course.getCode(),
-                    course.getDuration(),
-                    course.getDescription()
-                ))
-                .collect(Collectors.toList())
-            );
-        }, taskExecutor);
+        return CompletableFuture.completedFuture(responseMapper.toCourseResponseDTOList(courseR.findAll()));
     }
 
-    @Transactional
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<CourseDetailsDTO> readByIdAsync(UUID id) {
-        return CompletableFuture.supplyAsync(() -> {
-            Course course = findCourseWithDetails(id);
+        Course course = findWithSubjectsById(id);
             
-            return (
-                new CourseDetailsDTO(
-                    new CourseResponseDTO(
-                        course.getId(),
-                        course.getName(),
-                        course.getCode(),
-                        course.getDuration(),
-                        course.getDescription()
-                    ),
-                    course.getSubjects().stream().map(subject -> new SubjectResponseDTO(
-                        subject.getId(),
-                        subject.getCourse().getId(),
-                        subject.getName(),
-                        subject.getDescription(),
-                        subject.getDuration(),
-                        subject.getSemester(),
-                        subject.isRequired()
-                    )).collect(Collectors.toList())
-                )
-            );
-        }, taskExecutor);
+        return CompletableFuture.completedFuture(
+            new CourseDetailsDTO(
+                responseMapper.toCourseResponseDTO(course),
+                responseMapper.toSubjectResponseDTOList(course.getSubjects())
+            )
+        );
     }
 
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<String> updateAsync(UUID id, CourseUpdateDTO data) {
-        return CompletableFuture.supplyAsync(() -> {
-            Course course = findCourse(id);
-        
-            data.name().ifPresent(course::setName);
-            data.description().ifPresent(course::setDescription);
+        Course course = findCourse(id);
+    
+        data.name().ifPresent(course::setName);
+        data.description().ifPresent(course::setDescription);
 
-            courseR.save(course);
-            return "Updated Course";
-        }, taskExecutor);
-        
+        courseR.save(course);
+        return CompletableFuture.completedFuture("Updated Course");
     }
 
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<String> deleteAsync(UUID id) {
-        return CompletableFuture.supplyAsync(() -> {
-            findCourse(id);
-            
-            courseR.deleteById(id);
-            return "Deleted Course";
-        }, taskExecutor);
+        findCourse(id);        
+        courseR.deleteById(id);
+        return CompletableFuture.completedFuture("Deleted Course");
     }
+
 
     private Course findCourse(UUID id) {
         return courseR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found"));
     }
 
-    private Course findCourseWithDetails(UUID id) {
-        return courseR.findByIdWithSubjects(id).get();
+    private Course findWithSubjectsById(UUID id) {
+        return courseR.findWithSubjectsById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found"));
     }
 
 }

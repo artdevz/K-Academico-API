@@ -18,7 +18,7 @@ import com.kacademic.app.dto.course.CourseRequestDTO;
 import com.kacademic.app.dto.course.CourseResponseDTO;
 import com.kacademic.app.dto.course.CourseUpdateDTO;
 import com.kacademic.app.services.CourseService;
-import com.kacademic.shared.utils.AsyncUnwrapper;
+import com.kacademic.shared.utils.AsyncResultHandler;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -68,7 +68,7 @@ public class CourseController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<CourseDetailsDTO> readById(@PathVariable UUID id) {
-        return ResponseEntity.ok(AsyncUnwrapper.await(courseS.readByIdAsync(id)));
+        return ResponseEntity.ok(AsyncResultHandler.await(courseS.readByIdAsync(id)));
     } 
     
     
@@ -81,7 +81,7 @@ public class CourseController {
     })
     @PatchMapping("/{id}")
     public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid CourseUpdateDTO data) {
-        return ResponseEntity.ok(courseS.updateAsync(id, data).join());
+        return ResponseEntity.ok(AsyncResultHandler.await(courseS.updateAsync(id, data)));
     }
 
 
@@ -94,7 +94,7 @@ public class CourseController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable UUID id) {
-        return ResponseEntity.ok(courseS.deleteAsync(id).join());
+        return ResponseEntity.ok(AsyncResultHandler.await(courseS.deleteAsync(id)));
     }
 
 

@@ -50,7 +50,7 @@ public class SubjectService {
                 findEquivalences(data.prerequisites())
             );
             
-            updateCourseDuration(courseR.findByIdWithSubjects(data.course()).get(), data.duration());
+            updateCourseDuration(courseR.findWithSubjectsById(data.course()).get(), data.duration());
             
             subjectR.save(subject);
             return "Subject successfully Created: " + subject.getId();
@@ -138,7 +138,7 @@ public class SubjectService {
     }
 
     private Course findCourseDetails(UUID id) {
-        return courseR.findByIdWithSubjects(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found"));
+        return courseR.findWithSubjectsById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found"));
     }
 
     private List<Equivalence> findEquivalences(List<UUID> equivalences) {
