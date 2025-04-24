@@ -2,7 +2,6 @@ package com.kacademic.app.services;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 
@@ -30,21 +29,20 @@ public class AuthService {
     private final JwtService jwtS;
     private final TokenService tokenS;
     private final AuthenticationManager authenticationManager;
-    private final AsyncTaskExecutor taskExecutor;
 
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<AuthResponseDTO> loginAsync(AuthRequestDTO data) {
-        return CompletableFuture.supplyAsync(() -> {
-            Authentication auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(data.email(), data.password()));
-    
-            User user = findUserByEmail(auth.getName());
+        Authentication auth = authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(data.email(), data.password()));
 
-            return new AuthResponseDTO(
+        User user = findUserByEmail(auth.getName());
+
+        return CompletableFuture.completedFuture(
+            new AuthResponseDTO(
                 jwtS.generateAccessToken(user),
                 tokenS.createRefreshToken(user).getToken()
-            );
-        }, taskExecutor);
+            )
+        );
     }
 
     public AuthResponseDTO refreshSync(AuthRefreshDTO data) {

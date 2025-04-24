@@ -3,15 +3,13 @@ package com.kacademic.app.services;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
-
 import com.kacademic.app.dto.course.CourseDetailsDTO;
 import com.kacademic.app.dto.course.CourseRequestDTO;
 import com.kacademic.app.dto.course.CourseResponseDTO;
 import com.kacademic.app.dto.course.CourseUpdateDTO;
+import com.kacademic.app.helpers.EntityFinder;
 import com.kacademic.app.mapper.RequestMapper;
 import com.kacademic.app.mapper.ResponseMapper;
 import com.kacademic.domain.models.Course;
@@ -24,9 +22,9 @@ import lombok.RequiredArgsConstructor;
 public class CourseService {
     
     private final CourseRepository courseR;
+    private final EntityFinder entityFinder;
     private final RequestMapper requestMapper;
     private final ResponseMapper responseMapper;
-
 
     @Async
     public CompletableFuture<String> createAsync(CourseRequestDTO data) {
@@ -43,7 +41,7 @@ public class CourseService {
 
     @Async
     public CompletableFuture<CourseDetailsDTO> readByIdAsync(UUID id) {
-        Course course = findWithSubjectsById(id);
+        Course course = entityFinder.findByIdOrThrow(courseR.findWithSubjectsById(id), "Course not Found");
             
         return CompletableFuture.completedFuture(
             new CourseDetailsDTO(
@@ -55,7 +53,7 @@ public class CourseService {
 
     @Async
     public CompletableFuture<String> updateAsync(UUID id, CourseUpdateDTO data) {
-        Course course = findCourse(id);
+        Course course = entityFinder.findByIdOrThrow(courseR.findById(id), "Course not Found"); 
     
         data.name().ifPresent(course::setName);
         data.description().ifPresent(course::setDescription);
@@ -66,18 +64,9 @@ public class CourseService {
 
     @Async
     public CompletableFuture<String> deleteAsync(UUID id) {
-        findCourse(id);        
+        entityFinder.findByIdOrThrow(courseR.findById(id), "Course not Found");        
         courseR.deleteById(id);
         return CompletableFuture.completedFuture("Deleted Course");
-    }
-
-
-    private Course findCourse(UUID id) {
-        return courseR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found"));
-    }
-
-    private Course findWithSubjectsById(UUID id) {
-        return courseR.findWithSubjectsById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found"));
     }
 
 }

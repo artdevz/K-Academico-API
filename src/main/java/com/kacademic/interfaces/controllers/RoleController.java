@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.kacademic.app.dto.role.RoleRequestDTO;
 import com.kacademic.app.dto.role.RoleResponseDTO;
 import com.kacademic.app.services.RoleService;
+import com.kacademic.shared.utils.AsyncResultHandler;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,14 +28,14 @@ public class RoleController {
 
     @PostMapping
     public ResponseEntity<String> create(@RequestBody @Valid RoleRequestDTO request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(roleS.createAsync(request).join());
+        return ResponseEntity.status(HttpStatus.CREATED).body(AsyncResultHandler.await(roleS.createAsync(request)));
     }
 
 
 
     @GetMapping
     public ResponseEntity<List<RoleResponseDTO>> read() {
-        return ResponseEntity.ok(roleS.readAllAsync().join());
+        return ResponseEntity.ok(AsyncResultHandler.await(roleS.readAllAsync()));
     }
 
 

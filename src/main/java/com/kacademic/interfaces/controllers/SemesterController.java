@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kacademic.app.services.SemesterService;
+import com.kacademic.shared.utils.AsyncResultHandler;
 import com.kacademic.shared.utils.Semester;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,7 +34,7 @@ public class SemesterController {
     public ResponseEntity<String> finalSubmit(
         @Parameter(description = "The semester to be finalized. <br>E.g: 25.1", required = true)
         @PathVariable @Semester String semester) {
-        return ResponseEntity.ok(semesterS.finalizeSemester(semester).join());
+        return ResponseEntity.ok(AsyncResultHandler.await(semesterS.finalizeSemester(semester)));
     }
 
 }

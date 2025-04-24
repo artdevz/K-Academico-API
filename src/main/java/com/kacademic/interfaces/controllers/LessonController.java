@@ -19,6 +19,7 @@ import com.kacademic.app.dto.lesson.LessonRequestDTO;
 import com.kacademic.app.dto.lesson.LessonResponseDTO;
 import com.kacademic.app.dto.lesson.LessonUpdateDTO;
 import com.kacademic.app.services.LessonService;
+import com.kacademic.shared.utils.AsyncResultHandler;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -43,7 +44,7 @@ public class LessonController {
     })
     @PostMapping
     public ResponseEntity<String> create(@RequestBody @Valid LessonRequestDTO request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(lessonS.createAsync(request).join());
+        return ResponseEntity.status(HttpStatus.CREATED).body(AsyncResultHandler.await(lessonS.createAsync(request)));
     }
 
 
@@ -56,7 +57,7 @@ public class LessonController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping    
     public ResponseEntity<List<LessonResponseDTO>> readAll() {
-        return ResponseEntity.ok(lessonS.readAllAsync().join());
+        return ResponseEntity.ok(AsyncResultHandler.await(lessonS.readAllAsync()));
     }
 
 
@@ -69,7 +70,7 @@ public class LessonController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<LessonResponseDTO> readById(@PathVariable UUID id) {
-        return ResponseEntity.ok(lessonS.readByIdAsync(id).join());
+        return ResponseEntity.ok(AsyncResultHandler.await(lessonS.readByIdAsync(id)));
     }    
 
 
@@ -82,7 +83,7 @@ public class LessonController {
     })
     @PatchMapping("/{id}")
     public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid LessonUpdateDTO data) {
-        return ResponseEntity.ok(lessonS.updateAsync(id, data).join());
+        return ResponseEntity.ok(AsyncResultHandler.await(lessonS.updateAsync(id, data)));
     }
 
 
@@ -95,7 +96,7 @@ public class LessonController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable UUID id) {
-        return ResponseEntity.ok(lessonS.deleteAsync(id).join());
+        return ResponseEntity.ok(AsyncResultHandler.await(lessonS.deleteAsync(id)));
     }
     
 

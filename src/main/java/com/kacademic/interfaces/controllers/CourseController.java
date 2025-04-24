@@ -43,7 +43,7 @@ public class CourseController {
     })
     @PostMapping
     public ResponseEntity<String> create(@RequestBody @Valid CourseRequestDTO request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(courseS.createAsync(request).join());
+        return ResponseEntity.status(HttpStatus.CREATED).body(AsyncResultHandler.await(courseS.createAsync(request)));
     }
 
 
@@ -55,7 +55,7 @@ public class CourseController {
     })
     @GetMapping    
     public ResponseEntity<List<CourseResponseDTO>> readAll() {
-        return ResponseEntity.ok(courseS.readAllAsync().join());
+        return ResponseEntity.ok(AsyncResultHandler.await(courseS.readAllAsync()));
     }
 
 

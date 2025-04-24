@@ -18,6 +18,7 @@ import com.kacademic.app.dto.grade.GradeRequestDTO;
 import com.kacademic.app.dto.grade.GradeResponseDTO;
 import com.kacademic.app.dto.grade.GradeUpdateDTO;
 import com.kacademic.app.services.GradeService;
+import com.kacademic.shared.utils.AsyncResultHandler;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -42,7 +43,7 @@ public class GradeController {
     })
     @PostMapping
     public ResponseEntity<String> create(@RequestBody @Valid GradeRequestDTO request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(gradeS.createAsync(request).join());
+        return ResponseEntity.status(HttpStatus.CREATED).body(AsyncResultHandler.await(gradeS.createAsync(request)));
     }
 
 
@@ -54,7 +55,7 @@ public class GradeController {
     })
     @GetMapping    
     public ResponseEntity<List<GradeResponseDTO>> readAll() {
-        return ResponseEntity.ok(gradeS.readAllAsync().join());
+        return ResponseEntity.ok(AsyncResultHandler.await(gradeS.readAllAsync()));
     }
 
 
@@ -67,7 +68,7 @@ public class GradeController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<GradeResponseDTO> readById(@PathVariable UUID id) {
-        return ResponseEntity.ok(gradeS.readByIdAsync(id).join());
+        return ResponseEntity.ok(AsyncResultHandler.await(gradeS.readByIdAsync(id)));
     }    
 
 
@@ -80,7 +81,7 @@ public class GradeController {
     })
     @PatchMapping("/{id}")
     public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid GradeUpdateDTO data) {
-        return ResponseEntity.ok(gradeS.updateAsync(id, data).join());
+        return ResponseEntity.ok(AsyncResultHandler.await(gradeS.updateAsync(id, data)));
     }
 
 
@@ -93,7 +94,7 @@ public class GradeController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable UUID id) {
-        return ResponseEntity.ok(gradeS.deleteAsync(id).join());
+        return ResponseEntity.ok(AsyncResultHandler.await(gradeS.deleteAsync(id)));
     }
 
 

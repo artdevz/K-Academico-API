@@ -56,7 +56,7 @@ public class EnrolleeController {
     })
     @GetMapping    
     public ResponseEntity<List<EnrolleeResponseDTO>> readAll() {
-        return ResponseEntity.ok(enrolleeS.readAllAsync().join());
+        return ResponseEntity.ok(AsyncResultHandler.await(enrolleeS.readAllAsync()));
     }
 
 

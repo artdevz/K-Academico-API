@@ -56,7 +56,7 @@ public class UserController {
     })    
     @GetMapping    
     public ResponseEntity<List<UserResponseDTO>> readAll() {
-        return ResponseEntity.ok(userS.readAllAsync().join());
+        return ResponseEntity.ok(AsyncResultHandler.await(userS.readAllAsync()));
     }
 
 
@@ -69,7 +69,7 @@ public class UserController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDTO> readById(@PathVariable UUID id) {
-        return ResponseEntity.ok(userS.readByIdAsync(id).join());
+        return ResponseEntity.ok(AsyncResultHandler.await(userS.readByIdAsync(id)));
     }    
 
 
@@ -82,7 +82,7 @@ public class UserController {
     })
     @PatchMapping("/{id}")
     public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid UserUpdateDTO data) {
-        return ResponseEntity.ok(userS.updateAsync(id, data).join());
+        return ResponseEntity.ok(AsyncResultHandler.await(userS.updateAsync(id, data)));
     }
 
 
@@ -95,7 +95,7 @@ public class UserController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable UUID id) {
-        return ResponseEntity.ok(userS.deleteAsync(id).join());
+        return ResponseEntity.ok(AsyncResultHandler.await(userS.deleteAsync(id)));
     }
 
 

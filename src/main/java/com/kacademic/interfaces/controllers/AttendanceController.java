@@ -43,7 +43,7 @@ public class AttendanceController {
     })
     @PostMapping
     public ResponseEntity<String> create(@RequestBody @Valid AttendanceRequestDTO request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(attendanceS.createAsync(request).join());
+        return ResponseEntity.status(HttpStatus.CREATED).body(AsyncResultHandler.await(attendanceS.createAsync(request)));
     }
     
 
@@ -55,7 +55,7 @@ public class AttendanceController {
     })
     @GetMapping    
     public ResponseEntity<List<AttendanceResponseDTO>> readAll() {
-        return ResponseEntity.ok(attendanceS.readAllAsync().join());
+        return ResponseEntity.ok(AsyncResultHandler.await(attendanceS.readAllAsync()));
     }
 
 
@@ -81,7 +81,7 @@ public class AttendanceController {
     })
     @PatchMapping("/{id}")
     public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid AttendanceUpdateDTO data) {
-        return ResponseEntity.ok(attendanceS.updateAsync(id, data).join());
+        return ResponseEntity.ok(AsyncResultHandler.await(attendanceS.updateAsync(id, data)));
     }
 
 
@@ -94,7 +94,7 @@ public class AttendanceController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable UUID id) {
-        return ResponseEntity.ok(attendanceS.deleteAsync(id).join());
+        return ResponseEntity.ok(AsyncResultHandler.await(attendanceS.deleteAsync(id)));
     }
 
 

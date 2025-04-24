@@ -6,7 +6,6 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -32,92 +31,82 @@ public class UserService {
     private final UserRepository userR;
     private final RoleRepository roleR;
 
-    private final AsyncTaskExecutor taskExecutor;
-
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<String> createInitialAdmin() {
-        return CompletableFuture.supplyAsync(() -> {
-            Role adminRole = roleR.findByName("ADMIN").orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Role ADMIN isn't created yet"));
-    
-            User admin = new User(
-                "K-Academic Admin",
-                "admin@gmail.com",
-                passwordEncoder.encode("4bcdefG!"),
-                Set.of(adminRole)
-            );
-    
-            userR.save(admin);
-            return "Admin successfully Created: " + admin.getId();
-        }, taskExecutor);
+        Role adminRole = roleR.findByName("ADMIN").orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Role ADMIN isn't created yet"));
+        ensureEmailIsUnique("admin@gmail.com");
+
+        User admin = new User(
+            "K-Academic Admin",
+            "admin@gmail.com",
+            passwordEncoder.encode("4bcdefG!"),
+            Set.of(adminRole)
+        );
+
+        userR.save(admin);
+        return CompletableFuture.completedFuture("Admin successfully Created: " + admin.getId());
     }
 
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<String> createAsync(UserRequestDTO data) {
-        return CompletableFuture.supplyAsync(() -> {
-            ensureEmailIsUnique(data.email());
-    
-            User user = new User(            
-                data.name(),
-                data.email(),
-                passwordEncoder.encode(data.password()),
-                findRoles(data.roles())
-            );
-            
-            userR.save(user);
-            return "User successfully Created: " + user.getId();
-        }, taskExecutor);
+        ensureEmailIsUnique(data.email());
+
+        User user = new User(            
+            data.name(),
+            data.email(),
+            passwordEncoder.encode(data.password()),
+            findRoles(data.roles())
+        );
+        
+        userR.save(user);
+        return CompletableFuture.completedFuture("User successfully Created: " + user.getId());
     }
 
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<List<UserResponseDTO>> readAllAsync() {
-        return CompletableFuture.supplyAsync(() -> {
-            return userR.findAll().stream()
-                .map(user -> new UserResponseDTO(
-                    user.getId(),                
-                    user.getName(),
-                    user.getEmail(),
-                    user.getRoles()
-                ))
-                .collect(Collectors.toList()
-            );
-        }, taskExecutor);
+        return CompletableFuture.completedFuture(
+            userR.findAll().stream()
+            .map(user -> new UserResponseDTO(
+                user.getId(),                
+                user.getName(),
+                user.getEmail(),
+                user.getRoles()
+            ))
+            .collect(Collectors.toList()
+        ));
     }
 
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<UserResponseDTO> readByIdAsync(UUID id) {
-        return CompletableFuture.supplyAsync(() -> {
-            User user = findUser(id);
-            
-            return new UserResponseDTO(
+        User user = findUser(id);
+        
+        return CompletableFuture.completedFuture(
+            new UserResponseDTO(
                 user.getId(),            
                 user.getName(),
                 user.getEmail(),
                 user.getRoles()
-            );
-        }, taskExecutor);
+            )
+        );
     }
 
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<String> updateAsync(UUID id, UserUpdateDTO data) {
-        return CompletableFuture.supplyAsync(() -> {
-            User user = findUser(id);
+        User user = findUser(id);
+        
+        data.name().ifPresent(user::setName);
+        data.password().ifPresent(password -> user.setPassword(passwordEncoder.encode(password)));
             
-            data.name().ifPresent(user::setName);
-            data.password().ifPresent(password -> user.setPassword(passwordEncoder.encode(password)));
-                
-            userR.save(user);
-            return "Updated User";
-        }, taskExecutor);
+        userR.save(user);
+        return CompletableFuture.completedFuture("Updated User");
     }
 
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<String> deleteAsync(UUID id) {
-        return CompletableFuture.supplyAsync(() -> {
-            findUser(id);
-            
-            userR.deleteById(id);
-            return "Deleted User";
-        }, taskExecutor);
+        findUser(id);
+        
+        userR.deleteById(id);
+        return CompletableFuture.completedFuture("Deleted User");
     }
 
     private User findUser(UUID id) {

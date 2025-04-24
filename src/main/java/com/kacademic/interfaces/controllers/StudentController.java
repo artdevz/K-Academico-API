@@ -5,7 +5,6 @@ import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -57,10 +56,9 @@ public class StudentController {
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Students successfully retrieved")
     })
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping    
     public ResponseEntity<List<StudentResponseDTO>> readAll() {
-        return ResponseEntity.ok(studentS.readAllAsync().join());
+        return ResponseEntity.ok(AsyncResultHandler.await(studentS.readAllAsync()));
     }
 
 
@@ -73,7 +71,7 @@ public class StudentController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<StudentDetailsDTO> readById(@PathVariable UUID id) {
-        return ResponseEntity.ok(studentS.readByIdAsync(id).join());
+        return ResponseEntity.ok(AsyncResultHandler.await(studentS.readByIdAsync(id)));
     }    
 
 
@@ -86,7 +84,7 @@ public class StudentController {
     })
     @PatchMapping("/{id}")
     public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid StudentUpdateDTO data) {
-        return ResponseEntity.ok(studentS.updateAsync(id, data).join());
+        return ResponseEntity.ok(AsyncResultHandler.await(studentS.updateAsync(id, data)));
     }
 
 
@@ -99,7 +97,7 @@ public class StudentController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable UUID id) {
-        return ResponseEntity.ok(studentS.deleteAsync(id).join());
+        return ResponseEntity.ok(AsyncResultHandler.await(studentS.deleteAsync(id)));
     }
 
 

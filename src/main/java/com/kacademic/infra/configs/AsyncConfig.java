@@ -1,4 +1,4 @@
-package com.kacademic.infra.configs;
+/*package com.kacademic.infra.configs;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,4 +23,4 @@ public class AsyncConfig {
         return new DelegatingSecurityContextAsyncTaskExecutor(executor);
     }
 
-}
+}*/

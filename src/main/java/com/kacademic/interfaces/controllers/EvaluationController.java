@@ -18,6 +18,7 @@ import com.kacademic.app.dto.evaluation.EvaluationRequestDTO;
 import com.kacademic.app.dto.evaluation.EvaluationResponseDTO;
 import com.kacademic.app.dto.evaluation.EvaluationUpdateDTO;
 import com.kacademic.app.services.EvaluationService;
+import com.kacademic.shared.utils.AsyncResultHandler;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -42,7 +43,7 @@ public class EvaluationController {
     })
     @PostMapping
     public ResponseEntity<String> create(@RequestBody @Valid EvaluationRequestDTO request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(evaluationS.createAsync(request).join());
+        return ResponseEntity.status(HttpStatus.CREATED).body(AsyncResultHandler.await(evaluationS.createAsync(request)));
     }
 
 
@@ -54,7 +55,7 @@ public class EvaluationController {
     })
     @GetMapping    
     public ResponseEntity<List<EvaluationResponseDTO>> readAll() {
-        return ResponseEntity.ok(evaluationS.readAllAsync().join());
+        return ResponseEntity.ok(AsyncResultHandler.await(evaluationS.readAllAsync()));
     }
 
 
@@ -67,7 +68,7 @@ public class EvaluationController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<EvaluationResponseDTO> readById(@PathVariable UUID id) {
-        return ResponseEntity.ok(evaluationS.readByIdAsync(id).join());
+        return ResponseEntity.ok(AsyncResultHandler.await(evaluationS.readByIdAsync(id)));
     }
     
     
@@ -80,7 +81,7 @@ public class EvaluationController {
     })
     @PatchMapping("/{id}")
     public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid EvaluationUpdateDTO data) {
-        return ResponseEntity.ok(evaluationS.updateAsync(id, data).join());
+        return ResponseEntity.ok(AsyncResultHandler.await(evaluationS.updateAsync(id, data)));
     }
 
 
@@ -93,7 +94,7 @@ public class EvaluationController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable UUID id) {
-        return ResponseEntity.ok(evaluationS.deleteAsync(id).join());
+        return ResponseEntity.ok(AsyncResultHandler.await(evaluationS.deleteAsync(id)));
     }
 
 

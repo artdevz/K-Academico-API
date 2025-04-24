@@ -20,6 +20,7 @@ import com.kacademic.app.dto.subject.SubjectRequestDTO;
 import com.kacademic.app.dto.subject.SubjectResponseDTO;
 import com.kacademic.app.dto.subject.SubjectUpdateDTO;
 import com.kacademic.app.services.SubjectService;
+import com.kacademic.shared.utils.AsyncResultHandler;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -44,7 +45,7 @@ public class SubjectController {
     })
     @PostMapping
     public ResponseEntity<String> create(@RequestBody @Valid SubjectRequestDTO request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(subjectS.createAsync(request).join());
+        return ResponseEntity.status(HttpStatus.CREATED).body(AsyncResultHandler.await(subjectS.createAsync(request)));
     }
 
 
@@ -57,7 +58,7 @@ public class SubjectController {
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping    
     public ResponseEntity<List<SubjectResponseDTO>> readAll() {
-        return ResponseEntity.ok(subjectS.readAllAsync().join());
+        return ResponseEntity.ok(AsyncResultHandler.await(subjectS.readAllAsync()));
     }
 
 
@@ -70,7 +71,7 @@ public class SubjectController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<SubjectDetailsDTO> readById(@PathVariable UUID id) {
-        return ResponseEntity.ok(subjectS.readByIdAsync(id).join());
+        return ResponseEntity.ok(AsyncResultHandler.await(subjectS.readByIdAsync(id)));
     }    
 
 
@@ -83,7 +84,7 @@ public class SubjectController {
     })
     @PatchMapping("/{id}")
     public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid SubjectUpdateDTO data) {
-        return ResponseEntity.ok(subjectS.updateAsync(id, data).join());
+        return ResponseEntity.ok(AsyncResultHandler.await(subjectS.updateAsync(id, data)));
     }
 
 
@@ -96,7 +97,7 @@ public class SubjectController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable UUID id) {
-        return ResponseEntity.ok(subjectS.deleteAsync(id).join());
+        return ResponseEntity.ok(AsyncResultHandler.await(subjectS.deleteAsync(id)));
     }
 
 

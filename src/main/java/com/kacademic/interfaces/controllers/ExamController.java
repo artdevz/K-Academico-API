@@ -18,6 +18,7 @@ import com.kacademic.app.dto.exam.ExamRequestDTO;
 import com.kacademic.app.dto.exam.ExamResponseDTO;
 import com.kacademic.app.dto.exam.ExamUpdateDTO;
 import com.kacademic.app.services.ExamService;
+import com.kacademic.shared.utils.AsyncResultHandler;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -42,7 +43,7 @@ public class ExamController {
     })
     @PostMapping
     public ResponseEntity<String> create(@RequestBody @Valid ExamRequestDTO request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(examS.createAsync(request).join());
+        return ResponseEntity.status(HttpStatus.CREATED).body(AsyncResultHandler.await(examS.createAsync(request)));
     }
 
 
@@ -54,7 +55,7 @@ public class ExamController {
     })
     @GetMapping    
     public ResponseEntity<List<ExamResponseDTO>> readAll() {
-        return ResponseEntity.ok(examS.readAllAsync().join());
+        return ResponseEntity.ok(AsyncResultHandler.await(examS.readAllAsync()));
     }
 
 
@@ -67,7 +68,7 @@ public class ExamController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<ExamResponseDTO> readById(@PathVariable UUID id) {
-        return ResponseEntity.ok(examS.readByIdAsync(id).join());
+        return ResponseEntity.ok(AsyncResultHandler.await(examS.readByIdAsync(id)));
     }
     
     
@@ -80,7 +81,7 @@ public class ExamController {
     })
     @PatchMapping("/{id}")
     public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid ExamUpdateDTO data) {
-        return ResponseEntity.ok(examS.updateAsync(id, data).join());
+        return ResponseEntity.ok(AsyncResultHandler.await(examS.updateAsync(id, data)));
     }
 
 
@@ -93,7 +94,7 @@ public class ExamController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable UUID id) {
-        return ResponseEntity.ok(examS.deleteAsync(id).join());
+        return ResponseEntity.ok(AsyncResultHandler.await(examS.deleteAsync(id)));
     }
 
 

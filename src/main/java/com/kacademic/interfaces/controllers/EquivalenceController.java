@@ -41,7 +41,7 @@ public class EquivalenceController {
 
     @GetMapping    
     public ResponseEntity<List<EquivalenceResponseDTO>> readAll() {
-        return ResponseEntity.ok(equivalenceS.readAllAsync().join());
+        return ResponseEntity.ok(AsyncResultHandler.await(equivalenceS.readAllAsync()));
     }
 
 

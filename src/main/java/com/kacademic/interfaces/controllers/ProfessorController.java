@@ -19,6 +19,7 @@ import com.kacademic.app.dto.professor.ProfessorRequestDTO;
 import com.kacademic.app.dto.professor.ProfessorResponseDTO;
 import com.kacademic.app.dto.professor.ProfessorUpdateDTO;
 import com.kacademic.app.services.ProfessorService;
+import com.kacademic.shared.utils.AsyncResultHandler;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -44,7 +45,7 @@ public class ProfessorController {
     })
     @PostMapping
     public ResponseEntity<String> create(@RequestBody @Valid ProfessorRequestDTO request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(professorS.createAsync(request).join());
+        return ResponseEntity.status(HttpStatus.CREATED).body(AsyncResultHandler.await(professorS.createAsync(request)));
     }
 
 
@@ -57,7 +58,7 @@ public class ProfessorController {
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping    
     public ResponseEntity<List<ProfessorResponseDTO>> readAll() {
-        return ResponseEntity.ok(professorS.readAllAsync().join());
+        return ResponseEntity.ok(AsyncResultHandler.await(professorS.readAllAsync()));
     }
 
 
@@ -70,7 +71,7 @@ public class ProfessorController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<ProfessorResponseDTO> readById(@PathVariable UUID id) {
-        return ResponseEntity.ok(professorS.readByIdAsync(id).join());
+        return ResponseEntity.ok(AsyncResultHandler.await(professorS.readByIdAsync(id)));
     }    
 
 
@@ -83,7 +84,7 @@ public class ProfessorController {
     })
     @PatchMapping("/{id}")
     public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody @Valid ProfessorUpdateDTO data) {
-        return ResponseEntity.ok(professorS.updateAsync(id, data).join());
+        return ResponseEntity.ok(AsyncResultHandler.await(professorS.updateAsync(id, data)));
     }
 
 
@@ -96,7 +97,7 @@ public class ProfessorController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable UUID id) {
-        return ResponseEntity.ok(professorS.deleteAsync(id).join());
+        return ResponseEntity.ok(AsyncResultHandler.await(professorS.deleteAsync(id)));
     }
 
 

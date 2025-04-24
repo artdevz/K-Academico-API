@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kacademic.app.services.UserService;
+import com.kacademic.shared.utils.AsyncResultHandler;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,7 +20,7 @@ public class InitController {
     
     @PostMapping
     public ResponseEntity<String> initAdmin() {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userS.createInitialAdmin().join());
+        return ResponseEntity.status(HttpStatus.CREATED).body(AsyncResultHandler.await(userS.createInitialAdmin()));
     }
 
 }
