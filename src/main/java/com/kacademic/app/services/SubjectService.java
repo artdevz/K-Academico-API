@@ -5,7 +5,6 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -17,6 +16,8 @@ import com.kacademic.app.dto.subject.SubjectDetailsDTO;
 import com.kacademic.app.dto.subject.SubjectRequestDTO;
 import com.kacademic.app.dto.subject.SubjectResponseDTO;
 import com.kacademic.app.dto.subject.SubjectUpdateDTO;
+import com.kacademic.app.mapper.RequestMapper;
+import com.kacademic.app.mapper.ResponseMapper;
 import com.kacademic.domain.models.Course;
 import com.kacademic.domain.models.Equivalence;
 import com.kacademic.domain.models.Subject;
@@ -33,35 +34,32 @@ public class SubjectService {
     private final SubjectRepository subjectR;
     private final CourseRepository courseR;
     private final EquivalenceRepository equivalenceR;
-
-    private final AsyncTaskExecutor taskExecutor;
+    private final RequestMapper requestMapper;
+    private final ResponseMapper responseMapper;
 
     @Transactional
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<String> createAsync(SubjectRequestDTO data) {
-        return CompletableFuture.supplyAsync(() -> {
-            Subject subject = new Subject(
-                data.name(),
-                data.description(),
-                data.duration(),
-                data.semester(),
-                data.isRequired(),
-                findCourseDetails(data.course()),
-                findEquivalences(data.prerequisites())
-            );
-            
-            updateCourseDuration(courseR.findWithSubjectsById(data.course()).get(), data.duration());
-            
-            subjectR.save(subject);
-            return "Subject successfully Created: " + subject.getId();
-        }, taskExecutor);        
+        Subject subject = requestMapper.toSubject(data);
+        
+        updateCourseDuration(courseR.findWithSubjectsById(data.course()).get(), data.duration());
+        
+        subjectR.save(subject);
+        return CompletableFuture.completedFuture("Subject successfully Created: " + subject.getId());
     }
 
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<List<SubjectResponseDTO>> readAllAsync() {
-        return CompletableFuture.supplyAsync(() -> {
-            return subjectR.findAll().stream()
-                .map(subject -> new SubjectResponseDTO(
+        return CompletableFuture.completedFuture(responseMapper.toSubjectResponseDTOList(subjectR.findAll()));
+    }
+
+    @Async
+    public CompletableFuture<SubjectDetailsDTO> readByIdAsync(UUID id) {
+        Subject subject = findSubject(id);
+        
+        return CompletableFuture.completedFuture(
+            new SubjectDetailsDTO(
+                new SubjectResponseDTO(
                     subject.getId(),
                     subject.getCourse().getId(),                
                     subject.getName(),
@@ -69,63 +67,37 @@ public class SubjectService {
                     subject.getDuration(),
                     subject.getSemester(),
                     subject.isRequired()
-                ))
-                .collect(Collectors.toList()
-            );
-        }, taskExecutor);
+                ),
+                subject.getPrerequisites().stream().map(prerequisites -> new EquivalenceResponseDTO(
+                    prerequisites.getId(),
+                    prerequisites.getName()
+                )).collect(Collectors.toList())
+            )
+        );
     }
 
-    @Async("taskExecutor")
-    public CompletableFuture<SubjectDetailsDTO> readByIdAsync(UUID id) {
-        return CompletableFuture.supplyAsync(() -> {
-            Subject subject = findSubject(id);
-            
-            return (
-                new SubjectDetailsDTO(
-                    new SubjectResponseDTO(
-                        subject.getId(),
-                        subject.getCourse().getId(),                
-                        subject.getName(),
-                        subject.getDescription(),
-                        subject.getDuration(),
-                        subject.getSemester(),
-                        subject.isRequired()
-                    ),
-                    subject.getPrerequisites().stream().map(prerequisites -> new EquivalenceResponseDTO(
-                        prerequisites.getId(),
-                        prerequisites.getName()
-                    )).collect(Collectors.toList())
-                )
-            );
-        }, taskExecutor);
-    }
-
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<String> updateAsync(UUID id, SubjectUpdateDTO data) {
-        return CompletableFuture.supplyAsync(() -> {
-            Subject subject = findSubject(id);
-                
-            data.isRequired().ifPresent(subject::setRequired);
-            data.name().ifPresent(subject::setName);
-            data.description().ifPresent(subject::setDescription);
-            // data.duration().ifPresent(subject::setDuration);
-            // data.semester().ifPresent(subject::setSemester);
-    
-            subjectR.save(subject);
-            return "Updated Subject";
-        }, taskExecutor);
+        Subject subject = findSubject(id);
+            
+        data.isRequired().ifPresent(subject::setRequired);
+        data.name().ifPresent(subject::setName);
+        data.description().ifPresent(subject::setDescription);
+        // data.duration().ifPresent(subject::setDuration);
+        // data.semester().ifPresent(subject::setSemester);
+
+        subjectR.save(subject);
+        return CompletableFuture.completedFuture("Updated Subject");
     }
 
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<String> deleteAsync(UUID id) {
-        return CompletableFuture.supplyAsync(() -> {
-            Subject subject = findSubject(id);
-    
-            updateCourseDuration(subject.getCourse(), subject.getDuration() * (-1)); // -1 for REMOVE
-    
-            subjectR.deleteById(id);
-            return "Deleted Subject";
-        }, taskExecutor);
+        Subject subject = findSubject(id);
+
+        updateCourseDuration(subject.getCourse(), subject.getDuration() * (-1)); // -1 for REMOVE
+
+        subjectR.deleteById(id);
+        return CompletableFuture.completedFuture("Deleted Subject");
     }
 
     private void updateCourseDuration(Course course, int duration) {
