@@ -11,12 +11,17 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.kacademic.app.dto.course.CourseRequestDTO;
+import com.kacademic.app.dto.professor.ProfessorRequestDTO;
+import com.kacademic.app.dto.student.StudentRequestDTO;
 import com.kacademic.app.dto.subject.SubjectRequestDTO;
 import com.kacademic.app.dto.user.UserRequestDTO;
 import com.kacademic.app.helpers.EntityFinder;
+import com.kacademic.app.services.EnrollmentGeneratorService;
 import com.kacademic.domain.models.Course;
 import com.kacademic.domain.models.Equivalence;
+import com.kacademic.domain.models.Professor;
 import com.kacademic.domain.models.Role;
+import com.kacademic.domain.models.Student;
 import com.kacademic.domain.models.Subject;
 import com.kacademic.domain.models.User;
 import com.kacademic.domain.repositories.CourseRepository;
@@ -36,32 +41,55 @@ public class RequestMapper {
     private final EquivalenceRepository equivalenceR;
     private final RoleRepository roleR;
     
-    public Course toCourse(CourseRequestDTO courseRequestDTO) {
+    private final EnrollmentGeneratorService enrollmentGS;
+
+    public Course toCourse(CourseRequestDTO data) {
         return new Course(
-            courseRequestDTO.name(),
-            courseRequestDTO.code(),
-            courseRequestDTO.description()
+            data.name(),
+            data.code(),
+            data.description()
         );
     }
 
-    public User toUser(UserRequestDTO userRequestDTO) {
+    public User toUser(UserRequestDTO data) {
         return new User(
-            userRequestDTO.name(),
-            userRequestDTO.email(),
-            passwordEncoder.encode(userRequestDTO.password()),
-            findRoles(userRequestDTO.roles())
+            data.name(),
+            data.email(),
+            passwordEncoder.encode(data.password()),
+            findRoles(data.roles())
         );
     }
 
-    public Subject toSubject(SubjectRequestDTO subjectRequestDTO) {
+    public Subject toSubject(SubjectRequestDTO data) {
         return new Subject(
-            subjectRequestDTO.name(),
-            subjectRequestDTO.description(),
-            subjectRequestDTO.duration(),
-            subjectRequestDTO.semester(),
-            subjectRequestDTO.isRequired(),
-            finder.findByIdOrThrow(courseR.findById(subjectRequestDTO.course()), "Course not Found"),
-            findEquivalences(subjectRequestDTO.prerequisites())
+            data.name(),
+            data.description(),
+            data.duration(),
+            data.semester(),
+            data.isRequired(),
+            finder.findByIdOrThrow(courseR.findById(data.course()), "Course not Found"),
+            findEquivalences(data.prerequisites())
+        );
+    }
+
+    public Student toStudent(StudentRequestDTO data) {
+        return new Student(
+            data.user().name(),
+            data.user().email(),
+            passwordEncoder.encode(data.user().password()),
+            findRoles(data.user().roles()),
+            enrollmentGS.generate(finder.findByIdOrThrow(courseR.findById(data.course()), "Course not Found").getCode()),
+            finder.findByIdOrThrow(courseR.findById(data.course()), "Course not Found")
+        );
+    }
+
+    public Professor toProfessor(ProfessorRequestDTO data) {
+        return new Professor(
+            data.user().name(),
+            data.user().email(),
+            passwordEncoder.encode(data.user().password()),
+            findRoles(data.user().roles()),
+            data.wage()
         );
     }
 

@@ -1,115 +1,63 @@
 package com.kacademic.app.services;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
-
-import org.springframework.core.task.AsyncTaskExecutor;
-import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
-
 import com.kacademic.app.dto.professor.ProfessorRequestDTO;
 import com.kacademic.app.dto.professor.ProfessorResponseDTO;
 import com.kacademic.app.dto.professor.ProfessorUpdateDTO;
+import com.kacademic.app.helpers.EntityFinder;
+import com.kacademic.app.mapper.RequestMapper;
+import com.kacademic.app.mapper.ResponseMapper;
 import com.kacademic.domain.models.Professor;
-import com.kacademic.domain.models.Role;
 import com.kacademic.domain.repositories.ProfessorRepository;
-import com.kacademic.domain.repositories.RoleRepository;
-
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
 public class ProfessorService {
-    
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-    
+        
     private final ProfessorRepository professorR;
-    private final RoleRepository roleR;
+    private final RequestMapper requestMapper;
+    private final ResponseMapper responseMapper;
+    private final EntityFinder finder;
 
-    private final AsyncTaskExecutor taskExecutor;
-
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<String> createAsync(ProfessorRequestDTO data) {
-        return CompletableFuture.supplyAsync(() -> {
-            Professor professor = new Professor(
-                data.user().name(),
-                data.user().email(),
-                passwordEncoder.encode(data.user().password()),
-                findRoles(data.user().roles()),                
-                data.wage()
-            );
-    
-            professorR.save(professor);
-            return "Professor successfully Created: " + professor.getId();
-        }, taskExecutor);
+        Professor professor = requestMapper.toProfessor(data);
+
+        professorR.save(professor);
+        return CompletableFuture.completedFuture("Professor successfully Created: " + professor.getId());
     }
 
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<List<ProfessorResponseDTO>> readAllAsync() {
-        return CompletableFuture.supplyAsync(() -> {
-            return professorR.findAll().stream()
-                .map(professor -> new ProfessorResponseDTO(
-                    professor.getId(),
-                    professor.getName(),
-                    professor.getEmail(),
-                    professor.getWage()
-                ))
-                .collect(Collectors.toList()
-            );
-        }, taskExecutor);
+        return CompletableFuture.completedFuture(responseMapper.toProfessorResponseDTOList(professorR.findAll()));
     }
 
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<ProfessorResponseDTO> readByIdAsync(UUID id) {
-        return CompletableFuture.supplyAsync(() -> {
-            Professor professor = findProfessor(id);
-    
-            return new ProfessorResponseDTO(
-                professor.getId(),
-                professor.getName(),
-                professor.getEmail(),
-                professor.getWage()
-            );
-        }, taskExecutor);
+        return CompletableFuture.completedFuture(responseMapper.toProfessorResponseDTO(finder.findByIdOrThrow(professorR.findById(id), "Professor not Found")));
     }
 
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<String> updateAsync(UUID id, ProfessorUpdateDTO data) {
-        return CompletableFuture.supplyAsync(() -> {
-            Professor professor = findProfessor(id);
-    
-            data.wage().ifPresent(professor::setWage);
-            
-            professorR.save(professor);
-            return "Updated Professor";
-        }, taskExecutor);
+        Professor professor = finder.findByIdOrThrow(professorR.findById(id), "Professor not Found");
+
+        data.wage().ifPresent(professor::setWage);
+        
+        professorR.save(professor);
+        return CompletableFuture.completedFuture("Updated Professor");
     }
 
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<String> deleteAsync(UUID id) {
-        return CompletableFuture.supplyAsync(() -> {
-            findProfessor(id);
-            
-            professorR.deleteById(id);
-            return "Deleted Professor";
-        }, taskExecutor);
-    }
-
-    private Professor findProfessor(UUID id) {
-        return professorR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Professor not Found"));
-    }
-
-    private Set<Role> findRoles(Set<UUID> roles) {
-        return roles.stream()
-        .map(roleId -> roleR.findById(roleId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not Found")))
-        .collect(Collectors.toSet());
+        finder.findByIdOrThrow(professorR.findById(id), "Professor not Found");
+        
+        professorR.deleteById(id);
+        return CompletableFuture.completedFuture("Deleted Professor");
     }
 
 }

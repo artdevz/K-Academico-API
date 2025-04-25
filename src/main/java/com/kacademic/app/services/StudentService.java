@@ -1,28 +1,20 @@
 package com.kacademic.app.services;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
-import org.springframework.core.task.AsyncTaskExecutor;
-import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
-import com.kacademic.app.dto.enrollee.EnrolleeResponseDTO;
 import com.kacademic.app.dto.student.StudentDetailsDTO;
 import com.kacademic.app.dto.student.StudentRequestDTO;
 import com.kacademic.app.dto.student.StudentResponseDTO;
 import com.kacademic.app.dto.student.StudentUpdateDTO;
-import com.kacademic.domain.models.Course;
-import com.kacademic.domain.models.Role;
+import com.kacademic.app.helpers.EntityFinder;
+import com.kacademic.app.mapper.RequestMapper;
+import com.kacademic.app.mapper.ResponseMapper;
 import com.kacademic.domain.models.Student;
-import com.kacademic.domain.repositories.CourseRepository;
-import com.kacademic.domain.repositories.RoleRepository;
 import com.kacademic.domain.repositories.StudentRepository;
 
 import jakarta.transaction.Transactional;
@@ -32,109 +24,49 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class StudentService {
     
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
     private final StudentRepository studentR;
-    private final CourseRepository courseR;
-    private final RoleRepository roleR;
+    private final RequestMapper requestMapper;
+    private final ResponseMapper responseMapper;
+    private final EntityFinder finder;
 
-    private final EnrollmentGeneratorService enrolleeGS;
-
-    private final AsyncTaskExecutor taskExecutor;
-
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<String> createAsync(StudentRequestDTO data) {
-        return CompletableFuture.supplyAsync(() -> {
-            Student student = new Student(
-                data.user().name(),
-                data.user().email(),
-                passwordEncoder.encode(data.user().password()),
-                findRoles(data.user().roles()),
-                enrolleeGS.generate(findCourse(data.course()).getCode()),
-                findCourse(data.course())
-            );
+        Student student = requestMapper.toStudent(data);
 
-            studentR.save(student);
-            return "Student successfully Created: " + student.getId();
-        }, taskExecutor);
+        studentR.save(student);
+        return CompletableFuture.completedFuture("Student successfully Created: " + student.getId());
     }
 
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<List<StudentResponseDTO>> readAllAsync() {
-        return CompletableFuture.supplyAsync(() -> {
-            return studentR.findAll().stream()
-                .map(student -> new StudentResponseDTO(
-                    student.getId(),                
-                    student.getCourse().getId(),
-                    student.getEnrollment().getValue(),
-                    student.getName(),
-                    student.getEmail(),
-                    student.getAverage()
-                ))
-                .collect(Collectors.toList()
-            );
-        }, taskExecutor);
+        return CompletableFuture.completedFuture(responseMapper.toStudentResponseDTOList(studentR.findAll()));
     }
 
-    @Async("taskExecutor")
+    @Async
     @Transactional
     public CompletableFuture<StudentDetailsDTO> readByIdAsync(UUID id) {
-        return CompletableFuture.supplyAsync(() -> {
-            Student student = studentR.findByIdWithEnrollees(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not Found"));
-            
-            return new StudentDetailsDTO(
-                new StudentResponseDTO(
-                    student.getId(),            
-                    student.getCourse().getId(),
-                    student.getEnrollment().getValue(),
-                    student.getName(),
-                    student.getEmail(),
-                    student.getAverage()
-                ),
-                student.getEnrollees().stream().map(enrollee -> new EnrolleeResponseDTO(
-                    enrollee.getId(),
-                    enrollee.getStudent().getId(),
-                    enrollee.getGrade().getId(),
-                    enrollee.getAbsences(),
-                    enrollee.getAverage(),
-                    enrollee.getStatus()
-                )).collect(Collectors.toList())
-            );
-        }, taskExecutor);
+        Student student = finder.findByIdOrThrow(studentR.findByIdWithEnrollees(id), "Student not Found");
+        
+        return CompletableFuture.completedFuture(new StudentDetailsDTO(
+            responseMapper.toStudentResponseDTO(student),
+            responseMapper.toEnrolleeResponseDTOList(student.getEnrollees())
+        ));
     }
 
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<String> updateAsync(UUID id, StudentUpdateDTO data) {
-        return CompletableFuture.supplyAsync(() -> {
-            Student student = studentR.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not Found"));
-                
-            studentR.save(student);
-            return "Updated Student";
-        }, taskExecutor);
-    }
-
-    @Async("taskExecutor")
-    public CompletableFuture<String> deleteAsync(UUID id) {
-        return CompletableFuture.supplyAsync(() -> {
-            if (!studentR.findById(id).isPresent()) 
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not Found");
+        Student student = finder.findByIdOrThrow(studentR.findById(id), "Student not Found");
             
-            studentR.deleteById(id);
-            return "Deleted Student";
-        }, taskExecutor);
+        studentR.save(student);
+        return CompletableFuture.completedFuture("Updated Student");
     }
 
-    private Course findCourse(UUID id) {
-        return courseR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found"));
-    }
-
-    private Set<Role> findRoles(Set<UUID> roles) {
-        return roles.stream()
-        .map(roleId -> roleR.findById(roleId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not Found")))
-        .collect(Collectors.toSet());
+    @Async
+    public CompletableFuture<String> deleteAsync(UUID id) {
+        finder.findByIdOrThrow(studentR.findById(id), "Student not Found"); 
+        
+        studentR.deleteById(id);
+        return CompletableFuture.completedFuture("Deleted Student");
     }
 
 }

@@ -5,24 +5,21 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.kacademic.app.dto.equivalence.EquivalenceResponseDTO;
 import com.kacademic.app.dto.subject.SubjectDetailsDTO;
 import com.kacademic.app.dto.subject.SubjectRequestDTO;
 import com.kacademic.app.dto.subject.SubjectResponseDTO;
 import com.kacademic.app.dto.subject.SubjectUpdateDTO;
+import com.kacademic.app.helpers.EntityFinder;
 import com.kacademic.app.mapper.RequestMapper;
 import com.kacademic.app.mapper.ResponseMapper;
 import com.kacademic.domain.models.Course;
-import com.kacademic.domain.models.Equivalence;
 import com.kacademic.domain.models.Subject;
 import com.kacademic.domain.repositories.CourseRepository;
-import com.kacademic.domain.repositories.EquivalenceRepository;
 import com.kacademic.domain.repositories.SubjectRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -33,9 +30,9 @@ public class SubjectService {
     
     private final SubjectRepository subjectR;
     private final CourseRepository courseR;
-    private final EquivalenceRepository equivalenceR;
     private final RequestMapper requestMapper;
     private final ResponseMapper responseMapper;
+    private final EntityFinder finder;
 
     @Transactional
     @Async
@@ -55,19 +52,11 @@ public class SubjectService {
 
     @Async
     public CompletableFuture<SubjectDetailsDTO> readByIdAsync(UUID id) {
-        Subject subject = findSubject(id);
+        Subject subject = finder.findByIdOrThrow(subjectR.findById(id), "Subject not Found");
         
         return CompletableFuture.completedFuture(
             new SubjectDetailsDTO(
-                new SubjectResponseDTO(
-                    subject.getId(),
-                    subject.getCourse().getId(),                
-                    subject.getName(),
-                    subject.getDescription(),
-                    subject.getDuration(),
-                    subject.getSemester(),
-                    subject.isRequired()
-                ),
+                responseMapper.toSubjectResponseDTO(subject),
                 subject.getPrerequisites().stream().map(prerequisites -> new EquivalenceResponseDTO(
                     prerequisites.getId(),
                     prerequisites.getName()
@@ -78,7 +67,7 @@ public class SubjectService {
 
     @Async
     public CompletableFuture<String> updateAsync(UUID id, SubjectUpdateDTO data) {
-        Subject subject = findSubject(id);
+        Subject subject = finder.findByIdOrThrow(subjectR.findById(id), "Subject not Found");
             
         data.isRequired().ifPresent(subject::setRequired);
         data.name().ifPresent(subject::setName);
@@ -92,7 +81,7 @@ public class SubjectService {
 
     @Async
     public CompletableFuture<String> deleteAsync(UUID id) {
-        Subject subject = findSubject(id);
+        Subject subject = finder.findByIdOrThrow(subjectR.findById(id), "Subject not Found");
 
         updateCourseDuration(subject.getCourse(), subject.getDuration() * (-1)); // -1 for REMOVE
 
@@ -103,21 +92,6 @@ public class SubjectService {
     private void updateCourseDuration(Course course, int duration) {
         course.setDuration(course.getDuration() + duration);
         courseR.save(course);
-    }
-
-    private Subject findSubject(UUID id) {
-        return subjectR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subject not Found"));
-    }
-
-    private Course findCourseDetails(UUID id) {
-        return courseR.findWithSubjectsById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not Found"));
-    }
-
-    private List<Equivalence> findEquivalences(List<UUID> equivalences) {
-        return equivalences.stream()
-        .map(equivalenceId -> equivalenceR.findById(equivalenceId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Equivalence not Found")))
-        .collect(Collectors.toList());
     }
 
 }
