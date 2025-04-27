@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -21,33 +20,27 @@ public class RoleService {
     
     private final RoleRepository roleR;
 
-    private final AsyncTaskExecutor taskExecutor;
-
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<String> createAsync(RoleRequestDTO data) {
-        return CompletableFuture.supplyAsync(() -> {
-            Role role = new Role(
-                data.name(),
-                data.description()
-            );
-    
-            roleR.save(role);
-            return "Role successfully Created: " + role.getId();
-        }, taskExecutor);
+        Role role = new Role(
+            data.name(),
+            data.description()
+        );
+
+        roleR.save(role);
+        return CompletableFuture.completedFuture("Role successfully Created: " + role.getId());
     }
 
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<List<RoleResponseDTO>> readAllAsync() {
-        return CompletableFuture.supplyAsync(() -> {
-            return roleR.findAll().stream()
-                .map(role -> new RoleResponseDTO(
-                    role.getId(),
-                    role.getName(),
-                    role.getDescription()
-                ))
-                .collect(Collectors.toList()
-            );
-        }, taskExecutor);
+        return CompletableFuture.completedFuture(roleR.findAll().stream()
+            .map(role -> new RoleResponseDTO(
+                role.getId(),
+                role.getName(),
+                role.getDescription()
+            ))
+            .collect(Collectors.toList()
+        ));
     }
 
 }

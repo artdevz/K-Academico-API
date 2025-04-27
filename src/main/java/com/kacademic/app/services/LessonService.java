@@ -3,20 +3,17 @@ package com.kacademic.app.services;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
-import org.springframework.core.task.AsyncTaskExecutor;
-import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.kacademic.app.dto.lesson.LessonRequestDTO;
 import com.kacademic.app.dto.lesson.LessonResponseDTO;
 import com.kacademic.app.dto.lesson.LessonUpdateDTO;
-import com.kacademic.domain.models.Grade;
+import com.kacademic.app.helpers.EntityFinder;
+import com.kacademic.app.mapper.RequestMapper;
+import com.kacademic.app.mapper.ResponseMapper;
 import com.kacademic.domain.models.Lesson;
-import com.kacademic.domain.repositories.GradeRepository;
 import com.kacademic.domain.repositories.LessonRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -26,81 +23,42 @@ import lombok.RequiredArgsConstructor;
 public class LessonService {
     
     private final LessonRepository lessonR;
-    private final GradeRepository gradeR;
+    private final RequestMapper requestMapper;
+    private final ResponseMapper responseMapper;
+    private final EntityFinder finder;
 
-    private final AsyncTaskExecutor taskExecutor;
-
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<String> createAsync(LessonRequestDTO data) {
-        return CompletableFuture.supplyAsync(() -> {
-            Lesson lesson = new Lesson(
-                data.topic(),
-                data.date(),
-                findGrade(data.grade())
-            );
-            
-            lessonR.save(lesson);
-            return "Lesson successfully Created: " + lesson.getId();
-        }, taskExecutor);
+        Lesson lesson = requestMapper.toLesson(data);
+        
+        lessonR.save(lesson);
+        return CompletableFuture.completedFuture("Lesson successfully Created: " + lesson.getId());
     }
 
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<List<LessonResponseDTO>> readAllAsync() {
-        return CompletableFuture.supplyAsync(() -> {
-            return lessonR.findAll().stream()
-                .map(lesson -> new LessonResponseDTO(
-                    lesson.getId(),
-                    lesson.getGrade().getId(),
-                    lesson.getTopic(),
-                    lesson.getDate(),
-                    lesson.getStatus()
-                ))
-                .collect(Collectors.toList()
-            );
-        }, taskExecutor);
+        return CompletableFuture.completedFuture(responseMapper.toResponseDTOList(lessonR.findAll(), responseMapper::toLessonResponseDTO));
     }
 
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<LessonResponseDTO> readByIdAsync(UUID id) {
-        return CompletableFuture.supplyAsync(() -> {
-            Lesson lesson = findLesson(id);
-    
-            return new LessonResponseDTO(
-                lesson.getId(),
-                lesson.getGrade().getId(),
-                lesson.getTopic(),
-                lesson.getDate(),
-                lesson.getStatus()
-            );
-        }, taskExecutor);
+        return CompletableFuture.completedFuture(responseMapper.toLessonResponseDTO(finder.findByIdOrThrow(lessonR.findById(id), "Lesson not Found")));
     }
 
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<String> updateAsync(UUID id, LessonUpdateDTO data) {
-        return CompletableFuture.supplyAsync(() -> {
-            Lesson lesson = findLesson(id);
-    
-            lessonR.save(lesson);
-            return "Updated Lesson";
-        }, taskExecutor);
+        Lesson lesson = finder.findByIdOrThrow(lessonR.findById(id), "Lesson not Found");
+
+        lessonR.save(lesson);
+        return CompletableFuture.completedFuture("Updated Lesson");
     }
 
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<String> deleteAsync(UUID id) {
-        return CompletableFuture.supplyAsync(() -> {
-            findLesson(id);
-            
-            lessonR.deleteById(id);
-            return "Deleted Lesson";
-        }, taskExecutor);
-    }
-
-    private Lesson findLesson(UUID id) {
-        return lessonR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not Found"));
-    }
-    
-    private Grade findGrade(UUID id) {
-        return gradeR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Grade not Found"));
+        finder.findByIdOrThrow(lessonR.findById(id), "Lesson not Found");
+        
+        lessonR.deleteById(id);
+        return CompletableFuture.completedFuture("Deleted Lesson");
     }
 
 }

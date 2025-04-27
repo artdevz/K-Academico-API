@@ -3,9 +3,7 @@ package com.kacademic.app.services;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
-import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -14,6 +12,9 @@ import org.springframework.web.server.ResponseStatusException;
 import com.kacademic.app.dto.evaluation.EvaluationRequestDTO;
 import com.kacademic.app.dto.evaluation.EvaluationResponseDTO;
 import com.kacademic.app.dto.evaluation.EvaluationUpdateDTO;
+import com.kacademic.app.helpers.EntityFinder;
+import com.kacademic.app.mapper.RequestMapper;
+import com.kacademic.app.mapper.ResponseMapper;
 import com.kacademic.domain.models.Enrollee;
 import com.kacademic.domain.models.Evaluation;
 import com.kacademic.domain.models.Exam;
@@ -30,98 +31,53 @@ public class EvaluationService {
     private final EvaluationRepository evaluationR;
     private final EnrolleeRepository enrolleeR;
     private final ExamRepository examR;
-
-    private final AsyncTaskExecutor taskExecutor;
+    private final RequestMapper requestMapper;
+    private final ResponseMapper responseMapper;
+    private final EntityFinder finder;
     
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<String> createAsync(EvaluationRequestDTO data) {
-        return CompletableFuture.supplyAsync(() -> {
-            Enrollee enrollee = findEnrolleeWithDetails(data.enrollee());
-            Exam exam = findExamWithGrade(data.exam());
+        Enrollee enrollee = finder.findByIdOrThrow(enrolleeR.findByIdWithEvaluationsAndAttendances(data.enrollee()), "Enrollee not Found");
+        Exam exam = finder.findByIdOrThrow(examR.findByIdWithGrade(data.exam()), "Exam not Found");
 
-            ensureEvaluationNotExists(enrollee, exam);
-            ensureSameGrade(enrollee, exam);
+        ensureEvaluationNotExists(enrollee, exam);
+        ensureSameGrade(enrollee, exam);
 
-            Evaluation evaluation = new Evaluation(
-                data.score(),
-                enrollee,
-                exam
-            );
-            
-            evaluationR.save(evaluation);
-            updateAverage(enrollee);
-            return "Evaluation successfully Created: " + evaluation.getId();
-        }, taskExecutor);
+        Evaluation evaluation = requestMapper.toEvaluation(data);
+        
+        evaluationR.save(evaluation);
+        updateAverage(enrollee);
+        return CompletableFuture.completedFuture("Evaluation successfully Created: " + evaluation.getId());
     }
 
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<List<EvaluationResponseDTO>> readAllAsync() {
-        return CompletableFuture.supplyAsync(() -> {
-            return (
-                evaluationR.findAll().stream()
-                .map(evaluation -> new EvaluationResponseDTO(
-                    evaluation.getId(),
-                    evaluation.getEnrollee().getId(),
-                    evaluation.getExam().getGrade().getId(),
-                    evaluation.getExam().getId(),
-                    evaluation.getScore()
-                ))
-                .collect(Collectors.toList())
-            );
-        }, taskExecutor);
+        return CompletableFuture.completedFuture(responseMapper.toResponseDTOList(evaluationR.findAll(), responseMapper::toEvaluationResponseDTO));
     }
 
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<EvaluationResponseDTO> readByIdAsync(UUID id) {
-        return CompletableFuture.supplyAsync(() -> {
-            Evaluation evaluation =findEvaluation(id);
-            
-            return (
-                new EvaluationResponseDTO(
-                    evaluation.getId(),
-                    evaluation.getEnrollee().getId(),
-                    evaluation.getExam().getGrade().getId(),
-                    evaluation.getExam().getId(),
-                    evaluation.getScore()
-                )
-            );
-        }, taskExecutor);
+        return CompletableFuture.completedFuture(responseMapper.toEvaluationResponseDTO(finder.findByIdOrThrow(evaluationR.findById(id), "Evaluation not Found")));
     }
 
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<String> updateAsync(UUID id, EvaluationUpdateDTO data) {
-        return CompletableFuture.supplyAsync(() -> {
-            Evaluation evaluation = findEvaluation(id);
+        Evaluation evaluation = finder.findByIdOrThrow(evaluationR.findById(id), "Evaluation not Found");
+        
+        data.score().ifPresent(evaluation::setScore);
+        if (data.score().isPresent()) updateAverage(evaluation.getEnrollee());
             
-            data.score().ifPresent(evaluation::setScore);
-            if (data.score().isPresent()) updateAverage(evaluation.getEnrollee());
-                
-            evaluationR.save(evaluation);
-            return "Updated Evaluation";
-        }, taskExecutor);
+        evaluationR.save(evaluation);
+        return CompletableFuture.completedFuture("Updated Evaluation");
     }
 
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<String> deleteAsync(UUID id) {
-        return CompletableFuture.supplyAsync(() -> {
-            Evaluation evaluation = findEvaluation(id);
-            
-            evaluationR.deleteById(id);
-            updateAverage(evaluation.getEnrollee());
-            return "Deleted Evaluation";
-        }, taskExecutor);
-    }
-
-    private Evaluation findEvaluation(UUID id) {
-        return evaluationR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Evaluation not Found"));
-    }
-
-    private Enrollee findEnrolleeWithDetails(UUID enrolleeId) {
-        return enrolleeR.findByIdWithEvaluationsAndAttendances(enrolleeId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee Not Found"));
-    }
-
-    private Exam findExamWithGrade(UUID examId) {
-        return examR.findByIdWithGrade(examId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exam not Found"));
+        Evaluation evaluation = finder.findByIdOrThrow(evaluationR.findById(id), "Evaluation not Found");
+        
+        evaluationR.deleteById(id);
+        updateAverage(evaluation.getEnrollee());
+        return CompletableFuture.completedFuture("Updated Evaluation");
     }
 
     private void ensureEvaluationNotExists(Enrollee enrollee, Exam exam) {

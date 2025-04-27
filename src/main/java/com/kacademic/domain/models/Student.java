@@ -1,6 +1,7 @@
 package com.kacademic.domain.models;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import com.kacademic.domain.models.values.Enrollment;
@@ -40,7 +41,7 @@ public class Student extends User {
     private Course course; 
 
     @OneToMany(mappedBy = "student", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
-    private Set<Enrollee> enrollees = new HashSet<>();
+    private List<Enrollee> enrollees = new ArrayList<>();
         
     public Student(String name, String email, String password, Set<Role> roles, Enrollment enrollment, Course course) {
         super(name, email, password, roles);

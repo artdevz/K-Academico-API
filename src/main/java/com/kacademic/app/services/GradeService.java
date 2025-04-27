@@ -3,27 +3,21 @@ package com.kacademic.app.services;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
-import org.springframework.core.task.AsyncTaskExecutor;
-import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.kacademic.app.dto.grade.GradeRequestDTO;
 import com.kacademic.app.dto.grade.GradeResponseDTO;
 import com.kacademic.app.dto.grade.GradeUpdateDTO;
+import com.kacademic.app.helpers.EntityFinder;
+import com.kacademic.app.mapper.RequestMapper;
+import com.kacademic.app.mapper.ResponseMapper;
 import com.kacademic.domain.enums.EGrade;
 import com.kacademic.domain.models.Grade;
-import com.kacademic.domain.models.Professor;
-import com.kacademic.domain.models.Subject;
 import com.kacademic.domain.repositories.EnrolleeRepository;
 import com.kacademic.domain.repositories.GradeRepository;
-import com.kacademic.domain.repositories.ProfessorRepository;
-import com.kacademic.domain.repositories.SubjectRepository;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -32,112 +26,50 @@ public class GradeService {
     
     private final GradeRepository gradeR;
     private final EnrolleeRepository enrolleeR;
-    private final SubjectRepository subjectR;
-    private final ProfessorRepository professorR;  
+    private final RequestMapper requestMapper;
+    private final ResponseMapper responseMapper;
+    private final EntityFinder finder;  
     
     private final SemesterService semesterS;
-
-    private final AsyncTaskExecutor taskExecutor;
     
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<String> createAsync(GradeRequestDTO data) {
-        return CompletableFuture.supplyAsync(() -> {
-            Grade grade = new Grade(
-                findSubject(data.subject()),
-                findProfessor(data.professor()),
-                data.capacity(),
-                data.semester(),
-                data.locate(),
-                data.timetable()
-            );
-    
-            gradeR.save(grade);
-            return "Grade successfully Created: " + grade.getId();
-        }, taskExecutor);
+        Grade grade = requestMapper.toGrade(data);
+
+        gradeR.save(grade);
+        return CompletableFuture.completedFuture("Grade successfully Created: " + grade.getId());
     }
 
-    @Transactional
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<List<GradeResponseDTO>> readAllAsync() {
-        return CompletableFuture.supplyAsync(() -> {
-            return (
-                gradeR.findAllWithTimetables().stream()
-                .map(grade -> new GradeResponseDTO(
-                    grade.getId(),
-                    grade.getSubject().getId(),
-                    grade.getProfessor().getId(),
-                    grade.getCapacity(),
-                    grade.getCurrentStudents(),
-                    grade.getSemester(),
-                    grade.getStatus(),
-                    grade.getLocate(),
-                    grade.getTimetables()
-                ))
-                .collect(Collectors.toList())
-            );
-        }, taskExecutor);
+        return CompletableFuture.completedFuture(responseMapper.toResponseDTOList(gradeR.findAll(), responseMapper::toGradeResponseDTO));
     }
 
-    @Transactional
-    @Async("taskExecutor")
-    public CompletableFuture<GradeResponseDTO> readByIdAsync(UUID id) {
-        return CompletableFuture.supplyAsync(() -> {
-            Grade grade = findGrade(id);
-            
-            return (
-                new GradeResponseDTO(
-                    grade.getId(),
-                    grade.getSubject().getId(),
-                    grade.getProfessor().getId(),
-                    grade.getCapacity(),
-                    grade.getCurrentStudents(),
-                    grade.getSemester(),
-                    grade.getStatus(),
-                    grade.getLocate(),
-                    grade.getTimetables()
-                )
-            );
-        }, taskExecutor);
+    @Async
+    public CompletableFuture<GradeResponseDTO> readByIdAsync(UUID id) {        
+        return CompletableFuture.completedFuture(responseMapper.toGradeResponseDTO(finder.findByIdOrThrow(gradeR.findById(id), "Grade not Found")));
     }
 
-    @Transactional
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<String> updateAsync(UUID id, GradeUpdateDTO data) {
-        return CompletableFuture.supplyAsync(() -> {
-            Grade grade = findGrade(id);
-        
-            data.status().ifPresent(grade::setStatus);
-            if (data.status().isPresent() && data.status().get().equals(EGrade.FINAL)) semesterS.processPartialResults(id);
+        Grade grade = finder.findByIdOrThrow(gradeR.findById(id), "Grade not Found");
     
-            grade.setCurrentStudents(grade.getEnrollees().size()); // Atualiza o Número de Estudantes.
-            
-            gradeR.save(grade);
-            return "Updated Grade";
-        }, taskExecutor);
+        data.status().ifPresent(grade::setStatus);
+        if (data.status().isPresent() && data.status().get().equals(EGrade.FINAL)) semesterS.processPartialResults(id);
+
+        grade.setCurrentStudents(grade.getEnrollees().size()); // Atualiza o Número de Estudantes.
+        
+        gradeR.save(grade);
+        return CompletableFuture.completedFuture("Updated Grade");
     }
 
-    @Transactional
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<String> deleteAsync(UUID id) {
-        return CompletableFuture.supplyAsync(() -> {
-            findGrade(id);
-            
-            enrolleeR.removeGradeFromEnrollees(id);
-            gradeR.deleteById(id);
-            return "Deleted Grade";
-        }, taskExecutor);
-    }
-
-    private Grade findGrade(UUID id) {
-        return gradeR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Grade not Found"));
-    }
-
-    private Subject findSubject(UUID id) {
-        return subjectR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subject not Found"));
-    }
-
-    private Professor findProfessor(UUID id) {
-        return professorR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Professor not Found"));
+        finder.findByIdOrThrow(gradeR.findById(id), "Grade not Found");
+        
+        enrolleeR.removeGradeFromEnrollees(id);
+        gradeR.deleteById(id);
+        return CompletableFuture.completedFuture("Deleted Grade");
     }
 
 }

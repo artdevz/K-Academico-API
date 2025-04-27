@@ -39,7 +39,7 @@ public class StudentService {
 
     @Async
     public CompletableFuture<List<StudentResponseDTO>> readAllAsync() {
-        return CompletableFuture.completedFuture(responseMapper.toStudentResponseDTOList(studentR.findAll()));
+        return CompletableFuture.completedFuture(responseMapper.toResponseDTOList(studentR.findAll(), responseMapper::toStudentResponseDTO));
     }
 
     @Async
@@ -49,7 +49,7 @@ public class StudentService {
         
         return CompletableFuture.completedFuture(new StudentDetailsDTO(
             responseMapper.toStudentResponseDTO(student),
-            responseMapper.toEnrolleeResponseDTOList(student.getEnrollees())
+            responseMapper.toResponseDTOList(student.getEnrollees(), responseMapper::toEnrolleeResponseDTO)
         ));
     }
 

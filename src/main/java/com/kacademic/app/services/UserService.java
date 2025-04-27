@@ -31,14 +31,19 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     private final UserRepository userR;
-    private final EntityFinder entityFinder;
+    private final EntityFinder finder;
     private final RequestMapper requestMapper;
     private final ResponseMapper responseMapper;
     private final RoleRepository roleR;
 
     @Async
     public CompletableFuture<String> createInitialAdmin() {
-        Role adminRole = roleR.findByName("ADMIN").orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Role ADMIN isn't created yet"));
+        Role adminRole = roleR.findByName("ADMIN").orElseGet(() -> {
+            Role role = new Role("ADMIN", "All authorities in K-Academico System");
+            roleR.save(role);
+            return role;
+        });
+        
         ensureEmailIsUnique("admin@gmail.com");
 
         User admin = new User(
@@ -64,19 +69,19 @@ public class UserService {
 
     @Async
     public CompletableFuture<List<UserResponseDTO>> readAllAsync() {
-        return CompletableFuture.completedFuture(responseMapper.toUserResponseDTOList(userR.findAll()));
+        return CompletableFuture.completedFuture(responseMapper.toResponseDTOList(userR.findAll(), responseMapper::toUserResponseDTO));
     }
 
     @Async
     public CompletableFuture<UserResponseDTO> readByIdAsync(UUID id) {
-        User user = entityFinder.findByIdOrThrow(userR.findById(id), "User not Found");
+        User user = finder.findByIdOrThrow(userR.findById(id), "User not Found");
         
         return CompletableFuture.completedFuture(responseMapper.toUserResponseDTO(user));
     }
 
     @Async
     public CompletableFuture<String> updateAsync(UUID id, UserUpdateDTO data) {
-        User user = entityFinder.findByIdOrThrow(userR.findById(id), "User not Found");
+        User user = finder.findByIdOrThrow(userR.findById(id), "User not Found");
         
         data.name().ifPresent(user::setName);
         data.password().ifPresent(password -> user.setPassword(passwordEncoder.encode(password)));
@@ -87,7 +92,7 @@ public class UserService {
 
     @Async
     public CompletableFuture<String> deleteAsync(UUID id) {
-        entityFinder.findByIdOrThrow(userR.findById(id), "User not Found");
+        finder.findByIdOrThrow(userR.findById(id), "User not Found");
         
         userR.deleteById(id);
         return CompletableFuture.completedFuture("Deleted User");

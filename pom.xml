@@ -12,9 +12,9 @@
 
 	<groupId>com.kacademic</groupId>
 	<artifactId>kacademic-api</artifactId>
-	<version>BETA-2.1.0</version>
-	<name>K-Academic</name>
-	<description>K-Academic System</description>
+	<version>BETA-3.0</version>
+	<name>K-Academico</name>
+	<description>K-Academico System</description>
 
 	<properties>
 		<java.version>17</java.version>

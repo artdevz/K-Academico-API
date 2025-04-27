@@ -14,9 +14,9 @@ public class OpenApiConfig {
     
     private static final String SECURITY_SCHEME_NAME = "JWT";
     private static final String AUTH_HEADER_NAME = "Authorization";
-    private static final String API_TITLE = "K-Academic API";
-    private static final String API_VERSION = "BETA 2.1.0";
-    private static final String API_DESCRPTION = "K-Academic API Documentation";
+    private static final String API_TITLE = "K-Academico API";
+    private static final String API_VERSION = "BETA 3.0";
+    private static final String API_DESCRPTION = "K-Academico API Documentation";
 
     @Bean
     public OpenAPI customOpenAPI() {

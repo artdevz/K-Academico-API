@@ -3,9 +3,7 @@ package com.kacademic.app.services;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
-import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -14,6 +12,9 @@ import org.springframework.web.server.ResponseStatusException;
 import com.kacademic.app.dto.attendance.AttendanceRequestDTO;
 import com.kacademic.app.dto.attendance.AttendanceResponseDTO;
 import com.kacademic.app.dto.attendance.AttendanceUpdateDTO;
+import com.kacademic.app.helpers.EntityFinder;
+import com.kacademic.app.mapper.RequestMapper;
+import com.kacademic.app.mapper.ResponseMapper;
 import com.kacademic.domain.models.Attendance;
 import com.kacademic.domain.models.Enrollee;
 import com.kacademic.domain.models.Lesson;
@@ -30,22 +31,19 @@ public class AttendanceService {
     private final AttendanceRepository attendanceR;
     private final EnrolleeRepository enrolleeR;
     private final LessonRepository lessonR;
-    
-    private final AsyncTaskExecutor taskExecutor;
-    
+    private final RequestMapper requestMapper;
+    private final ResponseMapper responseMapper;
+    private final EntityFinder finder;
+        
     @Async
     public CompletableFuture<String> createAsync(AttendanceRequestDTO data) {
-        Enrollee enrollee = findEnrolleeDetails(data.enrollee());
-        Lesson lesson = findLesson(data.lesson());
+        Enrollee enrollee = finder.findByIdOrThrow(enrolleeR.findByIdWithEvaluationsAndAttendances(data.enrollee()), "Enrollee not Found");
+        Lesson lesson = finder.findByIdOrThrow(lessonR.findById(data.lesson()), "Lesson not Found");
 
         ensureAttendanceNotExists(enrollee, lesson);
         ensureSameGrade(enrollee, lesson);
 
-        Attendance attendance = new Attendance(
-            data.isAbsent(),
-            enrollee,
-            lesson
-        );
+        Attendance attendance = requestMapper.toAttendance(data);
         
         attendanceR.save(attendance);
         updateAbsences(attendance.getEnrollee());
@@ -54,68 +52,32 @@ public class AttendanceService {
 
     @Async
     public CompletableFuture<List<AttendanceResponseDTO>> readAllAsync() {
-        return CompletableFuture.completedFuture(
-            attendanceR.findAll().stream()
-            .map(attendance -> new AttendanceResponseDTO(
-                attendance.getId(),
-                attendance.getEnrollee().getId(),
-                attendance.getLesson().getId(),
-                attendance.isAbsent()
-            ))
-            .collect(Collectors.toList())
-        );
+        return CompletableFuture.completedFuture(responseMapper.toResponseDTOList(attendanceR.findAll(), responseMapper::toAttendanceResponseDTO));
     }
 
     @Async
-    public CompletableFuture<AttendanceResponseDTO> readByIdAsync(UUID id) {
-        return CompletableFuture.supplyAsync(() -> {
-            Attendance attendance = findAttendance(id);
-            
-            return(
-                new AttendanceResponseDTO(
-                    attendance.getId(),
-                    attendance.getEnrollee().getId(),
-                    attendance.getLesson().getId(),
-                    attendance.isAbsent()
-                )
-            );
-        }, taskExecutor);
+    public CompletableFuture<AttendanceResponseDTO> readByIdAsync(UUID id) {        
+        return CompletableFuture.completedFuture(responseMapper.toAttendanceResponseDTO(finder.findByIdOrThrow(attendanceR.findById(id), "Attendance not Found")));
     }
 
     @Async
     public CompletableFuture<String> updateAsync(UUID id, AttendanceUpdateDTO data) {
-        return CompletableFuture.supplyAsync(() -> {
-            Attendance attendance = findAttendance(id);
-            
-            data.isAbsent().ifPresent(attendance::setAbsent);
-            if (data.isAbsent().isPresent()) updateAbsences(attendance.getEnrollee());
+        Attendance attendance = finder.findByIdOrThrow(attendanceR.findById(id), "Attendance not Found");
+        
+        data.isAbsent().ifPresent(attendance::setAbsent);
+        if (data.isAbsent().isPresent()) updateAbsences(attendance.getEnrollee());
 
-            attendanceR.save(attendance);
-            return "Updated Attendance";
-        }, taskExecutor);
+        attendanceR.save(attendance);
+        return CompletableFuture.completedFuture("Updated Attendance");
     }
 
     @Async
     public CompletableFuture<String> deleteAsync(UUID id) {
-        return CompletableFuture.supplyAsync(() -> {
-            Attendance attendance = findAttendance(id);
-            
-            attendanceR.deleteById(id);
-            updateAbsences(attendance.getEnrollee());
-            return "Deleted Attendance";
-        }, taskExecutor);
-    }
-
-    private Attendance findAttendance(UUID id) {
-        return attendanceR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Attendance not Found"));
-    }
-
-    private Enrollee findEnrolleeDetails(UUID enrolleeId) {
-        return enrolleeR.findByIdWithEvaluationsAndAttendances(enrolleeId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollee not Found"));
-    }
-
-    private Lesson findLesson(UUID lessonId) {
-        return lessonR.findById(lessonId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not Found"));
+        Attendance attendance = finder.findByIdOrThrow(attendanceR.findById(id), "Attendance not Found");
+        
+        attendanceR.deleteById(id);
+        updateAbsences(attendance.getEnrollee());
+        return CompletableFuture.completedFuture("Deleted Attendance");
     }
 
     private void ensureAttendanceNotExists(Enrollee enrollee, Lesson lesson) {

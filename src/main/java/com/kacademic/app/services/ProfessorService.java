@@ -3,8 +3,10 @@ package com.kacademic.app.services;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+
 import com.kacademic.app.dto.professor.ProfessorRequestDTO;
 import com.kacademic.app.dto.professor.ProfessorResponseDTO;
 import com.kacademic.app.dto.professor.ProfessorUpdateDTO;
@@ -34,7 +36,7 @@ public class ProfessorService {
 
     @Async
     public CompletableFuture<List<ProfessorResponseDTO>> readAllAsync() {
-        return CompletableFuture.completedFuture(responseMapper.toProfessorResponseDTOList(professorR.findAll()));
+        return CompletableFuture.completedFuture(responseMapper.toResponseDTOList(professorR.findAll(), responseMapper::toProfessorResponseDTO));
     }
 
     @Async

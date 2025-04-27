@@ -47,7 +47,7 @@ public class SubjectService {
 
     @Async
     public CompletableFuture<List<SubjectResponseDTO>> readAllAsync() {
-        return CompletableFuture.completedFuture(responseMapper.toSubjectResponseDTOList(subjectR.findAll()));
+        return CompletableFuture.completedFuture(responseMapper.toResponseDTOList(subjectR.findAll(), responseMapper::toSubjectResponseDTO));
     }
 
     @Async

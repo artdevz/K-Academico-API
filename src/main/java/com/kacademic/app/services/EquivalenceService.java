@@ -3,22 +3,20 @@ package com.kacademic.app.services;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
-import org.springframework.core.task.AsyncTaskExecutor;
-import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.kacademic.app.dto.equivalence.EquivalenceDetailsDTO;
 import com.kacademic.app.dto.equivalence.EquivalenceRequestDTO;
 import com.kacademic.app.dto.equivalence.EquivalenceResponseDTO;
 import com.kacademic.app.dto.equivalence.EquivalenceUpdateDTO;
+import com.kacademic.app.helpers.EntityFinder;
+import com.kacademic.app.mapper.RequestMapper;
+import com.kacademic.app.mapper.ResponseMapper;
 import com.kacademic.domain.models.Equivalence;
 import com.kacademic.domain.models.Subject;
 import com.kacademic.domain.repositories.EquivalenceRepository;
-import com.kacademic.domain.repositories.SubjectRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,79 +25,48 @@ import lombok.RequiredArgsConstructor;
 public class EquivalenceService {
     
     private final EquivalenceRepository equivalenceR;
-    private final SubjectRepository subjectR;
-
-    private final AsyncTaskExecutor taskExecutor;
+    private final RequestMapper requestMapper;
+    private final ResponseMapper responseMapper;
+    private final EntityFinder finder;
 
     public CompletableFuture<String> createAsync(EquivalenceRequestDTO data) {
-        return CompletableFuture.supplyAsync(() -> {
-            Equivalence equivalence = new Equivalence(
-                data.name(),
-                data.subjects().stream().map(this::findSubject).toList()
-            );
+        Equivalence equivalence = requestMapper.toEquivalence(data);
 
-            equivalenceR.save(equivalence);
-            return "Equivalence successfully Created: " + equivalence.getId();
-        }, taskExecutor);
+        equivalenceR.save(equivalence);
+        return CompletableFuture.completedFuture("Equivalence successfully Created: " + equivalence.getId());
     }
 
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<List<EquivalenceResponseDTO>> readAllAsync() {
-        return CompletableFuture.supplyAsync(() -> {
-            return (
-                equivalenceR.findAll().stream()
-                .map(equivalence -> new EquivalenceResponseDTO(
-                    equivalence.getId(),
-                    equivalence.getName()
-                ))
-                .collect(Collectors.toList())
-            );
-        }, taskExecutor);
+        return CompletableFuture.completedFuture(responseMapper.toResponseDTOList(equivalenceR.findAll(), responseMapper::toEquivalenceResponseDTO));
     }
 
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<EquivalenceDetailsDTO> readByIdAsync(UUID id) {
-        return CompletableFuture.supplyAsync(() -> {
-            Equivalence equivalence =findEquivalence(id);
-            
-            return (
-                new EquivalenceDetailsDTO(
-                    new EquivalenceResponseDTO(
-                        equivalence.getId(),
-                        equivalence.getName()
-                    ),
-                    equivalence.getSubjects().stream().map(Subject::getId).toList()
-                )
-            );
-        }, taskExecutor);
+        Equivalence equivalence = finder.findByIdOrThrow(equivalenceR.findById(id), "Equivalence not Found");
+        
+        return CompletableFuture.completedFuture(
+            new EquivalenceDetailsDTO(
+                responseMapper.toEquivalenceResponseDTO(equivalence),
+                equivalence.getSubjects().stream().map(Subject::getId).toList()
+            )
+        );
     }
 
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<String> updateAsync(UUID id, EquivalenceUpdateDTO data) {
-        return CompletableFuture.supplyAsync(() -> {
-            Equivalence equivalence = findEquivalence(id);
-                
-            equivalenceR.save(equivalence);
-            return "Updated Equivalence";
-        }, taskExecutor);
-    }
-
-    @Async("taskExecutor")
-    public CompletableFuture<String> deleteAsync(UUID id) {
-        return CompletableFuture.supplyAsync(() -> {
-            findEquivalence(id);
+        Equivalence equivalence = finder.findByIdOrThrow(equivalenceR.findById(id), "Equivalence not Found");
             
-            equivalenceR.deleteById(id);
-            return "Deleted Equivalence";
-        }, taskExecutor);
+        equivalenceR.save(equivalence);
+        return CompletableFuture.completedFuture("Updated Equivalence");
     }
 
-    private Equivalence findEquivalence(UUID id) {
-        return equivalenceR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Equivalence not Found"));
-    }
-
-    private Subject findSubject(UUID id) {
-        return subjectR.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subject not Found"));
+    @Async
+    public CompletableFuture<String> deleteAsync(UUID id) {
+        finder.findByIdOrThrow(equivalenceR.findById(id), "Equivalence not Found");
+        
+        equivalenceR.deleteById(id);
+        return CompletableFuture.completedFuture("Deleted Equivalence");
     }
 
 }
