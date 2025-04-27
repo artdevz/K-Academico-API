@@ -10,8 +10,8 @@
 		<relativePath/>
 	</parent>
 
-	<groupId>com.kacademic</groupId>
-	<artifactId>kacademic-api</artifactId>
+	<groupId>com.kacademico</groupId>
+	<artifactId>kacademico-api</artifactId>
 	<version>BETA-3.0</version>
 	<name>K-Academico</name>
 	<description>K-Academico System</description>
