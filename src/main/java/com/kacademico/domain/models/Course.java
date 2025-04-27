@@ -5,9 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -31,9 +30,11 @@ public class Course implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
+    @Column(unique = true)
     @Size(min=4, max=160, message="Course name must be between 4 and 160 characters")
     private String name;
 
+    @Column(unique = true, nullable = false)
     @Pattern(regexp = "^\\d+$", message = "Course code must contain only numbers")
     @Size(min=3, max=3, message="Course code must contain exactly 3 characters")
     private String code;
@@ -46,7 +47,6 @@ public class Course implements Serializable {
     @OneToMany(mappedBy = "course", cascade = CascadeType.MERGE, orphanRemoval = false)
     private List<Student> students = new ArrayList<>();
 
-    @JsonManagedReference
     @OneToMany(mappedBy = "course", cascade = CascadeType.MERGE, orphanRemoval = false)
     private List<Subject> subjects = new ArrayList<>();
 

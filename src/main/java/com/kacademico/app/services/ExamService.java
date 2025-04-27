@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -28,8 +27,6 @@ public class ExamService {
     private final ResponseMapper responseMapper;
     private final EntityFinder finder;
 
-    private final AsyncTaskExecutor taskExecutor;
-
     @Async
     public CompletableFuture<String> createAsync(ExamRequestDTO data) {
         Exam exam = requestMapper.toExam(data);
@@ -50,22 +47,18 @@ public class ExamService {
 
     @Async
     public CompletableFuture<String> updateAsync(UUID id, ExamUpdateDTO data) {
-        return CompletableFuture.supplyAsync(() -> {
-            Exam exam = finder.findByIdOrThrow(examR.findById(id), "Exam not Found");
-                
-            examR.save(exam);
-            return "Updated Exam";
-        }, taskExecutor);
+        Exam exam = finder.findByIdOrThrow(examR.findById(id), "Exam not Found");
+            
+        examR.save(exam);
+        return CompletableFuture.completedFuture("Updated Exam");
     }
 
     @Async
     public CompletableFuture<String> deleteAsync(UUID id) {
-        return CompletableFuture.supplyAsync(() -> {
-            finder.findByIdOrThrow(examR.findById(id), "Exam not Found");
-            
-            examR.deleteById(id);
-            return "Deleted Exam";
-        }, taskExecutor);
+        finder.findByIdOrThrow(examR.findById(id), "Exam not Found");
+        
+        examR.deleteById(id);
+        return CompletableFuture.completedFuture("Deleted Exam");
     }
 
 }

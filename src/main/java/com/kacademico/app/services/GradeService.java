@@ -4,8 +4,10 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.kacademico.app.dto.grade.GradeRequestDTO;
 import com.kacademico.app.dto.grade.GradeResponseDTO;
@@ -15,9 +17,11 @@ import com.kacademico.app.mapper.RequestMapper;
 import com.kacademico.app.mapper.ResponseMapper;
 import com.kacademico.domain.enums.EGrade;
 import com.kacademico.domain.models.Grade;
+import com.kacademico.domain.models.values.Timetable;
 import com.kacademico.domain.repositories.EnrolleeRepository;
 import com.kacademico.domain.repositories.GradeRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -34,6 +38,8 @@ public class GradeService {
     
     @Async
     public CompletableFuture<String> createAsync(GradeRequestDTO data) {
+        ensureStartTimeIsBeforeEndTime(data.timetable());
+
         Grade grade = requestMapper.toGrade(data);
 
         gradeR.save(grade);
@@ -56,13 +62,12 @@ public class GradeService {
     
         data.status().ifPresent(grade::setStatus);
         if (data.status().isPresent() && data.status().get().equals(EGrade.FINAL)) semesterS.processPartialResults(id);
-
-        grade.setCurrentStudents(grade.getEnrollees().size()); // Atualiza o Número de Estudantes.
         
         gradeR.save(grade);
         return CompletableFuture.completedFuture("Updated Grade");
     }
 
+    @Transactional
     @Async
     public CompletableFuture<String> deleteAsync(UUID id) {
         finder.findByIdOrThrow(gradeR.findById(id), "Grade not Found");
@@ -70,6 +75,19 @@ public class GradeService {
         enrolleeR.removeGradeFromEnrollees(id);
         gradeR.deleteById(id);
         return CompletableFuture.completedFuture("Deleted Grade");
+    }
+
+    private void ensureStartTimeIsBeforeEndTime(List<Timetable> timetables) {
+        timetables.stream()
+            .filter(t -> !t.getStartTime().isBefore(t.getEndTime()))
+            .findFirst()
+            .ifPresent(t -> {
+                String message = String.format(
+                    "Invalid Timetable: StartTime [%s] must be before EndTime [%s]",
+                    t.getStartTime(), t.getEndTime() 
+                );
+                throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, message);
+            });
     }
 
 }

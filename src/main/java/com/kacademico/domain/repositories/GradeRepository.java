@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,8 +17,8 @@ import com.kacademico.shared.utils.Semester;
 @Repository
 public interface GradeRepository extends JpaRepository<Grade, UUID> {
 
-    @Query("SELECT g FROM Grade g LEFT JOIN FETCH g.enrollees WHERE g.id = :id")
-    Optional<Grade> findByIdWithEnrollees(@Param("id") UUID id);
+    @EntityGraph(attributePaths = {"enrollees"})
+    Optional<Grade> findWithEnrolleesById(UUID id);
 
     @Query("SELECT g FROM Grade g WHERE g.semester = :semester AND g.status = :status")
     List<Grade> findAllBySemesterAndStatus(@Param("semester") @Semester String semester, @Param("status") EGrade status);
@@ -25,10 +26,10 @@ public interface GradeRepository extends JpaRepository<Grade, UUID> {
     @Query("SELECT DISTINCT g FROM Grade g LEFT JOIN FETCH g.enrollees WHERE g.semester = :semester AND g.status = :status")
     List<Grade> findAllWithEnrolleesBySemesterAndStatus(@Param("semester") @Semester String semester, @Param("status") EGrade status);
 
-    @Query("SELECT g FROM Grade g LEFT JOIN FETCH g.timetables")
-    List<Grade> findAllWithTimetables();
+    @EntityGraph(attributePaths = {"timetables"})
+    Optional<Grade> findById(UUID id);
 
-    @Query("SELECT g FROM Grade g LEFT JOIN FETCH g.timetables WHERE g.id = :id")
-    Optional<Grade> findByIdWithTimetables(@Param("id") UUID id);
+    @EntityGraph(attributePaths = {"timetables"})
+    List<Grade> findAll();
 
 }

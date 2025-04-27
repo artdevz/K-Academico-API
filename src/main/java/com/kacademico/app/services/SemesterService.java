@@ -43,7 +43,7 @@ public class SemesterService {
     @Async("taskExecutor")
     public CompletableFuture<String> processPartialResults(UUID id) {
         return CompletableFuture.supplyAsync(() -> {
-            Grade grade = gradeR.findByIdWithEnrollees(id).get();
+            Grade grade = gradeR.findWithEnrolleesById(id).get();
     
             grade.getEnrollees().forEach(this::updatePartialStatus);
     

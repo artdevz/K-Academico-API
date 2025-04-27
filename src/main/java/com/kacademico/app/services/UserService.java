@@ -5,11 +5,9 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.kacademico.app.dto.user.UserRequestDTO;
 import com.kacademico.app.dto.user.UserResponseDTO;
@@ -21,6 +19,7 @@ import com.kacademico.domain.models.Role;
 import com.kacademico.domain.models.User;
 import com.kacademico.domain.repositories.RoleRepository;
 import com.kacademico.domain.repositories.UserRepository;
+import com.kacademico.shared.utils.EnsureUniqueUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -44,7 +43,7 @@ public class UserService {
             return role;
         });
         
-        ensureEmailIsUnique("admin@gmail.com");
+        EnsureUniqueUtil.ensureUnique(() -> userR.findByEmail("admin@gmail.com"), () -> "An user with email " + "admin@gmail.com" + " already exists");
 
         User admin = new User(
             "K-Academico Admin",
@@ -59,7 +58,7 @@ public class UserService {
 
     @Async
     public CompletableFuture<String> createAsync(UserRequestDTO data) {
-        ensureEmailIsUnique(data.email());
+        EnsureUniqueUtil.ensureUnique(() -> userR.findByEmail(data.email()), () -> "An user with email " + data.email() + " already exists");
 
         User user = requestMapper.toUser(data);
         
@@ -96,11 +95,6 @@ public class UserService {
         
         userR.deleteById(id);
         return CompletableFuture.completedFuture("Deleted User");
-    }
-    
-    private void ensureEmailIsUnique(String email) {
-        if (userR.findByEmail(email).isPresent()) 
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already being used");
     }
 
 }

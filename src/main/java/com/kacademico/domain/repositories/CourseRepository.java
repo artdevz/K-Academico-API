@@ -15,4 +15,7 @@ public interface CourseRepository extends JpaRepository<Course, UUID> {
     @EntityGraph(attributePaths = {"subjects"})
     Optional<Course> findWithSubjectsById(UUID id);
 
+    Optional<Course> findByCode(String code);
+    Optional<Course> findByName(String name);
+
 }

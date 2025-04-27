@@ -16,6 +16,7 @@ import com.kacademico.app.mapper.RequestMapper;
 import com.kacademico.app.mapper.ResponseMapper;
 import com.kacademico.domain.models.Course;
 import com.kacademico.domain.repositories.CourseRepository;
+import com.kacademico.shared.utils.EnsureUniqueUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,6 +31,9 @@ public class CourseService {
 
     @Async
     public CompletableFuture<String> createAsync(CourseRequestDTO data) {
+        EnsureUniqueUtil.ensureUnique(() -> courseR.findByCode(data.code()), () -> "A course with code " + data.code() + " already exists");
+        EnsureUniqueUtil.ensureUnique(() -> courseR.findByName(data.name()), () -> "A course with name " + data.name() + " already exists");
+        
         Course course = requestMapper.toCourse(data);
 
         courseR.save(course);
@@ -55,9 +59,12 @@ public class CourseService {
 
     @Async
     public CompletableFuture<String> updateAsync(UUID id, CourseUpdateDTO data) {
-        Course course = finder.findByIdOrThrow(courseR.findById(id), "Course not Found"); 
-    
-        data.name().ifPresent(course::setName);
+        Course course = finder.findByIdOrThrow(courseR.findById(id), "Course not Found");
+
+        if (data.name().isPresent()) {
+            EnsureUniqueUtil.ensureUnique(() -> courseR.findByName(data.name().get()), () -> "A course with name " + data.name().get() + " already exists");
+            course.setName(data.name().get());
+        }
         data.description().ifPresent(course::setDescription);
 
         courseR.save(course);

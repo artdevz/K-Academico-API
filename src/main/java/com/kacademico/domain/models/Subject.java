@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -51,7 +49,6 @@ public class Subject implements Serializable {
 
     private boolean isRequired;
 
-    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "course_id")
     private Course course;

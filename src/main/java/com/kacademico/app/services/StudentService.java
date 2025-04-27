@@ -16,6 +16,8 @@ import com.kacademico.app.mapper.RequestMapper;
 import com.kacademico.app.mapper.ResponseMapper;
 import com.kacademico.domain.models.Student;
 import com.kacademico.domain.repositories.StudentRepository;
+import com.kacademico.domain.repositories.UserRepository;
+import com.kacademico.shared.utils.EnsureUniqueUtil;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -25,12 +27,15 @@ import lombok.RequiredArgsConstructor;
 public class StudentService {
     
     private final StudentRepository studentR;
+    private final UserRepository userR;
     private final RequestMapper requestMapper;
     private final ResponseMapper responseMapper;
     private final EntityFinder finder;
 
     @Async
     public CompletableFuture<String> createAsync(StudentRequestDTO data) {
+        EnsureUniqueUtil.ensureUnique(() -> userR.findByEmail(data.user().email()), () -> "An user with email " + data.user().email() + " already exists");
+
         Student student = requestMapper.toStudent(data);
 
         studentR.save(student);
