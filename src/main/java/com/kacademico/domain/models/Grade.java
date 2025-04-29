@@ -8,12 +8,13 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.kacademico.domain.enums.EGrade;
+import com.kacademico.domain.models.values.Schedule;
 import com.kacademico.domain.models.values.Timetable;
-import com.kacademico.shared.utils.Semester;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -44,12 +45,10 @@ public class Grade implements Serializable {
 
     private int currentStudents;
 
-    @Semester
-    private String semester;
-
-    private String locate;
-
     private EGrade status; // Grade Status (PENDING, ONGOING, FINAL, FINISHED)
+
+    @Embedded
+    private Schedule schedule;
 
     @ElementCollection
     @CollectionTable(name = "grade_timetables", joinColumns = @JoinColumn(name = "grade_id"))
@@ -72,15 +71,14 @@ public class Grade implements Serializable {
     @OneToMany(mappedBy = "grade", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Lesson> lessons = new ArrayList<>();
 
-    public Grade(Subject subject, Professor professor, int capacity, String semester, String locate, List<Timetable> timetables) {
+    public Grade(Subject subject, Professor professor, int capacity, Schedule schedule, List<Timetable> timetables) {
         this.capacity = capacity;
         this.currentStudents = 0; // Inicia-se em 0; Irá atulizar a medida que é adicionado novos Estudantes na Turma.
-        this.semester = semester;
-        this.locate = locate;
         this.status = EGrade.PENDING; // Default Start
+        this.schedule = schedule;
+        this.timetables = timetables;
         this.subject = subject;
         this.professor = professor;
-        this.timetables = timetables;
     }    
 
 }

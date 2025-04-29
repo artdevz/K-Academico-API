@@ -125,8 +125,7 @@ public class RequestMapper {
             finder.findByIdOrThrow(subjectR.findById(data.subject()), "Grade not Found"),
             finder.findByIdOrThrow(professorR.findById(data.professor()), "Professor not Found"),
             data.capacity(),
-            data.semester(),
-            data.locate(),
+            data.schedule(),
             data.timetable()
         );
     }

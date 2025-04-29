@@ -59,7 +59,7 @@ public class SemesterService {
     @Async("taskExecutor")
     public CompletableFuture<String> finalizeSemester(@Semester String semester) {
         return CompletableFuture.supplyAsync(() -> {
-            List<Grade> grades = gradeR.findAllWithEnrolleesBySemesterAndStatus(semester, EGrade.FINAL);
+            List<Grade> grades = gradeR.findByScheduleSemesterAndStatus(semester, EGrade.FINAL);
     
             grades.forEach(this::finalizeGrade);
             updateStudentsAvarage();

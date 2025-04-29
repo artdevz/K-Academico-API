@@ -98,9 +98,8 @@ public class ResponseMapper {
             grade.getProfessor().getId(),
             grade.getCapacity(),
             grade.getCurrentStudents(),
-            grade.getSemester(),
             grade.getStatus(),
-            grade.getLocate(),
+            grade.getSchedule(),
             grade.getTimetables()
         );
     }

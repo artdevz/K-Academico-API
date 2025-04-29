@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.kacademico.domain.enums.EGrade;
+import com.kacademico.domain.models.values.Schedule;
 import com.kacademico.domain.models.values.Timetable;
 
 public record GradeResponseDTO(
@@ -12,8 +13,7 @@ public record GradeResponseDTO(
     UUID professor,
     int capacity,
     int currentStudents,
-    String semester,
     EGrade status,
-    String locate,
+    Schedule schedule,
     List<Timetable> timetable
 ) {}
