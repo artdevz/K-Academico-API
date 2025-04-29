@@ -17,6 +17,7 @@ import com.kacademico.app.mapper.RequestMapper;
 import com.kacademico.app.mapper.ResponseMapper;
 import com.kacademico.domain.enums.EGrade;
 import com.kacademico.domain.models.Grade;
+import com.kacademico.domain.models.values.Schedule;
 import com.kacademico.domain.models.values.Timetable;
 import com.kacademico.domain.repositories.EnrolleeRepository;
 import com.kacademico.domain.repositories.GradeRepository;
@@ -39,6 +40,7 @@ public class GradeService {
     @Async
     public CompletableFuture<String> createAsync(GradeRequestDTO data) {
         ensureStartTimeIsBeforeEndTime(data.timetable());
+        ensureTimeTableAndLocateIsNotInEquals(data.schedule(), data.timetable());
 
         Grade grade = requestMapper.toGrade(data);
 
@@ -88,6 +90,22 @@ public class GradeService {
                 );
                 throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, message);
             });
+    }
+
+    private void ensureTimeTableAndLocateIsNotInEquals(Schedule schedule, List<Timetable> newTimetables) {
+        List<Grade> activedLocalGrades = gradeR.findAll().stream()
+            .filter(
+                grade -> grade.getSchedule().getSemester().equals(schedule.getSemester()) &&
+                grade.getSchedule().getLocate().equals(schedule.getLocate())
+            ).toList();
+            
+        List<Timetable> timetables = activedLocalGrades.stream().flatMap(grade -> grade.getTimetables().stream()).toList();
+
+        for (Timetable timetable : timetables) {
+            for (Timetable newTimetable : newTimetables) {
+                if (timetable.conflict(newTimetable, timetable)) throw new ResponseStatusException(HttpStatus.CONFLICT, "Timetable already used");
+            }
+        }
     }
 
 }

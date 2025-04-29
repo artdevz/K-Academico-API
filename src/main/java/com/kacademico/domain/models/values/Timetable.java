@@ -30,6 +30,11 @@ public class Timetable {
     @JsonFormat(pattern = "HH:mm")
     private LocalTime endTime;
 
+    public boolean conflict(Timetable t1, Timetable t2) {
+        if ( (t1.getDay().equals(t2.getDay() )&& ( t1.getStartTime().equals(t2.getStartTime()) || t1.getEndTime().equals(t2.getEndTime()) ) )) return true;
+        return false;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
