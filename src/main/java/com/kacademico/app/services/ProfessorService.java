@@ -53,8 +53,6 @@ public class ProfessorService {
     @Async
     public CompletableFuture<String> updateAsync(UUID id, ProfessorUpdateDTO data) {
         Professor professor = finder.findByIdOrThrow(professorR.findById(id), "Professor not Found");
-
-        data.wage().ifPresent(professor::setWage);
         
         professorR.save(professor);
         return CompletableFuture.completedFuture("Updated Professor");

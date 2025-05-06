@@ -86,8 +86,7 @@ public class ResponseMapper {
         return new ProfessorResponseDTO(
             professor.getId(),
             professor.getName(),
-            professor.getEmail(),
-            professor.getWage()
+            professor.getEmail()
         );
     }
 

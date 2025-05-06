@@ -115,8 +115,7 @@ public class RequestMapper {
             data.user().name(),
             data.user().email(),
             passwordEncoder.encode(data.user().password()),
-            findRoles(data.user().roles()),
-            data.wage()
+            findRoles(data.user().roles())
         );
     }
 

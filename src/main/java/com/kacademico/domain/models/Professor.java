@@ -21,14 +21,11 @@ import lombok.Setter;
 @DiscriminatorValue("PROFESSOR")
 public class Professor extends User {
 
-    private int wage; // Wage in cents (e.g., 1000 cents = 10.00)
-
     @OneToMany(mappedBy = "professor", cascade = CascadeType.PERSIST, orphanRemoval = false)
     private List<Grade> grades = new ArrayList<>();
 
-    public Professor(String name, String email, String password, Set<Role> roles, int wage) {
+    public Professor(String name, String email, String password, Set<Role> roles) {
         super(name, email, password, roles);
-        this.wage = wage;
     }
 
 }
