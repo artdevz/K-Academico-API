@@ -1,6 +1,8 @@
 package com.kacademico.app.services;
 
+import java.time.format.TextStyle;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -40,7 +42,9 @@ public class GradeService {
     @Async
     public CompletableFuture<String> createAsync(GradeRequestDTO data) {
         ensureStartTimeIsBeforeEndTime(data.timetable());
-        ensureTimeTableAndLocateIsNotInEquals(data.schedule(), data.timetable());
+        ensureNoInternalTimetableConflicts(data.timetable());
+        ensureTimeTableAndLocationAreNotConflicting(data.timetable(), data.schedule());
+        ensureProfessorIsAvailableAtTime(data.timetable(), data.schedule(), data.professor());
 
         Grade grade = requestMapper.toGrade(data);
 
@@ -85,27 +89,52 @@ public class GradeService {
             .findFirst()
             .ifPresent(t -> {
                 String message = String.format(
-                    "Invalid Timetable: StartTime [%s] must be before EndTime [%s]",
-                    t.getStartTime(), t.getEndTime() 
+                    "Invalid Timetable: at [%s] StartTime [%s] must be before EndTime [%s]",
+                    t.getDay().getDisplayName(TextStyle.FULL, Locale.ENGLISH), t.getStartTime(), t.getEndTime() 
                 );
                 throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, message);
             });
     }
 
-    private void ensureTimeTableAndLocateIsNotInEquals(Schedule schedule, List<Timetable> newTimetables) {
-        List<Grade> activedLocalGrades = gradeR.findAll().stream()
-            .filter(
-                grade -> grade.getSchedule().getSemester().equals(schedule.getSemester()) &&
-                grade.getSchedule().getLocate().equals(schedule.getLocate())
-            ).toList();
-            
-        List<Timetable> timetables = activedLocalGrades.stream().flatMap(grade -> grade.getTimetables().stream()).toList();
-
-        for (Timetable timetable : timetables) {
-            for (Timetable newTimetable : newTimetables) {
-                if (timetable.conflict(newTimetable, timetable)) throw new ResponseStatusException(HttpStatus.CONFLICT, "Timetable already used");
+    private void ensureNoInternalTimetableConflicts(List<Timetable> timetables) {
+        for (int i = 0; i < timetables.size(); i++) {
+            for (int j = i + 1; j < timetables.size(); j++) {
+                if (timetables.get(i).conflictWith(timetables.get(j))) throw new ResponseStatusException(HttpStatus.CONFLICT, "Conflicting Timetables in request");
             }
         }
+    }
+
+    private void ensureTimeTableAndLocationAreNotConflicting(List<Timetable> newTimetables, Schedule schedule) {
+        List<Grade> gradesAtSameLocation = findGradesBySemesterAndLocation(schedule.getSemester(), schedule.getLocate());
+    
+        checkForTimetableConflicts(gradesAtSameLocation, newTimetables, "Timetable already used at this location");
+    }
+    
+    private void ensureProfessorIsAvailableAtTime(List<Timetable> newTimetables, Schedule schedule, UUID professorId) {
+        List<Grade> gradesWithSameProfessor = findGradesBySemesterAndProfessor(schedule.getSemester(), professorId);
+    
+        checkForTimetableConflicts(gradesWithSameProfessor, newTimetables, "Professor is unavailable at this time");
+    }
+
+    private void checkForTimetableConflicts(List<Grade> grades, List<Timetable> newTimetables, String errorMessage) {
+        for (Grade grade : grades) for (Timetable existing : grade.getTimetables()) for (Timetable incoming : newTimetables)
+            if (existing.conflictWith(incoming)) throw new ResponseStatusException(HttpStatus.CONFLICT, errorMessage);
+    }
+
+    private List<Grade> findGradesBySemesterAndLocation(String semester, String location) {
+        return gradeR.findAll().stream()
+            .filter(grade -> semester.equals(grade.getSchedule().getSemester())
+                && location.equals(grade.getSchedule().getLocate())
+            )
+            .toList();
+    }
+    
+    private List<Grade> findGradesBySemesterAndProfessor(String semester, UUID professorId) {
+        return gradeR.findAll().stream()
+            .filter(grade -> semester.equals(grade.getSchedule().getSemester())
+                && professorId.equals(grade.getProfessor().getId())
+            )
+            .toList();
     }
 
 }
