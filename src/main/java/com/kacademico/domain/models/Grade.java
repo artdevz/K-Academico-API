@@ -10,6 +10,7 @@ import java.util.UUID;
 import com.kacademico.domain.enums.EGrade;
 import com.kacademico.domain.models.values.Schedule;
 import com.kacademico.domain.models.values.Timetable;
+import com.kacademico.infra.entities.SubjectEntity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
@@ -56,7 +57,7 @@ public class Grade implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "subject_id", nullable = false)
-    private Subject subject;
+    private SubjectEntity subject;
 
     @ManyToOne
     @JoinColumn(name = "professor_id", nullable = true)
@@ -71,7 +72,7 @@ public class Grade implements Serializable {
     @OneToMany(mappedBy = "grade", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Lesson> lessons = new ArrayList<>();
 
-    public Grade(Subject subject, Professor professor, int capacity, Schedule schedule, List<Timetable> timetables) {
+    public Grade(SubjectEntity subject, Professor professor, int capacity, Schedule schedule, List<Timetable> timetables) {
         this.capacity = capacity;
         this.currentStudents = 0; // Inicia-se em 0; Irá atulizar a medida que é adicionado novos Estudantes na Turma.
         this.status = EGrade.PENDING; // Default Start

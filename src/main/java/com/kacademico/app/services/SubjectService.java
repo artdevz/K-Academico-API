@@ -19,8 +19,8 @@ import com.kacademico.app.mapper.RequestMapper;
 import com.kacademico.app.mapper.ResponseMapper;
 import com.kacademico.domain.models.Course;
 import com.kacademico.domain.models.Subject;
-import com.kacademico.domain.repositories.CourseRepository;
-import com.kacademico.domain.repositories.SubjectRepository;
+import com.kacademico.domain.repositories.ICourseRepository;
+import com.kacademico.domain.repositories.ISubjectRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,8 +28,8 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class SubjectService {
     
-    private final SubjectRepository subjectR;
-    private final CourseRepository courseR;
+    private final ISubjectRepository subjectR;
+    private final ICourseRepository courseR;
     private final RequestMapper requestMapper;
     private final ResponseMapper responseMapper;
     private final EntityFinder finder;
@@ -39,10 +39,10 @@ public class SubjectService {
     public CompletableFuture<String> createAsync(SubjectRequestDTO data) {
         Subject subject = requestMapper.toSubject(data);
         
-        updateCourseDuration(courseR.findWithSubjectsById(data.course()).get(), data.duration());
-        
-        subjectR.save(subject);
-        return CompletableFuture.completedFuture("Subject successfully Created: " + subject.getId());
+        Subject saved = subjectR.save(subject);
+        updateCourseDuration(subject.getCourse());
+
+        return CompletableFuture.completedFuture("Subject successfully Created: " + saved.getId());
     }
 
     @Async
@@ -53,7 +53,6 @@ public class SubjectService {
     @Async
     public CompletableFuture<SubjectDetailsDTO> readByIdAsync(UUID id) {
         Subject subject = finder.findByIdOrThrow(subjectR.findById(id), "Subject not Found");
-        
         return CompletableFuture.completedFuture(
             new SubjectDetailsDTO(
                 responseMapper.toSubjectResponseDTO(subject),
@@ -83,15 +82,19 @@ public class SubjectService {
     public CompletableFuture<String> deleteAsync(UUID id) {
         Subject subject = finder.findByIdOrThrow(subjectR.findById(id), "Subject not Found");
 
-        updateCourseDuration(subject.getCourse(), subject.getDuration() * (-1)); // -1 for REMOVE
-
         subjectR.deleteById(id);
+        updateCourseDuration(subject.getCourse());
+
         return CompletableFuture.completedFuture("Deleted Subject");
     }
 
-    private void updateCourseDuration(Course course, int duration) {
-        course.setDuration(course.getDuration() + duration);
+    private void updateCourseDuration(Course course) {
+        System.out.println("Attualizando");
+        int duration = course.getSubjects().stream()
+            .mapToInt(Subject::getDuration).sum();
+        course.setDuration(duration);
         courseR.save(course);
+        System.out.println("Atualizado");
     }
 
 }

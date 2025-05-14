@@ -1,77 +1,65 @@
 package com.kacademico.domain.models;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+public class Subject {
 
-@Getter
-@Setter
-@NoArgsConstructor
-@Table(name="subjects")
-@Entity
-public class Subject implements Serializable {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;    
-
-    @Size(max=128)
     private String name;
-    
-    @Size(max=255)
     private String description;
-    
-    @Min(40)
-    @Max(80)
     private int duration;
-
-    @Min(1)
     private int semester;
-
     private boolean isRequired;
-
-    @ManyToOne
-    @JoinColumn(name = "course_id")
+    
     private Course course;
-
-    @OneToMany(mappedBy = "subject")
-    private List<Grade> grades = new ArrayList<>();
-
-    @ManyToMany(cascade = CascadeType.MERGE)
-    @JoinTable(
-        name = "subject_prerequisite_groups",
-        joinColumns = @JoinColumn(name = "subject_id"),
-        inverseJoinColumns = @JoinColumn(name = "prerequisites_id")
-    )
+    
+    private List<Grade> grades = new ArrayList<>();    
     private List<Equivalence> prerequisites = new ArrayList<>();
 
-    public Subject(String name, String description, int duration, int semester, boolean isRequired, Course course, List<Equivalence> prerequisites) {
-        this.name = name;
-        this.description = description;
-        this.duration = duration;
-        this.semester = semester;
-        this.isRequired = isRequired;        
+    public Subject() {}
+
+    public Subject(UUID id, String name, String description, int duration, int semester, boolean isRequired, Course course) {
+        this.id = id;
+        setName(name);
+        setDescription(description);
+        setDuration(duration);
+        setSemester(semester);
+        setRequired(isRequired);
         this.course = course;
-        this.prerequisites = prerequisites;
-    }    
+    }
+    
+    public UUID getId() { return id; }
+    public String getName() { return name; }
+    public String getDescription() { return description; }
+    public int getDuration() { return duration; }
+    public int getSemester() { return semester; }
+    public boolean isRequired() { return isRequired; }
+    public Course getCourse() { return course; }
+    public List<Grade> getGrades() { return grades; }
+    public List<Equivalence> getPrerequisites() { return prerequisites; }
+
+    public void setName(String name) {
+        if (name == null || name.length() > 128) throw new IllegalArgumentException("Name must be at most 256 characters"); 
+        this.name = name;
+    }
+
+    public void setDescription(String description) {
+        if (description == null || description.length() > 256) throw new IllegalArgumentException("Description must be at most 256 characters"); 
+        this.description = description;
+    }
+
+    private void setDuration(int duration) {
+        if (duration < 40 || duration > 80) throw new IllegalArgumentException("Subject duration must be between 40 and 80 hours");
+        this.duration = duration;
+    }
+
+    private void setSemester(int semester) {
+        if (semester < 1) throw new IllegalArgumentException("Semester cannot be less than 1");
+        this.semester = semester;
+    }
+
+    public void setRequired(boolean isRequired) { this.isRequired = isRequired; }
 
 }

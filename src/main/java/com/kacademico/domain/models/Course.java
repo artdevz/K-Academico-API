@@ -1,60 +1,64 @@
 package com.kacademico.domain.models;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+public class Course {
 
-@Getter
-@Setter
-@NoArgsConstructor
-@Table(name="courses")
-@Entity
-public class Course implements Serializable {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
-
-    @Column(unique = true)
-    @Size(min=4, max=160, message="Course name must be between 4 and 160 characters")
     private String name;
-
-    @Column(unique = true, nullable = false)
-    @Pattern(regexp = "^\\d+$", message = "Course code must contain only numbers")
-    @Size(min=3, max=3, message="Course code must contain exactly 3 characters")
     private String code;
-    
-    private int duration; // In Hours.
-
-    @Size(max=256)
     private String description;
+    private int duration; // Medido em horas
 
-    @OneToMany(mappedBy = "course", cascade = CascadeType.MERGE, orphanRemoval = false)
     private List<Student> students = new ArrayList<>();
-
-    @OneToMany(mappedBy = "course", cascade = CascadeType.MERGE, orphanRemoval = false)
     private List<Subject> subjects = new ArrayList<>();
 
-    public Course(String name, String code, String description) {
+    public Course() {}
+
+    public Course(UUID id, String name, String code, String description, int duration) {
+        this.id = id;
+        setName(name);
+        setCode(code);
+        setDescription(description);
+        setDuration(duration);
+    }
+
+    public UUID getId() { return id; }
+    public String getName() { return name; }
+    public String getCode() { return code; }
+    public int getDuration() { return duration; }
+    public String getDescription() { return description; }
+    public List<Student> getStudents() { return students; }
+    public List<Subject> getSubjects() { return subjects; }
+
+    public void setName(String name) {
+        if (name == null || name.length() < 8 || name.length() > 128) {
+            throw new IllegalArgumentException("Course name must be between 8 and 128 characters");
+        }
         this.name = name;
+    }
+
+    public void setCode(String code) {
+        if (code == null || !code.matches("^\\d{3}$")) {
+            throw new IllegalArgumentException("Course code must contain exactly 3 digits");
+        }
         this.code = code;
-        this.duration = 0;
+    }
+
+    public void setDescription(String description) {
+        if (description == null || description.length() > 255) {
+            throw new IllegalArgumentException("Description must be at most 255 characters");
+        }
         this.description = description;
+    }
+
+    public void setDuration(int duration) {
+        if (duration < 0) {
+            throw new IllegalArgumentException("Duration must be non-negative");
+        }
+        this.duration = duration;
     }
 
 }

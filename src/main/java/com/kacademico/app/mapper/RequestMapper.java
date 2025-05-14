@@ -37,16 +37,18 @@ import com.kacademico.domain.models.Role;
 import com.kacademico.domain.models.Student;
 import com.kacademico.domain.models.Subject;
 import com.kacademico.domain.models.User;
-import com.kacademico.domain.repositories.CourseRepository;
 import com.kacademico.domain.repositories.EnrolleeRepository;
 import com.kacademico.domain.repositories.EquivalenceRepository;
 import com.kacademico.domain.repositories.ExamRepository;
 import com.kacademico.domain.repositories.GradeRepository;
+import com.kacademico.domain.repositories.ICourseRepository;
 import com.kacademico.domain.repositories.LessonRepository;
 import com.kacademico.domain.repositories.ProfessorRepository;
 import com.kacademico.domain.repositories.RoleRepository;
 import com.kacademico.domain.repositories.StudentRepository;
-import com.kacademico.domain.repositories.SubjectRepository;
+import com.kacademico.domain.repositories.ISubjectRepository;
+import com.kacademico.infra.mapper.CourseEntityMapper;
+import com.kacademico.infra.mapper.SubjectEntityMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -57,8 +59,8 @@ public class RequestMapper {
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final EntityFinder finder;
 
-    private final CourseRepository courseR;
-    private final SubjectRepository subjectR;
+    private final ICourseRepository courseR;
+    private final ISubjectRepository subjectR;
     private final StudentRepository studentR;
     private final ProfessorRepository professorR;
     private final GradeRepository gradeR;
@@ -72,9 +74,11 @@ public class RequestMapper {
 
     public Course toCourse(CourseRequestDTO data) {
         return new Course(
+            null,
             data.name(),
             data.code(),
-            data.description()
+            data.description(),
+            0
         );
     }
 
@@ -89,13 +93,14 @@ public class RequestMapper {
 
     public Subject toSubject(SubjectRequestDTO data) {
         return new Subject(
+            null,
             data.name(),
             data.description(),
             data.duration(),
             data.semester(),
             data.isRequired(),
-            finder.findByIdOrThrow(courseR.findById(data.course()), "Course not Found"),
-            findEquivalences(data.prerequisites())
+            finder.findByIdOrThrow(courseR.findById(data.course()), "Course not Found")
+            // findEquivalences(data.prerequisites())
         );
     }
 
@@ -106,7 +111,7 @@ public class RequestMapper {
             passwordEncoder.encode(data.user().password()),
             findRoles(data.user().roles()),
             enrollmentGS.generate(finder.findByIdOrThrow(courseR.findById(data.course()), "Course not Found").getCode()),
-            finder.findByIdOrThrow(courseR.findById(data.course()), "Course not Found")
+            CourseEntityMapper.toEntity(finder.findByIdOrThrow(courseR.findById(data.course()), "Course not Found"))
         );
     }
 
@@ -121,7 +126,7 @@ public class RequestMapper {
 
     public Grade toGrade(GradeRequestDTO data) {
         return new Grade(
-            finder.findByIdOrThrow(subjectR.findById(data.subject()), "Grade not Found"),
+            SubjectEntityMapper.toEntity(finder.findByIdOrThrow(subjectR.findById(data.subject()), "Grade not Found")),
             finder.findByIdOrThrow(professorR.findById(data.professor()), "Professor not Found"),
             data.capacity(),
             data.schedule(),
@@ -172,7 +177,7 @@ public class RequestMapper {
     public Equivalence toEquivalence(EquivalenceRequestDTO data) {
         return new Equivalence(
             data.name(),
-            data.subjects().stream().map(id -> finder.findByIdOrThrow(subjectR.findById(id), "Subject not Found")).toList()
+            data.subjects().stream().map(id -> SubjectEntityMapper.toEntity(finder.findByIdOrThrow(subjectR.findById(id), "Subject not Found"))).toList()
         );
     }
 

@@ -11,12 +11,14 @@ public class AsyncResultHandler {
 
     public static <T> T await(CompletableFuture<T> future) {
         try {
+            System.out.println("Chegou em Try");
             return future.join();
         } 
         catch (CompletionException e) {
             Throwable cause = e.getCause();
-
+            System.out.println("Chegou!");
             // if (cause instanceof AccessDeniedException) throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access Denied", cause);
+            if (cause instanceof IllegalArgumentException iae) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, iae.getMessage());
             if (cause instanceof ResponseStatusException rse) throw rse;
             if (cause instanceof AuthenticationException) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid Credentials");
             

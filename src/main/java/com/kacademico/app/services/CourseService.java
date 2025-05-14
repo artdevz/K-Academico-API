@@ -15,7 +15,7 @@ import com.kacademico.app.helpers.EntityFinder;
 import com.kacademico.app.mapper.RequestMapper;
 import com.kacademico.app.mapper.ResponseMapper;
 import com.kacademico.domain.models.Course;
-import com.kacademico.domain.repositories.CourseRepository;
+import com.kacademico.domain.repositories.ICourseRepository;
 import com.kacademico.shared.utils.EnsureUniqueUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -24,31 +24,33 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class CourseService {
     
-    private final CourseRepository courseR;
+    private final ICourseRepository courseR;
     private final EntityFinder finder;
     private final RequestMapper requestMapper;
     private final ResponseMapper responseMapper;
 
     @Async
     public CompletableFuture<String> createAsync(CourseRequestDTO data) {
-        EnsureUniqueUtil.ensureUnique(() -> courseR.findByCode(data.code()), () -> "A course with code " + data.code() + " already exists");
+        EnsureUniqueUtil.ensureUnique(() -> courseR.findByCode(data.code()), () -> "A course with code " + data.code() + " already exists");        
         EnsureUniqueUtil.ensureUnique(() -> courseR.findByName(data.name()), () -> "A course with name " + data.name() + " already exists");
-        
-        Course course = requestMapper.toCourse(data);
 
-        courseR.save(course);
-        return CompletableFuture.completedFuture("Course successfully Created: " + course.getId());
+        Course course = requestMapper.toCourse(data);
+        Course saved = courseR.save(course);
+
+        return CompletableFuture.completedFuture("Course successfully Created: " + saved.getId());
     }
 
     @Async
     public CompletableFuture<List<CourseResponseDTO>> readAllAsync() {
-        return CompletableFuture.completedFuture(responseMapper.toResponseDTOList(courseR.findAll(), responseMapper::toCourseResponseDTO));
+        List<Course> courses = courseR.findAll();
+        List<CourseResponseDTO> response = responseMapper.toResponseDTOList(courses, responseMapper::toCourseResponseDTO);
+        return CompletableFuture.completedFuture(response);
     }
 
     @Async
     public CompletableFuture<CourseDetailsDTO> readByIdAsync(UUID id) {
         Course course = finder.findByIdOrThrow(courseR.findWithSubjectsById(id), "Course not Found");
-            
+        System.out.println("Course.subjects: " + course.getSubjects());
         return CompletableFuture.completedFuture(
             new CourseDetailsDTO(
                 responseMapper.toCourseResponseDTO(course),

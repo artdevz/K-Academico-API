@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.kacademico.domain.models.values.Enrollment;
+import com.kacademico.infra.entities.CourseEntity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.DiscriminatorValue;
@@ -38,12 +39,12 @@ public class Student extends User {
 
     @ManyToOne
     @JoinColumn(name = "course_id")
-    private Course course; 
+    private CourseEntity course; 
 
     @OneToMany(mappedBy = "student", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     private List<Enrollee> enrollees = new ArrayList<>();
         
-    public Student(String name, String email, String password, Set<Role> roles, Enrollment enrollment, Course course) {
+    public Student(String name, String email, String password, Set<Role> roles, Enrollment enrollment, CourseEntity course) {
         super(name, email, password, roles);
         this.credits = 0;
         this.average = 0; // Default Value = 0
