@@ -2,45 +2,36 @@ package com.kacademico.domain.models;
 
 import java.util.UUID;
 
-import org.springframework.security.core.GrantedAuthority;
+public class Role {
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+    private static final int MAX_NAME_LENGTH = 20;
+    private static final int MIN_NAME_LENGTH = 4;
+    private static final int MAX_DESCRIPTION_LENGTH = 255;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@Table(name = "roles")
-@Entity
-public class Role implements GrantedAuthority {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
-
-    @Column(nullable = false, unique = true)
-    @Size(min = 4, max = 20, message = "Role name must be between 4 and 20 characters")
     private String name;
-
-    @Size(max = 255, message = "Description cannot exceed 255 characters")
     private String description;
 
-    public Role(String name, String description) {
-        this.name = name;
-        this.description = description;
+    public Role() {};
+
+    public Role(UUID id, String name, String description) {
+        this.id = id;
+        setName(name);
+        setDesciption(description);
     }
 
-    @Override
-    public String getAuthority() {
-        return this.name;
+    public UUID getId() { return id; }
+    public String getName() { return name; }
+    public String getDescription() { return description; }
+
+    public void setName(String name) {
+        if (name.length() < MIN_NAME_LENGTH || name.length() > MAX_NAME_LENGTH) throw new IllegalArgumentException("Role name must be between " + MIN_NAME_LENGTH + " and " + MAX_NAME_LENGTH + " characters");
+        this.name = name;
+    }
+
+    public void setDesciption(String description) {
+        if (description.length() < MAX_DESCRIPTION_LENGTH) throw new IllegalArgumentException("Description cannot exceed " + MAX_DESCRIPTION_LENGTH + "characters");
+        this.description = description;
     }
 
     /*

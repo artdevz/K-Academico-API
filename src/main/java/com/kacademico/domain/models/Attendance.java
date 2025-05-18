@@ -2,43 +2,28 @@ package com.kacademico.domain.models;
 
 import java.util.UUID;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-@Getter
-@Setter
-@NoArgsConstructor
-@Table(name = "attendances")
-@Entity
 public class Attendance {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
 
+    private UUID id;
     private boolean isAbsent;
 
-    @ManyToOne(cascade = CascadeType.MERGE)
-    @JoinColumn(name = "enrollee_id", referencedColumnName = "id")
     private Enrollee enrollee;
-
-    @ManyToOne(cascade = CascadeType.MERGE)
-    @JoinColumn(name = "lesson_id", referencedColumnName = "id")
     private Lesson lesson;
 
-    public Attendance(boolean isAbsent, Enrollee enrollee, Lesson lesson) {
-        this.isAbsent = isAbsent;
+    public Attendance() {};
+
+    public Attendance(UUID id, boolean isAbsent, Enrollee enrollee, Lesson lesson) {
+        this.id = id;
+        setAbsent(isAbsent);
         this.enrollee = enrollee;
         this.lesson = lesson;
     }
+
+    public UUID getId() { return id; }
+    public boolean isAbsent() { return isAbsent; }
+    public Enrollee getEnrollee() { return enrollee; }
+    public Lesson getLesson() { return lesson; }
+
+    public void setAbsent(boolean isAbsent) { this.isAbsent = isAbsent; }
 
 }

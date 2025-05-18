@@ -1,12 +1,8 @@
 package com.kacademico.infra.entities;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import com.kacademico.domain.models.Equivalence;
-import com.kacademico.domain.models.Grade;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -31,7 +27,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 @Table(name = "subjects")
-public class SubjectEntity implements Serializable {
+public class SubjectEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -52,7 +48,7 @@ public class SubjectEntity implements Serializable {
     private CourseEntity course;
 
     @OneToMany(mappedBy = "subject")
-    private List<Grade> grades = new ArrayList<>();
+    private List<GradeEntity> grades = new ArrayList<>();
 
     @ManyToMany(cascade = CascadeType.MERGE)
     @JoinTable(
@@ -60,6 +56,6 @@ public class SubjectEntity implements Serializable {
         joinColumns = @JoinColumn(name = "subject_id"),
         inverseJoinColumns = @JoinColumn(name = "prerequisites_id")
     )
-    private List<Equivalence> prerequisites = new ArrayList<>();
+    private List<EquivalenceEntity> prerequisites = new ArrayList<>();
 
 }

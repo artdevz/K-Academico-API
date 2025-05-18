@@ -1,60 +1,48 @@
 package com.kacademico.domain.models;
 
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.kacademico.domain.enums.ELesson;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+public class Lesson {
 
-@Getter
-@Setter
-@NoArgsConstructor
-@Table(name = "lessons")
-@Entity
-public class Lesson implements Serializable {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    private static final int MAX_TOPIC_LENGTH = 32;
+
     private UUID id;
-
-    @Size(max=32)
     private String topic;
-
-    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
-
     private ELesson status; // (UPCOMING, PENDING)
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-    @JoinColumn(name = "grade.id", nullable = false)
     private Grade grade;
 
-    @OneToMany(mappedBy = "lesson")
     private Set<Attendance> attendances = new HashSet<>();
 
-    public Lesson(String topic, LocalDate date, Grade grade) {
-        this.topic = topic;
-        this.date = date;
-        this.status = ELesson.UPCOMING; // Default Status
+    public Lesson() {};
+
+    public Lesson(UUID id, String topic, LocalDate date, ELesson status, Grade grade) {
+        this.id = id;
+        setTopic(topic);
+        setDate(date);
+        setStatus(status);
         this.grade = grade;
     }
+
+    public UUID getId() { return id; }
+    public String getTopic() { return topic; }
+    public LocalDate getDate() { return date; }
+    public ELesson getStatus() { return status; }
+    public Grade getGrade() { return grade; }
+    public Set<Attendance> getAttendances() { return attendances; }
+
+    public void setTopic(String topic) {
+        if (topic.length() > MAX_TOPIC_LENGTH) throw new IllegalArgumentException("Topic cannot be most than " + MAX_TOPIC_LENGTH + "characters");
+        this.topic = topic;
+    }
+
+    public void setDate(LocalDate date) { this.date = date; }
+    public void setStatus(ELesson status) { this.status = status; }
 
 }

@@ -1,6 +1,5 @@
 package com.kacademico.domain.models;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -10,76 +9,75 @@ import java.util.UUID;
 import com.kacademico.domain.enums.EGrade;
 import com.kacademico.domain.models.values.Schedule;
 import com.kacademico.domain.models.values.Timetable;
-import com.kacademico.infra.entities.SubjectEntity;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.CollectionTable;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.Min;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+public class Grade {
 
-@Getter
-@Setter
-@NoArgsConstructor
-@Table(name = "grades")
-@Entity
-public class Grade implements Serializable {
+    private static final int MIN_CAPACITY = 20;
+    private static final int MIN_CURRENT_STUDENTS = 0;
     
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
-
-    @Min(20)
     private int capacity;
-
     private int currentStudents;
-
     private EGrade status; // Grade Status (PENDING, ONGOING, FINAL, FINISHED)
 
-    @Embedded
     private Schedule schedule;
 
-    @ElementCollection
-    @CollectionTable(name = "grade_timetables", joinColumns = @JoinColumn(name = "grade_id"))
     private List<Timetable> timetables = new ArrayList<>();
 
-    @ManyToOne
-    @JoinColumn(name = "subject_id", nullable = false)
-    private SubjectEntity subject;
-
-    @ManyToOne
-    @JoinColumn(name = "professor_id", nullable = true)
+    private Subject subject;
     private Professor professor;
 
-    @OneToMany(mappedBy = "grade", cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
     private Set<Enrollee> enrollees = new HashSet<>();
-
-    @OneToMany(mappedBy = "grade", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Exam> exams = new ArrayList<>();
-
-    @OneToMany(mappedBy = "grade", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Lesson> lessons = new ArrayList<>();
 
-    public Grade(SubjectEntity subject, Professor professor, int capacity, Schedule schedule, List<Timetable> timetables) {
-        this.capacity = capacity;
-        this.currentStudents = 0; // Inicia-se em 0; Irá atulizar a medida que é adicionado novos Estudantes na Turma.
-        this.status = EGrade.PENDING; // Default Start
-        this.schedule = schedule;
-        this.timetables = timetables;
+    public Grade() {};
+
+    public Grade(UUID id, Subject subject, Professor professor, int capacity, int currentStudents, EGrade status, Schedule schedule, List<Timetable> timetables) {
+        this.id = id;
+        setCapacity(capacity);
+        setCurrentStudents(currentStudents);
+        this.status = status;
+        setSchedule(schedule);
+        setTimetable(timetables);
         this.subject = subject;
+        setProfessor(professor);
+    }
+    
+    public UUID getId() { return id; }
+    public int getCapacity() { return capacity; }
+    public int getCurrentStudents() { return currentStudents; }
+    public EGrade getStatus() { return status; }
+    public Schedule getSchedule() { return schedule; }
+    public List<Timetable> getTimetable() { return timetables; }
+    public Subject getSubject() { return subject; }
+    public Professor getProfessor() { return professor; }
+    public Set<Enrollee> getEnrollees() { return enrollees; }
+    public List<Exam> getExams() { return exams; }
+    public List<Lesson> getLessons() { return lessons; }
+
+    public void setCapacity(int capacity) {
+        if (capacity < MIN_CAPACITY) throw new IllegalArgumentException("Capacity cannot be less than " + MIN_CAPACITY);
+        this.capacity = capacity;
+    }
+
+    public void setCurrentStudents(int currentStudents) {
+        if (this.status == EGrade.FINISHED) throw new IllegalArgumentException("Cannot update a grade that is already finished");
+        if (currentStudents < MIN_CURRENT_STUDENTS) throw new IllegalArgumentException("Current Students cannot be negative");
+        if (currentStudents > this.capacity) throw new IllegalArgumentException("Cannot enroll more students: maximum capacity has been reached: " + this.capacity);
+        this.currentStudents = currentStudents;
+    }
+
+    public void setSchedule(Schedule schedule) {
+        this.schedule = schedule;
+    }
+
+    public void setTimetable(List<Timetable> timetables) {
+        this.timetables = timetables;
+    }
+
+    public void setProfessor(Professor professor) {
         this.professor = professor;
-    }    
+    }
 
 }

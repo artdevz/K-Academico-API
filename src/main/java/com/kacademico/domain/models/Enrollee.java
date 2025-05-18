@@ -1,64 +1,67 @@
 package com.kacademico.domain.models;
 
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
 import com.kacademico.domain.enums.EEnrollee;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.Max;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+public class Enrollee {
 
-@Getter
-@Setter
-@NoArgsConstructor
-@Table(name = "enrollees")
-@Entity
-public class Enrollee implements Serializable {
+    private static final float MAX_PERCENTAGEM_ABSENCES = 0.25f;
+    private static final float MAX_AVERAGE = 10f;
+    private static final float MIN_AVERAGE = 0f;
+    private static final int MIN_ABSENCES = 0;
         
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
-
     private int absences;
-    
-    @Max(10)
     private float average;
-    
     private EEnrollee status; // Student Status (Enrolled, APPROVED, FINAL_EXAM, FAILED) 
 
-    @ManyToOne(cascade = CascadeType.MERGE)
-    @JoinColumn(name = "grade_id", referencedColumnName = "id", nullable = true)
     private Grade grade;
-
-    @ManyToOne
-    @JoinColumn(name = "student_id", referencedColumnName = "id", nullable = false)
     private Student student;
 
-    @OneToMany(mappedBy = "enrollee")
     private Set<Evaluation> evaluations = new HashSet<>();
-
-    @OneToMany(mappedBy = "enrollee")
     private Set<Attendance> attendances = new HashSet<>();
 
-    public Enrollee(Grade grade, Student student) {
-        this.absences = 0; // Default Value = 0
-        this.average = 0; // Default Value = 0
-        this.status = EEnrollee.ENROLLED; // Default Status
+    public Enrollee() {};
+
+    public Enrollee(UUID id, Grade grade, Student student) {
+        this.id = id;
+        setAbsences(absences);
+        setAverage(average);
+        setStatus(status);
         this.grade = grade;
         this.student = student;
+    }
+
+    public UUID getId() { return id; }
+    public int getAbsences() { return absences; }
+    public float getAverage() { return average; }
+    public EEnrollee getStatus() { return status; }
+    public Grade getGrade() { return grade; }
+    public Student getStudent() { return student; }
+    public Set<Evaluation> getEvaluations() { return evaluations; }
+    public Set<Attendance> getAttendances() { return attendances; }
+
+    public void setAbsences(int absences) {
+        if (absences < MIN_ABSENCES) throw new IllegalArgumentException("Absences cannot be negative");
+        this.absences = absences;
+        updateStatusByAbsences();        
+    }
+
+    public void setAverage(float average) {
+        if (average < MIN_AVERAGE || average > MAX_AVERAGE) throw new IllegalArgumentException("Average must be between " + MIN_AVERAGE + " and " + MAX_AVERAGE);
+        this.average = average;
+    }
+
+    public void setStatus(EEnrollee status) {
+        this.status = status;
+    }
+
+    private void updateStatusByAbsences() {
+        int maxAbsences = this.grade.getSubject().getDuration();
+        if (this.absences > (int) Math.floor(maxAbsences * MAX_PERCENTAGEM_ABSENCES)) this.status = EEnrollee.FAILED;
     }
 
 }

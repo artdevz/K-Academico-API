@@ -6,6 +6,13 @@ import java.util.UUID;
 
 public class Subject {
 
+    private static final int MAX_NAME_LENGTH = 128;
+    private static final int MIN_NAME_LENGTH = 8;
+    private static final int MAX_DESCRIPTION_LENGTH = 256;
+    private static final int MAX_DURATION = 80;
+    private static final int MIN_DURATION = 40;
+    private static final int MIN_SEMESTER = 1;
+
     private UUID id;    
     private String name;
     private String description;
@@ -41,22 +48,22 @@ public class Subject {
     public List<Equivalence> getPrerequisites() { return prerequisites; }
 
     public void setName(String name) {
-        if (name == null || name.length() > 128) throw new IllegalArgumentException("Name must be at most 256 characters"); 
+        if (name == null || name.length() < MIN_NAME_LENGTH || name.length() > MAX_NAME_LENGTH) throw new IllegalArgumentException("Name must be between " + MIN_NAME_LENGTH + "and" + MAX_NAME_LENGTH + " characters"); 
         this.name = name;
     }
 
     public void setDescription(String description) {
-        if (description == null || description.length() > 256) throw new IllegalArgumentException("Description must be at most 256 characters"); 
+        if (description == null || description.length() > MAX_DESCRIPTION_LENGTH) throw new IllegalArgumentException("Description must be at most " + MAX_DESCRIPTION_LENGTH + " characters"); 
         this.description = description;
     }
 
     private void setDuration(int duration) {
-        if (duration < 40 || duration > 80) throw new IllegalArgumentException("Subject duration must be between 40 and 80 hours");
+        if (duration < MIN_DURATION || duration > MAX_DURATION) throw new IllegalArgumentException("Subject duration must be between " + MIN_DURATION + " and " + MAX_DURATION + " hours");
         this.duration = duration;
     }
 
     private void setSemester(int semester) {
-        if (semester < 1) throw new IllegalArgumentException("Semester cannot be less than 1");
+        if (semester < MIN_SEMESTER) throw new IllegalArgumentException("Semester cannot be less than " + MIN_SEMESTER);
         this.semester = semester;
     }
 

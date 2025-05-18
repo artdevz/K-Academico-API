@@ -1,87 +1,61 @@
 package com.kacademico.domain.models;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+public class User {
 
-import jakarta.persistence.Column;
-import jakarta.persistence.DiscriminatorColumn;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.InheritanceType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+    private static final int MAX_NAME_LENGTH = 48;
+    private static final int MIN_NAME_LENGTH = 3;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@Table(name = "users")
-@Entity
-@Inheritance(strategy = InheritanceType.JOINED)
-@DiscriminatorColumn(name = "user_type")
-public class User implements UserDetails {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
-
-    @Size(min=3, max=48, message="Name must be between 3 and 48 characters")
     private String name;
-
-    @Column(unique = true, nullable = false)
-    @Email(message = "Must be a well-formed email address")
     private String email;
-    
     private String password;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-    @Fetch(FetchMode.JOIN)
     private Set<Role> roles;
 
-    public User(String name, String email, String password, Set<Role> roles) {
+    public User() {}
+
+    public User(UUID id, String name, String email, String password, Set<Role> roles) {
+        this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
         this.roles = roles;
     }
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<GrantedAuthority> authorities = roles.stream()
-            .map(role -> new SimpleGrantedAuthority(role.getName()))
-            .collect(Collectors.toList());
+    public UUID getId() { return id; }
+    public String getName() { return name; }
+    public String getEmail() { return email; }
+    public String getPassword() { return password; }
+    public Set<Role> getRoles() { return roles; }
 
-        return authorities;
+    public void setName(String name) { 
+        if (name.length() < MIN_NAME_LENGTH || name.length() > MAX_NAME_LENGTH) throw new IllegalArgumentException("Name must be between " + MIN_NAME_LENGTH + " and " + MAX_NAME_LENGTH + " characters");
+        this.name = name; 
     }
 
-    @Override
-    public String getPassword() {
-        return this.password;
+    public void setEmail(String email) {
+        validateEmail(email); 
+        this.email = email; 
     }
 
-    @Override
-    public String getUsername() {
-        return this.email;
+    public void setPassword(String password) {
+        validatePassword(password);
+        this.password = password; 
+    }
+
+    public void setRoles(Set<Role> roles) { this.roles = roles; }
+
+    private void validateEmail(String email) {
+        String regex = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$";
+        if ( !(email.matches(regex)) ) throw new IllegalArgumentException("Must be a well-formed email address");
+    }
+
+    private void validatePassword(String password) {
+        String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,32}$";
+        if ( !(password.matches(regex)) ) throw new IllegalArgumentException("The password must contain at least one lowercase letter, one uppercase letter, one number, one special character, and be between 8 and 32 characters");
     }
     
 }
