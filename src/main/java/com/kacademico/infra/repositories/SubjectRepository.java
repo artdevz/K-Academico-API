@@ -10,6 +10,7 @@ import com.kacademico.domain.models.Subject;
 import com.kacademico.domain.repositories.ISubjectRepository;
 import com.kacademico.infra.entities.SubjectEntity;
 import com.kacademico.infra.mapper.SubjectEntityMapper;
+import com.kacademico.infra.repositories.jpa.SubjectJpaRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,20 +18,20 @@ import lombok.RequiredArgsConstructor;
 @Repository
 public class SubjectRepository implements ISubjectRepository {
 
-    private final JpaSubjectRepository jpa;
+    private final SubjectJpaRepository jpa;
+
+    @Override
+    public List<Subject> findAll() {
+        return jpa.findAll().stream()
+            .map(SubjectEntityMapper::toDomain)
+            .toList();
+    }
 
 	@Override
 	public Optional<Subject> findById(UUID id) {
         jpa.findById(id).map(SubjectEntityMapper::toDomain).get();
 
         return jpa.findById(id).map(SubjectEntityMapper::toDomain);
-    }
-
-	@Override
-	public List<Subject> findAll() {
-        return jpa.findAll().stream()
-            .map(SubjectEntityMapper::toDomain)
-            .toList();
     }
 
 	@Override

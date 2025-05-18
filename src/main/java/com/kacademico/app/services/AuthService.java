@@ -16,7 +16,7 @@ import com.kacademico.app.dto.auth.AuthRequestDTO;
 import com.kacademico.app.dto.auth.AuthResponseDTO;
 import com.kacademico.domain.models.Token;
 import com.kacademico.domain.models.User;
-import com.kacademico.domain.repositories.UserRepository;
+import com.kacademico.domain.repositories.IUserRepository;
 import com.kacademico.infra.security.JwtService;
 
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class AuthService {
     
-    private final UserRepository userR;
+    private final IUserRepository userR;
     private final JwtService jwtS;
     private final TokenService tokenS;
     private final AuthenticationManager authenticationManager;

@@ -1,4 +1,4 @@
-package com.kacademico.domain.repositories;
+package com.kacademico.infra.repositories.jpa;
 
 import java.util.List;
 import java.util.Optional;
@@ -6,25 +6,23 @@ import java.util.UUID;
 
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
 import com.kacademico.domain.enums.EGrade;
-import com.kacademico.domain.models.Grade;
+import com.kacademico.infra.entities.GradeEntity;
 import com.kacademico.shared.utils.Semester;
 
-@Repository
-public interface GradeRepository extends JpaRepository<Grade, UUID> {
+public interface GradeJpaRepository extends JpaRepository<GradeEntity, UUID> {
+    
+    @EntityGraph(attributePaths = {"enrollees"})
+    Optional<GradeEntity> findWithEnrolleesById(UUID id);
 
     @EntityGraph(attributePaths = {"enrollees"})
-    Optional<Grade> findWithEnrolleesById(UUID id);
-
-    @EntityGraph(attributePaths = {"enrollees"})
-    List<Grade> findByScheduleSemesterAndStatus(@Semester String semester, EGrade status);
+    List<GradeEntity> findByScheduleSemesterAndStatus(@Semester String semester, EGrade status);
 
     @EntityGraph(attributePaths = {"timetables"})
-    Optional<Grade> findById(UUID id);
+    Optional<GradeEntity> findById(UUID id);
 
     @EntityGraph(attributePaths = {"timetables"})
-    List<Grade> findAll();
+    List<GradeEntity> findAll();
 
 }

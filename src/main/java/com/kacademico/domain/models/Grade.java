@@ -37,7 +37,7 @@ public class Grade {
         this.id = id;
         setCapacity(capacity);
         setCurrentStudents(currentStudents);
-        this.status = status;
+        setStatus(status);
         setSchedule(schedule);
         setTimetable(timetables);
         this.subject = subject;
@@ -49,7 +49,7 @@ public class Grade {
     public int getCurrentStudents() { return currentStudents; }
     public EGrade getStatus() { return status; }
     public Schedule getSchedule() { return schedule; }
-    public List<Timetable> getTimetable() { return timetables; }
+    public List<Timetable> getTimetables() { return timetables; }
     public Subject getSubject() { return subject; }
     public Professor getProfessor() { return professor; }
     public Set<Enrollee> getEnrollees() { return enrollees; }
@@ -66,6 +66,10 @@ public class Grade {
         if (currentStudents < MIN_CURRENT_STUDENTS) throw new IllegalArgumentException("Current Students cannot be negative");
         if (currentStudents > this.capacity) throw new IllegalArgumentException("Cannot enroll more students: maximum capacity has been reached: " + this.capacity);
         this.currentStudents = currentStudents;
+    }
+
+    public void setStatus(EGrade status) {
+        this.setStatus(status);
     }
 
     public void setSchedule(Schedule schedule) {

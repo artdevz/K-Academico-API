@@ -15,8 +15,8 @@ import com.kacademico.app.helpers.EntityFinder;
 import com.kacademico.app.mapper.RequestMapper;
 import com.kacademico.app.mapper.ResponseMapper;
 import com.kacademico.domain.models.Equivalence;
+import com.kacademico.domain.models.Subject;
 import com.kacademico.domain.repositories.EquivalenceRepository;
-import com.kacademico.infra.entities.SubjectEntity;
 
 import lombok.RequiredArgsConstructor;
 
@@ -48,7 +48,7 @@ public class EquivalenceService {
         return CompletableFuture.completedFuture(
             new EquivalenceDetailsDTO(
                 responseMapper.toEquivalenceResponseDTO(equivalence),
-                equivalence.getSubjects().stream().map(SubjectEntity::getId).toList()
+                equivalence.getSubjects().stream().map(Subject::getId).toList()
             )
         );
     }

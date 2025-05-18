@@ -1,4 +1,4 @@
-package com.kacademico.domain.repositories;
+package com.kacademico.infra.repositories.jpa;
 
 import java.util.List;
 import java.util.Optional;
@@ -8,20 +8,18 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
-import com.kacademico.domain.models.Student;
+import com.kacademico.infra.entities.StudentEntity;
 
-@Repository
-public interface StudentRepository extends JpaRepository<Student, UUID> {
-
+public interface StudentJpaRepository extends JpaRepository<StudentEntity, UUID> {
+    
     @Query("SELECT s.enrollment.value FROM Student s WHERE s.enrollment.value LIKE CONCAT(:prefix, '%')")
     Set<String> findAllEnrollmentsByPrefix(@Param("prefix") String prefix);
 
     @Query("SELECT s FROM Student s LEFT JOIN FETCH s.enrollees")
-    List<Student> findAllWithEnrollees();
+    List<StudentEntity> findAllWithEnrollees();
 
     @Query("SELECT s FROM Student s LEFT JOIN FETCH s.enrollees WHERE s.id = :id")
-    Optional<Student> findByIdWithEnrollees(@Param("id") UUID id);
+    Optional<StudentEntity> findByIdWithEnrollees(@Param("id") UUID id);
 
 }

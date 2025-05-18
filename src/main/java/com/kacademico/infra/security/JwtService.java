@@ -17,8 +17,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.kacademico.domain.models.User;
-import com.kacademico.domain.repositories.UserRepository;
+import com.kacademico.domain.repositories.IUserRepository;
 import com.kacademico.infra.configs.JwtConfig;
+import com.kacademico.infra.entities.UserEntity;
+import com.kacademico.infra.mapper.UserEntityMapper;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -31,7 +33,7 @@ import lombok.RequiredArgsConstructor;
 public class JwtService {
     
     private final JwtConfig jwtConfig;
-    private final UserRepository userR;
+    private final IUserRepository userR;
 
     public String generateAccessToken(User user) {
         Map<String, Object> extraClaims = new HashMap<>();
@@ -90,7 +92,7 @@ public class JwtService {
             .parseClaimsJws(token)
             .getBody();
         
-        User userDetails = findUserByEmail(claims.getSubject());
+        UserEntity userDetails = UserEntityMapper.toEntity(findUserByEmail(claims.getSubject()));
         List<GrantedAuthority> authorities = new ArrayList<>(userDetails.getAuthorities());
         Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
         SecurityContextHolder.getContext().setAuthentication(authentication);

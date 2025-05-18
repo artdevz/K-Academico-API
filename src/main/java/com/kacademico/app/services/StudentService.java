@@ -16,7 +16,7 @@ import com.kacademico.app.mapper.RequestMapper;
 import com.kacademico.app.mapper.ResponseMapper;
 import com.kacademico.domain.models.Student;
 import com.kacademico.domain.repositories.StudentRepository;
-import com.kacademico.domain.repositories.UserRepository;
+import com.kacademico.domain.repositories.IUserRepository;
 import com.kacademico.shared.utils.EnsureUniqueUtil;
 
 import jakarta.transaction.Transactional;
@@ -27,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 public class StudentService {
     
     private final StudentRepository studentR;
-    private final UserRepository userR;
+    private final IUserRepository userR;
     private final RequestMapper requestMapper;
     private final ResponseMapper responseMapper;
     private final EntityFinder finder;

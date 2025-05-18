@@ -23,6 +23,7 @@ public class RoleService {
     @Async
     public CompletableFuture<String> createAsync(RoleRequestDTO data) {
         Role role = new Role(
+            null,
             data.name(),
             data.description()
         );

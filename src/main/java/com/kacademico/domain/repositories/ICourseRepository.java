@@ -8,12 +8,13 @@ import com.kacademico.domain.models.Course;
 
 public interface ICourseRepository {
 
+    List<Course> findAll();
     Optional<Course> findById(UUID id);
+    Course save(Course course);
+    void deleteById(UUID id);
+
     Optional<Course> findByCode(String code);
     Optional<Course> findByName(String name);
     Optional<Course> findWithSubjectsById(UUID id);
-    List<Course> findAll();
-    Course save(Course course);
-    void deleteById(UUID id);
 
 }

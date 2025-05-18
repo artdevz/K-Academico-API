@@ -1,4 +1,4 @@
-package com.kacademico.domain.repositories;
+package com.kacademico.infra.repositories.jpa;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -6,14 +6,12 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
-import com.kacademico.domain.models.Exam;
+import com.kacademico.infra.entities.ExamEntity;
 
-@Repository
-public interface ExamRepository extends JpaRepository<Exam, UUID> {
-
+public interface ExamJpaRepository extends JpaRepository<ExamEntity, UUID> {
+    
     @Query("SELECT e FROM Exam e JOIN FETCH e.grade WHERE e.id = :id")
-    Optional<Exam> findByIdWithGrade(@Param("id") UUID id);
+    Optional<ExamEntity> findByIdWithGrade(@Param("id") UUID id);
 
 }

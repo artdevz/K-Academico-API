@@ -11,16 +11,15 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.kacademico.domain.models.User;
-import com.kacademico.domain.repositories.UserRepository;
+import com.kacademico.domain.repositories.IUserRepository;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final UserRepository userR;
-
-    public CustomUserDetailsService(UserRepository userR) {
-        this.userR = userR;
-    }
+    private final IUserRepository userR;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

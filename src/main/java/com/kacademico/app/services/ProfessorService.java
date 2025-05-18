@@ -15,7 +15,7 @@ import com.kacademico.app.mapper.RequestMapper;
 import com.kacademico.app.mapper.ResponseMapper;
 import com.kacademico.domain.models.Professor;
 import com.kacademico.domain.repositories.ProfessorRepository;
-import com.kacademico.domain.repositories.UserRepository;
+import com.kacademico.domain.repositories.IUserRepository;
 import com.kacademico.shared.utils.EnsureUniqueUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 public class ProfessorService {
         
     private final ProfessorRepository professorR;
-    private final UserRepository userR;
+    private final IUserRepository userR;
     private final RequestMapper requestMapper;
     private final ResponseMapper responseMapper;
     private final EntityFinder finder;

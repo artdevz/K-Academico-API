@@ -1,16 +1,18 @@
 package com.kacademico.domain.repositories;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
 import com.kacademico.domain.models.User;
 
-@Repository
-public interface UserRepository extends JpaRepository<User, UUID> {
+public interface IUserRepository {
     
+    List<User> findAll();
+    Optional<User> findById(UUID id);
+    User save(User user);
+    void deleteById(UUID id);
+
     Optional<User> findByEmail(String email);
 
 }

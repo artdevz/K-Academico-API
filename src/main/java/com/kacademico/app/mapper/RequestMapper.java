@@ -24,6 +24,8 @@ import com.kacademico.app.dto.subject.SubjectRequestDTO;
 import com.kacademico.app.dto.user.UserRequestDTO;
 import com.kacademico.app.helpers.EntityFinder;
 import com.kacademico.app.services.EnrollmentGeneratorService;
+import com.kacademico.domain.enums.EGrade;
+import com.kacademico.domain.enums.ELesson;
 import com.kacademico.domain.models.Attendance;
 import com.kacademico.domain.models.Course;
 import com.kacademico.domain.models.Enrollee;
@@ -47,8 +49,6 @@ import com.kacademico.domain.repositories.ProfessorRepository;
 import com.kacademico.domain.repositories.RoleRepository;
 import com.kacademico.domain.repositories.StudentRepository;
 import com.kacademico.domain.repositories.ISubjectRepository;
-import com.kacademico.infra.mapper.CourseEntityMapper;
-import com.kacademico.infra.mapper.SubjectEntityMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -84,6 +84,7 @@ public class RequestMapper {
 
     public User toUser(UserRequestDTO data) {
         return new User(
+            null,
             data.name(),
             data.email(),
             passwordEncoder.encode(data.password()),
@@ -106,17 +107,21 @@ public class RequestMapper {
 
     public Student toStudent(StudentRequestDTO data) {
         return new Student(
+            null,
             data.user().name(),
             data.user().email(),
-            passwordEncoder.encode(data.user().password()),
+            data.user().password(),
             findRoles(data.user().roles()),
+            0, // DEFAULT STARTER VALUE
+            0, // DEFAULT STARTER VALUE
             enrollmentGS.generate(finder.findByIdOrThrow(courseR.findById(data.course()), "Course not Found").getCode()),
-            CourseEntityMapper.toEntity(finder.findByIdOrThrow(courseR.findById(data.course()), "Course not Found"))
+            finder.findByIdOrThrow(courseR.findById(data.course()), "Course not Found")
         );
     }
 
     public Professor toProfessor(ProfessorRequestDTO data) {
         return new Professor(
+            null,
             data.user().name(),
             data.user().email(),
             passwordEncoder.encode(data.user().password()),
@@ -126,9 +131,12 @@ public class RequestMapper {
 
     public Grade toGrade(GradeRequestDTO data) {
         return new Grade(
-            SubjectEntityMapper.toEntity(finder.findByIdOrThrow(subjectR.findById(data.subject()), "Grade not Found")),
+            null,
+            finder.findByIdOrThrow(subjectR.findById(data.subject()), "Grade not Found"),
             finder.findByIdOrThrow(professorR.findById(data.professor()), "Professor not Found"),
             data.capacity(),
+            0, // DEFAULT STARTER VALUE
+            EGrade.PENDING,
             data.schedule(),
             data.timetable()
         );
@@ -136,6 +144,7 @@ public class RequestMapper {
 
     public Enrollee toEnrollee(EnrolleeRequestDTO data) {
         return new Enrollee(
+            null,
             finder.findByIdOrThrow(gradeR.findById(data.grade()), "Grade not Found"),
             finder.findByIdOrThrow(studentR.findById(data.student()), "Student not Found")
         );
@@ -143,6 +152,7 @@ public class RequestMapper {
 
     public Exam toExam(ExamRequestDTO data) {
         return new Exam(
+            null,
             data.name(),
             data.maximum(),
             data.date(),
@@ -152,6 +162,7 @@ public class RequestMapper {
 
     public Evaluation toEvaluation(EvaluationRequestDTO data) {
         return new Evaluation(
+            null,
             data.score(),
             finder.findByIdOrThrow(enrolleeR.findById(data.enrollee()), "Enrollee not Found"),
             finder.findByIdOrThrow(examR.findById(data.exam()), "Exam not Found")
@@ -160,14 +171,17 @@ public class RequestMapper {
 
     public Lesson toLesson(LessonRequestDTO data) {
         return new Lesson(
+            null,
             data.topic(),
             data.date(),
+            ELesson.UPCOMING, // DEFAULT STARTER VALUE
             finder.findByIdOrThrow(gradeR.findById(data.grade()), "Grade not Found")
         );
     }
 
     public Attendance toAttendance(AttendanceRequestDTO data) {
         return new Attendance(
+            null,
             data.isAbsent(),
             finder.findByIdOrThrow(enrolleeR.findById(data.enrollee()), "Enrollee not Found"),
             finder.findByIdOrThrow(lessonR.findById(data.lesson()), "Lesson not Found")
@@ -176,8 +190,9 @@ public class RequestMapper {
 
     public Equivalence toEquivalence(EquivalenceRequestDTO data) {
         return new Equivalence(
+            null,
             data.name(),
-            data.subjects().stream().map(id -> SubjectEntityMapper.toEntity(finder.findByIdOrThrow(subjectR.findById(id), "Subject not Found"))).toList()
+            data.subjects().stream().map(id -> (finder.findByIdOrThrow(subjectR.findById(id), "Subject not Found"))).toList()
         );
     }
 

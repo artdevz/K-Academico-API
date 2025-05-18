@@ -18,7 +18,7 @@ import com.kacademico.app.mapper.ResponseMapper;
 import com.kacademico.domain.models.Role;
 import com.kacademico.domain.models.User;
 import com.kacademico.domain.repositories.RoleRepository;
-import com.kacademico.domain.repositories.UserRepository;
+import com.kacademico.domain.repositories.IUserRepository;
 import com.kacademico.shared.utils.EnsureUniqueUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ public class UserService {
     
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    private final UserRepository userR;
+    private final IUserRepository userR;
     private final EntityFinder finder;
     private final RequestMapper requestMapper;
     private final ResponseMapper responseMapper;
@@ -38,7 +38,7 @@ public class UserService {
     @Async
     public CompletableFuture<String> createInitialAdmin() {
         Role adminRole = roleR.findByName("ADMIN").orElseGet(() -> {
-            Role role = new Role("ADMIN", "All authorities in K-Academico System");
+            Role role = new Role(null, "ADMIN", "All authorities in K-Academico System");
             roleR.save(role);
             return role;
         });
@@ -46,6 +46,7 @@ public class UserService {
         EnsureUniqueUtil.ensureUnique(() -> userR.findByEmail("admin@gmail.com"), () -> "An user with email " + "admin@gmail.com" + " already exists");
 
         User admin = new User(
+            null,
             "K-Academico Admin",
             "admin@gmail.com",
             passwordEncoder.encode("4bcdefG!"),

@@ -1,4 +1,4 @@
-package com.kacademico.domain.repositories;
+package com.kacademico.infra.repositories.jpa;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -6,14 +6,12 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
-import com.kacademico.domain.models.Lesson;
+import com.kacademico.infra.entities.LessonEntity;
 
-@Repository
-public interface LessonRepository extends JpaRepository<Lesson, UUID> {
-
+public interface LessonJpaRepository extends JpaRepository<LessonEntity, UUID> {
+    
     @Query("SELECT l FROM Lesson l JOIN FETCH l.grade WHERE l.id = :id")
-    Optional<Lesson> findByIdWithGrade(@Param("id") UUID id);
+    Optional<LessonEntity> findByIdWithGrade(@Param("id") UUID id);
 
 }
