@@ -13,9 +13,9 @@ import com.kacademico.domain.enums.EGrade;
 import com.kacademico.domain.models.Enrollee;
 import com.kacademico.domain.models.Grade;
 import com.kacademico.domain.models.Student;
-import com.kacademico.domain.repositories.EnrolleeRepository;
-import com.kacademico.domain.repositories.GradeRepository;
-import com.kacademico.domain.repositories.StudentRepository;
+import com.kacademico.domain.repositories.IEnrolleeRepository;
+import com.kacademico.domain.repositories.IGradeRepository;
+import com.kacademico.domain.repositories.IStudentRepository;
 import com.kacademico.shared.utils.Semester;
 
 import lombok.RequiredArgsConstructor;
@@ -28,9 +28,9 @@ public class SemesterService {
     private final float PARTIAL_THRESHOLD = 5f;
     private final float FINAL_THRESHOLD = 3f;
 
-    private final GradeRepository gradeR;
-    private final StudentRepository studentR;
-    private final EnrolleeRepository enrolleeR;
+    private final IGradeRepository gradeR;
+    private final IStudentRepository studentR;
+    private final IEnrolleeRepository enrolleeR;
 
     private final AsyncTaskExecutor taskExecutor;
 

@@ -21,8 +21,8 @@ import com.kacademico.domain.enums.EGrade;
 import com.kacademico.domain.models.Grade;
 import com.kacademico.domain.models.values.Schedule;
 import com.kacademico.domain.models.values.Timetable;
-import com.kacademico.domain.repositories.EnrolleeRepository;
-import com.kacademico.domain.repositories.GradeRepository;
+import com.kacademico.domain.repositories.IEnrolleeRepository;
+import com.kacademico.domain.repositories.IGradeRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -31,8 +31,8 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class GradeService {
     
-    private final GradeRepository gradeR;
-    private final EnrolleeRepository enrolleeR;
+    private final IGradeRepository gradeR;
+    private final IEnrolleeRepository enrolleeR;
     private final RequestMapper requestMapper;
     private final ResponseMapper responseMapper;
     private final EntityFinder finder;  

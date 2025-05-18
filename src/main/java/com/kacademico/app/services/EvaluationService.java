@@ -18,9 +18,9 @@ import com.kacademico.app.mapper.ResponseMapper;
 import com.kacademico.domain.models.Enrollee;
 import com.kacademico.domain.models.Evaluation;
 import com.kacademico.domain.models.Exam;
-import com.kacademico.domain.repositories.EnrolleeRepository;
-import com.kacademico.domain.repositories.EvaluationRepository;
-import com.kacademico.domain.repositories.ExamRepository;
+import com.kacademico.domain.repositories.IEnrolleeRepository;
+import com.kacademico.domain.repositories.IEvaluationRepository;
+import com.kacademico.domain.repositories.IExamRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,9 +28,9 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class EvaluationService {
     
-    private final EvaluationRepository evaluationR;
-    private final EnrolleeRepository enrolleeR;
-    private final ExamRepository examR;
+    private final IEvaluationRepository evaluationR;
+    private final IEnrolleeRepository enrolleeR;
+    private final IExamRepository examR;
     private final RequestMapper requestMapper;
     private final ResponseMapper responseMapper;
     private final EntityFinder finder;

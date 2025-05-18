@@ -22,7 +22,7 @@ public class UserRepository implements IUserRepository {
 
     @Override
     public List<User> findAll() {
-        return jpa.findAll().stream().map(UserEntityMapper::toBaseDomain).toList();
+        return jpa.findAll().stream().map(UserEntityMapper::toDomain).toList();
     }
 
     @Override

@@ -6,8 +6,8 @@ import com.kacademico.domain.models.Course;
 import com.kacademico.infra.entities.CourseEntity;
 
 public class CourseEntityMapper {
-    
-    public static Course toBaseDomain(CourseEntity entity) {
+
+    public static Course toDomain(CourseEntity entity, boolean details) {
         if (entity == null) return null;
         Course course = new Course(
             entity.getId(),
@@ -17,20 +17,9 @@ public class CourseEntityMapper {
             entity.getDuration()
         );
 
-        return course;
-    }
-
-    public static Course toDomain(CourseEntity entity) {
-        if (entity == null) return null;
-        Course course = new Course(
-            entity.getId(),
-            entity.getName(),
-            entity.getCode(),
-            entity.getDescription(),
-            entity.getDuration()
-        );
-
-        if (entity.getSubjects() != null) course.getSubjects().addAll(entity.getSubjects().stream().map(SubjectEntityMapper::toDomain).collect(Collectors.toList()));  
+        if (details) {
+            if (entity.getSubjects() != null) course.getSubjects().addAll(entity.getSubjects().stream().map(subject -> SubjectEntityMapper.toDomain(subject, false)).collect(Collectors.toList()));  
+        } 
               
         return course;
     }

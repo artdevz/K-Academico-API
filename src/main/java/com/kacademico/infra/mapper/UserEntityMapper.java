@@ -6,19 +6,6 @@ import com.kacademico.domain.models.User;
 import com.kacademico.infra.entities.UserEntity;
 
 public class UserEntityMapper {
-    
-    public static User toBaseDomain(UserEntity entity) {
-        if (entity == null) return null;
-        User user = new User(
-            entity.getId(),
-            entity.getName(),
-            entity.getEmail(),
-            entity.getPassword(),
-            entity.getRoles().stream().map(RoleEntityMapper::toBaseDomain).collect(Collectors.toSet())
-        );
-
-        return user;
-    }
 
     public static User toDomain(UserEntity entity) {
         if (entity == null) return null;
@@ -27,7 +14,7 @@ public class UserEntityMapper {
             entity.getName(),
             entity.getEmail(),
             entity.getPassword(),
-            entity.getRoles().stream().map(RoleEntityMapper::toBaseDomain).collect(Collectors.toSet())
+            entity.getRoles().stream().map(RoleEntityMapper::toDomain).collect(Collectors.toSet())
         );
 
         return user;

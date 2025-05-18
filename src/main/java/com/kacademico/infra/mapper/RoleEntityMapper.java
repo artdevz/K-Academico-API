@@ -5,7 +5,7 @@ import com.kacademico.infra.entities.RoleEntity;
 
 public class RoleEntityMapper {
     
-    public static Role toBaseDomain(RoleEntity entity) {
+    public static Role toDomain(RoleEntity entity) {
         if (entity == null) return null;
         Role role = new Role(
             entity.getId(),

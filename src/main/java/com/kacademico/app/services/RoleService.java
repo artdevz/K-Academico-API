@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import com.kacademico.app.dto.role.RoleRequestDTO;
 import com.kacademico.app.dto.role.RoleResponseDTO;
 import com.kacademico.domain.models.Role;
-import com.kacademico.domain.repositories.RoleRepository;
+import com.kacademico.domain.repositories.IRoleRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class RoleService {
     
-    private final RoleRepository roleR;
+    private final IRoleRepository roleR;
 
     @Async
     public CompletableFuture<String> createAsync(RoleRequestDTO data) {

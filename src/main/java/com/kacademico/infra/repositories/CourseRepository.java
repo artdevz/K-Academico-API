@@ -22,12 +22,12 @@ public class CourseRepository implements ICourseRepository {
 
     @Override
     public List<Course> findAll() {
-        return jpa.findAll().stream().map(CourseEntityMapper::toBaseDomain).toList();
+        return jpa.findAll().stream().map(entity -> CourseEntityMapper.toDomain(entity, false)).toList();
     }
 
     @Override
     public Optional<Course> findById(UUID id) {
-        return jpa.findById(id).map(CourseEntityMapper::toDomain);
+        return jpa.findById(id).map(entity -> CourseEntityMapper.toDomain(entity, true));
     }
     
     @Override
@@ -35,7 +35,7 @@ public class CourseRepository implements ICourseRepository {
         CourseEntity entity = CourseEntityMapper.toEntity(course);
         CourseEntity saved = jpa.save(entity);
         
-        return CourseEntityMapper.toDomain(saved);
+        return CourseEntityMapper.toDomain(saved, true);
     }
     
     @Override
@@ -45,19 +45,19 @@ public class CourseRepository implements ICourseRepository {
     
     @Override
     public Optional<Course> findByCode(String code) {
-        return jpa.findByCode(code).map(CourseEntityMapper::toDomain);
+        return jpa.findByCode(code).map(entity -> CourseEntityMapper.toDomain(entity, true));
     }
 
     @Override
     public Optional<Course> findByName(String name) {
-        return jpa.findByName(name).map(CourseEntityMapper::toDomain);
+        return jpa.findByName(name).map(entity -> CourseEntityMapper.toDomain(entity, true));
     }
 
     @Override
     public Optional<Course> findWithSubjectsById(UUID id) {
-        Course course = jpa.findWithSubjectsById(id).map(CourseEntityMapper::toDomain).get();
+        Course course = jpa.findWithSubjectsById(id).map(entity -> CourseEntityMapper.toDomain(entity, true)).get();
         System.out.println("CourseRepository: Course.subjects: " + course.getSubjects());
-        return jpa.findWithSubjectsById(id).map(CourseEntityMapper::toDomain);
+        return jpa.findWithSubjectsById(id).map(entity -> CourseEntityMapper.toDomain(entity, true));
     }
 
 }

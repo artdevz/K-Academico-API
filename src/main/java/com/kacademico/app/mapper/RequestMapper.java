@@ -1,6 +1,6 @@
 package com.kacademico.app.mapper;
 
-import java.util.List;
+// import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -39,15 +39,15 @@ import com.kacademico.domain.models.Role;
 import com.kacademico.domain.models.Student;
 import com.kacademico.domain.models.Subject;
 import com.kacademico.domain.models.User;
-import com.kacademico.domain.repositories.EnrolleeRepository;
-import com.kacademico.domain.repositories.EquivalenceRepository;
-import com.kacademico.domain.repositories.ExamRepository;
-import com.kacademico.domain.repositories.GradeRepository;
+import com.kacademico.domain.repositories.IEnrolleeRepository;
+// import com.kacademico.domain.repositories.IEquivalenceRepository;
+import com.kacademico.domain.repositories.IExamRepository;
+import com.kacademico.domain.repositories.IGradeRepository;
 import com.kacademico.domain.repositories.ICourseRepository;
-import com.kacademico.domain.repositories.LessonRepository;
-import com.kacademico.domain.repositories.ProfessorRepository;
-import com.kacademico.domain.repositories.RoleRepository;
-import com.kacademico.domain.repositories.StudentRepository;
+import com.kacademico.domain.repositories.ILessonRepository;
+import com.kacademico.domain.repositories.IProfessorRepository;
+import com.kacademico.domain.repositories.IRoleRepository;
+import com.kacademico.domain.repositories.IStudentRepository;
 import com.kacademico.domain.repositories.ISubjectRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -61,14 +61,14 @@ public class RequestMapper {
 
     private final ICourseRepository courseR;
     private final ISubjectRepository subjectR;
-    private final StudentRepository studentR;
-    private final ProfessorRepository professorR;
-    private final GradeRepository gradeR;
-    private final EnrolleeRepository enrolleeR;
-    private final ExamRepository examR;
-    private final LessonRepository lessonR;
-    private final EquivalenceRepository equivalenceR;
-    private final RoleRepository roleR;
+    private final IStudentRepository studentR;
+    private final IProfessorRepository professorR;
+    private final IGradeRepository gradeR;
+    private final IEnrolleeRepository enrolleeR;
+    private final IExamRepository examR;
+    private final ILessonRepository lessonR;
+    // private final IEquivalenceRepository equivalenceR;
+    private final IRoleRepository roleR;
     
     private final EnrollmentGeneratorService enrollmentGS;
 
@@ -196,11 +196,12 @@ public class RequestMapper {
         );
     }
 
+    /*
     private List<Equivalence> findEquivalences(List<UUID> equivalences) {
         return equivalences.stream()
             .map(id -> finder.findByIdOrThrow(equivalenceR.findById(id), "Equivalence not Found"))
         .collect(Collectors.toList());
-    }
+    }*/
 
     private Set<Role> findRoles(Set<UUID> roles) {
         return roles.stream()

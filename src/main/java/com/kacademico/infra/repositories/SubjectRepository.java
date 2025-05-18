@@ -23,22 +23,20 @@ public class SubjectRepository implements ISubjectRepository {
     @Override
     public List<Subject> findAll() {
         return jpa.findAll().stream()
-            .map(SubjectEntityMapper::toDomain)
+            .map(entity -> SubjectEntityMapper.toDomain(entity, false))
             .toList();
     }
 
 	@Override
 	public Optional<Subject> findById(UUID id) {
-        jpa.findById(id).map(SubjectEntityMapper::toDomain).get();
-
-        return jpa.findById(id).map(SubjectEntityMapper::toDomain);
+        return jpa.findById(id).map(entity -> SubjectEntityMapper.toDomain(entity, true));
     }
 
 	@Override
 	public Subject save(Subject subject) {
         SubjectEntity entity = SubjectEntityMapper.toEntity(subject);
         SubjectEntity saved = jpa.save(entity);
-        return SubjectEntityMapper.toDomain(saved);
+        return SubjectEntityMapper.toDomain(saved, true);
     }
 
 	@Override

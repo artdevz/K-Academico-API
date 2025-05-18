@@ -10,7 +10,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.kacademico.domain.models.Token;
 import com.kacademico.domain.models.User;
-import com.kacademico.domain.repositories.TokenRepository;
+import com.kacademico.domain.repositories.ITokenRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class TokenService {
     
-    private final TokenRepository tokenR;
+    private final ITokenRepository tokenR;
 
     public Token createRefreshToken(User user) {
         Token token = new Token(

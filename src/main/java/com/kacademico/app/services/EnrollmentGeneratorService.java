@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.kacademico.domain.models.values.Enrollment;
-import com.kacademico.domain.repositories.StudentRepository;
+import com.kacademico.domain.repositories.IStudentRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class EnrollmentGeneratorService {
     
-    private final StudentRepository studentR;
+    private final IStudentRepository studentR;
 
     public Enrollment generate(String courseCode) {
         int year = Year.now().getValue() % 100; // 2025 -> 25

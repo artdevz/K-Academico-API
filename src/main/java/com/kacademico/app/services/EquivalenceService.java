@@ -16,7 +16,7 @@ import com.kacademico.app.mapper.RequestMapper;
 import com.kacademico.app.mapper.ResponseMapper;
 import com.kacademico.domain.models.Equivalence;
 import com.kacademico.domain.models.Subject;
-import com.kacademico.domain.repositories.EquivalenceRepository;
+import com.kacademico.domain.repositories.IEquivalenceRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class EquivalenceService {
     
-    private final EquivalenceRepository equivalenceR;
+    private final IEquivalenceRepository equivalenceR;
     private final RequestMapper requestMapper;
     private final ResponseMapper responseMapper;
     private final EntityFinder finder;

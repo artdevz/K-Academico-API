@@ -5,7 +5,7 @@ import com.kacademico.infra.entities.SubjectEntity;
 
 public class SubjectEntityMapper {
     
-    public static Subject toDomain(SubjectEntity entity) {
+    public static Subject toDomain(SubjectEntity entity, boolean details) {
         if (entity == null) return null;
         Subject subject = new Subject(
             entity.getId(),
@@ -14,10 +14,10 @@ public class SubjectEntityMapper {
             entity.getDuration(),
             entity.getSemester(),
             entity.isRequired(),
-            CourseEntityMapper.toBaseDomain(entity.getCourse())
+            CourseEntityMapper.toDomain(entity.getCourse(), false)
         );
 
-        if (entity.getGrades() != null);
+        if (details) if (entity.getGrades() != null);
 
         return subject;
     }

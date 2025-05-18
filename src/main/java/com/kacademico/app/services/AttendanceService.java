@@ -18,9 +18,9 @@ import com.kacademico.app.mapper.ResponseMapper;
 import com.kacademico.domain.models.Attendance;
 import com.kacademico.domain.models.Enrollee;
 import com.kacademico.domain.models.Lesson;
-import com.kacademico.domain.repositories.AttendanceRepository;
-import com.kacademico.domain.repositories.EnrolleeRepository;
-import com.kacademico.domain.repositories.LessonRepository;
+import com.kacademico.domain.repositories.IAttendanceRepository;
+import com.kacademico.domain.repositories.IEnrolleeRepository;
+import com.kacademico.domain.repositories.ILessonRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,9 +28,9 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class AttendanceService {
     
-    private final AttendanceRepository attendanceR;
-    private final EnrolleeRepository enrolleeR;
-    private final LessonRepository lessonR;
+    private final IAttendanceRepository attendanceR;
+    private final IEnrolleeRepository enrolleeR;
+    private final ILessonRepository lessonR;
     private final RequestMapper requestMapper;
     private final ResponseMapper responseMapper;
     private final EntityFinder finder;

@@ -14,7 +14,7 @@ import com.kacademico.app.helpers.EntityFinder;
 import com.kacademico.app.mapper.RequestMapper;
 import com.kacademico.app.mapper.ResponseMapper;
 import com.kacademico.domain.models.Exam;
-import com.kacademico.domain.repositories.ExamRepository;
+import com.kacademico.domain.repositories.IExamRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class ExamService {
     
-    private final ExamRepository examR;
+    private final IExamRepository examR;
     private final RequestMapper requestMapper;
     private final ResponseMapper responseMapper;
     private final EntityFinder finder;

@@ -17,7 +17,7 @@ import com.kacademico.app.mapper.RequestMapper;
 import com.kacademico.app.mapper.ResponseMapper;
 import com.kacademico.domain.models.Role;
 import com.kacademico.domain.models.User;
-import com.kacademico.domain.repositories.RoleRepository;
+import com.kacademico.domain.repositories.IRoleRepository;
 import com.kacademico.domain.repositories.IUserRepository;
 import com.kacademico.shared.utils.EnsureUniqueUtil;
 
@@ -33,7 +33,7 @@ public class UserService {
     private final EntityFinder finder;
     private final RequestMapper requestMapper;
     private final ResponseMapper responseMapper;
-    private final RoleRepository roleR;
+    private final IRoleRepository roleR;
 
     @Async
     public CompletableFuture<String> createInitialAdmin() {
