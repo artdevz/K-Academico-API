@@ -13,10 +13,9 @@ public class Equivalence {
 
     public Equivalence() {};
 
-    public Equivalence(UUID id, String name, List<Subject> subjects) {
+    public Equivalence(UUID id, String name) {
         this.id = id;
         setName(name);
-        this.subjects = subjects;
     }
 
     public UUID getId() { return id; }

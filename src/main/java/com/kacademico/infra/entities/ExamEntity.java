@@ -17,7 +17,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Size;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -36,7 +35,6 @@ public class ExamEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @Size(min = 3, max=16, message = "Exam name must be between 3 and 16 characters")
     private String name;
 
     private int maximum;

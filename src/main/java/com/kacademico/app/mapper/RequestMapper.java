@@ -24,6 +24,7 @@ import com.kacademico.app.dto.subject.SubjectRequestDTO;
 import com.kacademico.app.dto.user.UserRequestDTO;
 import com.kacademico.app.helpers.EntityFinder;
 import com.kacademico.app.services.EnrollmentGeneratorService;
+import com.kacademico.domain.enums.EEnrollee;
 import com.kacademico.domain.enums.EGrade;
 import com.kacademico.domain.enums.ELesson;
 import com.kacademico.domain.models.Attendance;
@@ -78,7 +79,7 @@ public class RequestMapper {
             data.name(),
             data.code(),
             data.description(),
-            0
+            0 // DEFAULT DURATION STARTER VALUE
         );
     }
 
@@ -112,8 +113,8 @@ public class RequestMapper {
             data.user().email(),
             data.user().password(),
             findRoles(data.user().roles()),
-            0, // DEFAULT STARTER VALUE
-            0, // DEFAULT STARTER VALUE
+            0, // DEFAULT CREDITS STARTER VALUE
+            0, // DEFAULT AVERAGE STARTER VALUE
             enrollmentGS.generate(finder.findByIdOrThrow(courseR.findById(data.course()), "Course not Found").getCode()),
             finder.findByIdOrThrow(courseR.findById(data.course()), "Course not Found")
         );
@@ -132,19 +133,22 @@ public class RequestMapper {
     public Grade toGrade(GradeRequestDTO data) {
         return new Grade(
             null,
-            finder.findByIdOrThrow(subjectR.findById(data.subject()), "Grade not Found"),
-            finder.findByIdOrThrow(professorR.findById(data.professor()), "Professor not Found"),
             data.capacity(),
-            0, // DEFAULT STARTER VALUE
-            EGrade.PENDING,
+            0, // DEFAULT CURRENT STUDENTS STARTER VALUE
+            EGrade.PENDING, // DEFAULT GRADE STATUS STARTER VALUE
             data.schedule(),
-            data.timetable()
+            data.timetable(),
+            finder.findByIdOrThrow(subjectR.findById(data.subject()), "Grade not Found"),
+            finder.findByIdOrThrow(professorR.findById(data.professor()), "Professor not Found")
         );
     }
 
     public Enrollee toEnrollee(EnrolleeRequestDTO data) {
         return new Enrollee(
             null,
+            0, // DEFAULT ABSENCES STARTER VALUE
+            0f, // DEFAULT AVERAGE STARTER VALUE
+            EEnrollee.ENROLLED, // DEFAULT ENROLLEE STATUS STARTER VALUE
             finder.findByIdOrThrow(gradeR.findById(data.grade()), "Grade not Found"),
             finder.findByIdOrThrow(studentR.findById(data.student()), "Student not Found")
         );
@@ -174,7 +178,7 @@ public class RequestMapper {
             null,
             data.topic(),
             data.date(),
-            ELesson.UPCOMING, // DEFAULT STARTER VALUE
+            ELesson.UPCOMING, // DEFAULT LESSON STATUS STARTER VALUE
             finder.findByIdOrThrow(gradeR.findById(data.grade()), "Grade not Found")
         );
     }
@@ -191,8 +195,7 @@ public class RequestMapper {
     public Equivalence toEquivalence(EquivalenceRequestDTO data) {
         return new Equivalence(
             null,
-            data.name(),
-            data.subjects().stream().map(id -> (finder.findByIdOrThrow(subjectR.findById(id), "Subject not Found"))).toList()
+            data.name()
         );
     }
 

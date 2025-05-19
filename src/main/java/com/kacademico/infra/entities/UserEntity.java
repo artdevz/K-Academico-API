@@ -25,8 +25,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Size;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -47,11 +45,9 @@ public class UserEntity implements UserDetails {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @Size(min=3, max=48, message="Name must be between 3 and 48 characters")
     private String name;
 
     @Column(unique = true, nullable = false)
-    @Email(message = "Must be a well-formed email address")
     private String email;
     
     private String password;

@@ -17,7 +17,8 @@ public class ProfessorEntityMapper {
             entity.getRoles().stream().map(RoleEntityMapper::toDomain).collect(Collectors.toSet())
         );
 
-        if (details) if (entity.getGrades() != null);
+        if (details)
+            professor.getGrades().addAll(entity.getGrades().stream().map(grade -> GradeEntityMapper.toDomain(grade, false)).toList());
 
         return professor;
     }
@@ -25,11 +26,11 @@ public class ProfessorEntityMapper {
     public static ProfessorEntity toEntity(Professor professor) {
         if (professor == null) return null;
         ProfessorEntity entity = new ProfessorEntity();
-        entity.setId(entity.getId());
-        entity.setName(entity.getName());
-        entity.setEmail(entity.getEmail());
-        entity.setPassword(entity.getPassword());
-        entity.setRoles(entity.getRoles());
+        entity.setId(professor.getId());
+        entity.setName(professor.getName());
+        entity.setEmail(professor.getEmail());
+        entity.setPassword(professor.getPassword());
+        entity.setRoles(professor.getRoles().stream().map(RoleEntityMapper::toEntity).collect(Collectors.toSet()));
 
         return entity;
     }

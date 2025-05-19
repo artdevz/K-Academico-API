@@ -17,7 +17,10 @@ public class SubjectEntityMapper {
             CourseEntityMapper.toDomain(entity.getCourse(), false)
         );
 
-        if (details) if (entity.getGrades() != null);
+        if (details) {
+            subject.getGrades().addAll(entity.getGrades().stream().map(grade -> GradeEntityMapper.toDomain(grade, details)).toList());
+            subject.getPrerequisites().addAll(entity.getPrerequisites().stream().map(prerequisites -> EquivalenceEntityMapper.toDomain(prerequisites, false)).toList());
+        }
 
         return subject;
     }

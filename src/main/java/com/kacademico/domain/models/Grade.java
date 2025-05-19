@@ -33,7 +33,7 @@ public class Grade {
 
     public Grade() {};
 
-    public Grade(UUID id, Subject subject, Professor professor, int capacity, int currentStudents, EGrade status, Schedule schedule, List<Timetable> timetables) {
+    public Grade(UUID id, int capacity, int currentStudents, EGrade status, Schedule schedule, List<Timetable> timetables, Subject subject, Professor professor) {
         this.id = id;
         setCapacity(capacity);
         setCurrentStudents(currentStudents);

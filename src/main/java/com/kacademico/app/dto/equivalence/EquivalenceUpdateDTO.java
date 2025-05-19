@@ -1,3 +1,8 @@
 package com.kacademico.app.dto.equivalence;
 
-public record EquivalenceUpdateDTO() {}
+import java.util.List;
+import java.util.UUID;
+
+public record EquivalenceUpdateDTO(
+    List<UUID> subjects
+) {}

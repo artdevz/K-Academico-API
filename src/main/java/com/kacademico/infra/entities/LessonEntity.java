@@ -18,7 +18,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Size;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -37,7 +36,6 @@ public class LessonEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @Size(max=32)
     private String topic;
 
     @JsonFormat(pattern = "yyyy-MM-dd")

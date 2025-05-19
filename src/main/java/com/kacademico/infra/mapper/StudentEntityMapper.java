@@ -21,7 +21,8 @@ public class StudentEntityMapper {
             CourseEntityMapper.toDomain(entity.getCourse(), false)
         );
 
-        if (details) if (entity.getEnrollees() != null);
+        if (details)
+            student.getEnrollees().addAll(entity.getEnrollees().stream().map(enrollee -> EnrolleEntityMapper.toDomain(enrollee, false)).toList());
 
         return student;
     }
@@ -29,14 +30,15 @@ public class StudentEntityMapper {
     public static StudentEntity toEntity(Student student) {
         if (student == null) return null;
         StudentEntity entity = new StudentEntity();
-        entity.setId(entity.getId());
-        entity.setName(entity.getName());
-        entity.setEmail(entity.getEmail());
-        entity.setPassword(entity.getPassword());
-        entity.setRoles(entity.getRoles());
-        entity.setCredits(entity.getCredits());
-        entity.setAverage(entity.getAverage());
-        entity.setEnrollment(entity.getEnrollment());
+        entity.setId(student.getId());
+        entity.setName(student.getName());
+        entity.setEmail(student.getEmail());
+        entity.setPassword(student.getPassword());
+        entity.setRoles(student.getRoles().stream().map(RoleEntityMapper::toEntity).collect(Collectors.toSet()));
+        entity.setCredits(student.getCredits());
+        entity.setAverage(student.getAverage());
+        entity.setEnrollment(student.getEnrollment());
+        entity.setCourse(CourseEntityMapper.toEntity(student.getCourse()));
 
         return entity;
     }

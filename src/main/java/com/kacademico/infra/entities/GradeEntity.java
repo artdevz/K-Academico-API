@@ -23,7 +23,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Min;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -42,7 +41,6 @@ public class GradeEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @Min(20)
     private int capacity;
 
     private int currentStudents;

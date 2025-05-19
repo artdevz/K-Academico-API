@@ -10,7 +10,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Size;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,10 +29,8 @@ public class RoleEntity implements GrantedAuthority {
     private UUID id;
 
     @Column(nullable = false, unique = true)
-    @Size(min = 4, max = 20, message = "Role name must be between 4 and 20 characters")
     private String name;
 
-    @Size(max = 255, message = "Description cannot exceed 255 characters")
     private String description;
 
     @Override

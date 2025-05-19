@@ -10,8 +10,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,8 +28,6 @@ public class EvaluationEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @Min(0)
-    @Max(10)
     private float score;
 
     @ManyToOne(cascade = CascadeType.MERGE)

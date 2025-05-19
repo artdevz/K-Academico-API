@@ -26,7 +26,7 @@ public class Enrollee {
 
     public Enrollee() {};
 
-    public Enrollee(UUID id, Grade grade, Student student) {
+    public Enrollee(UUID id, int absences, float average, EEnrollee status, Grade grade, Student student) {
         this.id = id;
         setAbsences(absences);
         setAverage(average);

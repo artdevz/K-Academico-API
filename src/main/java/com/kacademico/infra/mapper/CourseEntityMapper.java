@@ -18,7 +18,8 @@ public class CourseEntityMapper {
         );
 
         if (details) {
-            if (entity.getSubjects() != null) course.getSubjects().addAll(entity.getSubjects().stream().map(subject -> SubjectEntityMapper.toDomain(subject, false)).collect(Collectors.toList()));  
+            course.getStudents().addAll(entity.getStudents().stream().map(student -> StudentEntityMapper.toDomain(student, false)).collect(Collectors.toList()));
+            course.getSubjects().addAll(entity.getSubjects().stream().map(subject -> SubjectEntityMapper.toDomain(subject, false)).collect(Collectors.toList()));  
         } 
               
         return course;
