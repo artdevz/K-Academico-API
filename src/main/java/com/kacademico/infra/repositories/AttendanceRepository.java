@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
 
 import com.kacademico.domain.models.Attendance;
 import com.kacademico.domain.repositories.IAttendanceRepository;
+import com.kacademico.infra.entities.AttendanceEntity;
+import com.kacademico.infra.mapper.AttendanceEntityMapper;
 import com.kacademico.infra.repositories.jpa.AttendanceJpaRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -20,17 +22,20 @@ public class AttendanceRepository implements IAttendanceRepository {
 
     @Override
     public List<Attendance> findAll() {
-        throw new UnsupportedOperationException("Unimplemented method 'findAll'");
+        return jpa.findAll().stream().map(AttendanceEntityMapper::toDomain).toList();
     }
 
     @Override
     public Optional<Attendance> findById(UUID id) {
-        throw new UnsupportedOperationException("Unimplemented method 'findById'");
+        return jpa.findById(id).map(AttendanceEntityMapper::toDomain);
     }
 
     @Override
     public Attendance save(Attendance attendance) {
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
+        AttendanceEntity entity = AttendanceEntityMapper.toEntity(attendance);
+        AttendanceEntity saved = jpa.save(entity);
+
+        return AttendanceEntityMapper.toDomain(saved);
     }
 
     @Override
@@ -40,7 +45,7 @@ public class AttendanceRepository implements IAttendanceRepository {
 
     @Override
     public boolean existsByEnrolleeIdAndLessonId(UUID enrolleeId, UUID lessonId) {
-        throw new UnsupportedOperationException("Unimplemented method 'existsByEnrolleeIdAndLessonId'");
+        return jpa.existsByEnrolleeIdAndLessonId(enrolleeId, lessonId);
     }
 
 }

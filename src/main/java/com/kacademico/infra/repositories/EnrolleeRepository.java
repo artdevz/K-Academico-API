@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import com.kacademico.domain.models.Enrollee;
 import com.kacademico.domain.repositories.IEnrolleeRepository;
+import com.kacademico.infra.mapper.EnrolleEntityMapper;
 import com.kacademico.infra.repositories.jpa.EnrolleeJpaRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,7 @@ public class EnrolleeRepository implements IEnrolleeRepository {
 
     @Override
     public List<Enrollee> findAll() {
-        throw new UnsupportedOperationException("Unimplemented method 'findAll'");
+        return jpa.findAll().stream().map(entity -> EnrolleEntityMapper.toDomain(entity, false)).toList();
     }
 
     @Override
