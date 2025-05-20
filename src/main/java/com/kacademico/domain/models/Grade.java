@@ -1,8 +1,10 @@
 package com.kacademico.domain.models;
 
+import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 
@@ -76,12 +78,36 @@ public class Grade {
         this.schedule = schedule;
     }
 
-    public void setTimetable(List<Timetable> timetables) {
+    public void setTimetable(List<Timetable> timetables) { // 422
+        ensureStartTimeIsBeforeEndTime(timetables);
+        ensureNoInternalTimetableConflicts(timetables);
+
         this.timetables = timetables;
     }
 
     public void setProfessor(Professor professor) {
         this.professor = professor;
+    }
+
+    private void ensureStartTimeIsBeforeEndTime(List<Timetable> timetables) {
+        timetables.stream()
+            .filter(t -> !t.getStartTime().isBefore(t.getEndTime()))
+            .findFirst()
+            .ifPresent(t -> {
+                String message = String.format(
+                    "Invalid Timetable: at [%s] StartTime [%s] must be before EndTime [%s]", 
+                    t.getDay().getDisplayName(TextStyle.FULL, Locale.ENGLISH), t.getStartTime(), t.getEndTime()
+                );
+                throw new IllegalArgumentException(message);
+            });
+    }
+
+    private void ensureNoInternalTimetableConflicts(List<Timetable> timetables) {
+        for (int i = 0; i < timetables.size(); i++) {
+            for (int j = i + 1; j < timetables.size(); j++) {
+                if (timetables.get(i).conflictWith(timetables.get(j))) throw new IllegalArgumentException("Internal conflicting Timetables");
+            }
+        }
     }
 
 }

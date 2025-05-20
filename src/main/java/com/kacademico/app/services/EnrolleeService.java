@@ -19,7 +19,6 @@ import com.kacademico.app.dto.evaluation.EvaluationResponseDTO;
 import com.kacademico.app.helpers.EntityFinder;
 import com.kacademico.app.mapper.RequestMapper;
 import com.kacademico.app.mapper.ResponseMapper;
-import com.kacademico.domain.enums.EGrade;
 import com.kacademico.domain.models.Enrollee;
 import com.kacademico.domain.models.Grade;
 import com.kacademico.domain.models.Student;
@@ -45,7 +44,6 @@ public class EnrolleeService {
     public CompletableFuture<String> createAsync(EnrolleeRequestDTO data) {
         Enrollee enrollee = requestMapper.toEnrollee(data);
 
-        validateGradeStatus(enrollee.getGrade());
         ensureStudentIsUnique(enrollee.getStudent());
         
         enrolleeR.save(enrollee);
@@ -100,12 +98,8 @@ public class EnrolleeService {
             return CompletableFuture.completedFuture("Deleted Enrollee");
     }
 
-    private void validateGradeStatus(Grade grade) {
-        if(grade.getStatus() == EGrade.FINISHED) throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Cannot enroll a student in a finished class");
-    }
-
     private void ensureStudentIsUnique(Student student) {
-        if(studentR.findById(student.getId()).isPresent()) throw new ResponseStatusException(HttpStatus.CONFLICT, "Student already exists for this Grade");
+        if (studentR.findById(student.getId()).isPresent()) throw new ResponseStatusException(HttpStatus.CONFLICT, "Student already exists for this Grade");
     }
 
     private void updateGrade(Grade grade) {

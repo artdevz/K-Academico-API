@@ -41,7 +41,6 @@ public class EvaluationService {
         Exam exam = finder.findByIdOrThrow(examR.findWithGradeById(data.exam()), "Exam not Found");
 
         ensureEvaluationNotExists(enrollee, exam);
-        ensureSameGrade(enrollee, exam);
 
         Evaluation evaluation = requestMapper.toEvaluation(data);
         
@@ -83,11 +82,6 @@ public class EvaluationService {
     private void ensureEvaluationNotExists(Enrollee enrollee, Exam exam) {
         if (evaluationR.existsByEnrolleeIdAndExamId(enrollee.getId(), exam.getId()))
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Evaluation already exists for this Enrollee and Exam");
-    }
-
-    private void ensureSameGrade(Enrollee enrollee, Exam exam) {
-        if (!(enrollee.getGrade().getId().equals(exam.getGrade().getId())))
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Enrollee and Exam must belong to the same Grade");
     }
     
     private void updateAverage(Enrollee enrollee) {

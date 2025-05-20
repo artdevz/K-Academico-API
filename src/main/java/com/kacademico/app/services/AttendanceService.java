@@ -41,7 +41,6 @@ public class AttendanceService {
         Lesson lesson = finder.findByIdOrThrow(lessonR.findById(data.lesson()), "Lesson not Found");
 
         ensureAttendanceNotExists(enrollee, lesson);
-        ensureSameGrade(enrollee, lesson);
 
         Attendance attendance = requestMapper.toAttendance(data);
         
@@ -83,11 +82,6 @@ public class AttendanceService {
     private void ensureAttendanceNotExists(Enrollee enrollee, Lesson lesson) {
         if (attendanceR.existsByEnrolleeIdAndLessonId(enrollee.getId(), lesson.getId()))
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Attendance already exists for this Enrollee and Exam");
-    }
-
-    private void ensureSameGrade(Enrollee enrollee, Lesson lesson) {
-        if (!(enrollee.getGrade().getId().equals(lesson.getGrade().getId()))) 
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Enrollee and Lesson must belong to the same Grade");
     }
 
     private void updateAbsences(Enrollee enrollee) {

@@ -15,6 +15,8 @@ public class Evaluation {
     public Evaluation() {};
 
     public Evaluation(UUID id, float score, Enrollee enrollee, Exam exam) {
+        validateSameGrade(enrollee, exam);
+
         this.id = id;
         setScore(score);
         this.enrollee = enrollee;
@@ -29,6 +31,11 @@ public class Evaluation {
     public void setScore(float score) {
         if (score < MIN_SCORE || score > exam.getMaximum()) throw new IllegalArgumentException("Score must be between " + MIN_SCORE + " and " + exam.getMaximum());
         this.score = score;
+    }
+
+    private void validateSameGrade(Enrollee enrollee, Exam exam) { // 422
+        if ( !( enrollee.getGrade().getId().equals(exam.getGrade().getId()) ) ) 
+            throw new IllegalArgumentException(String.format("Enrollee (%s) and Exam (%s) must belong to the same Grade", enrollee.getId(), exam.getId()));
     }
 
 }

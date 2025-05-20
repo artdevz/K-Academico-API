@@ -1,8 +1,6 @@
 package com.kacademico.app.services;
 
-import java.time.format.TextStyle;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -41,8 +39,6 @@ public class GradeService {
     
     @Async
     public CompletableFuture<String> createAsync(GradeRequestDTO data) {
-        ensureStartTimeIsBeforeEndTime(data.timetable());
-        ensureNoInternalTimetableConflicts(data.timetable());
         ensureTimeTableAndLocationAreNotConflicting(data.timetable(), data.schedule());
         ensureProfessorIsAvailableAtTime(data.timetable(), data.schedule(), data.professor());
 
@@ -81,27 +77,6 @@ public class GradeService {
         enrolleeR.removeGradeFromEnrollees(id);
         gradeR.deleteById(id);
         return CompletableFuture.completedFuture("Deleted Grade");
-    }
-
-    private void ensureStartTimeIsBeforeEndTime(List<Timetable> timetables) {
-        timetables.stream()
-            .filter(t -> !t.getStartTime().isBefore(t.getEndTime()))
-            .findFirst()
-            .ifPresent(t -> {
-                String message = String.format(
-                    "Invalid Timetable: at [%s] StartTime [%s] must be before EndTime [%s]",
-                    t.getDay().getDisplayName(TextStyle.FULL, Locale.ENGLISH), t.getStartTime(), t.getEndTime() 
-                );
-                throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, message);
-            });
-    }
-
-    private void ensureNoInternalTimetableConflicts(List<Timetable> timetables) {
-        for (int i = 0; i < timetables.size(); i++) {
-            for (int j = i + 1; j < timetables.size(); j++) {
-                if (timetables.get(i).conflictWith(timetables.get(j))) throw new ResponseStatusException(HttpStatus.CONFLICT, "Conflicting Timetables in request");
-            }
-        }
     }
 
     private void ensureTimeTableAndLocationAreNotConflicting(List<Timetable> newTimetables, Schedule schedule) {

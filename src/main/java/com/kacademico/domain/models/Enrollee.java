@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.kacademico.domain.enums.EEnrollee;
+import com.kacademico.domain.enums.EGrade;
 
 public class Enrollee {
 
@@ -31,7 +32,7 @@ public class Enrollee {
         setAbsences(absences);
         setAverage(average);
         setStatus(status);
-        this.grade = grade;
+        setGrade(grade);
         this.student = student;
     }
 
@@ -57,6 +58,10 @@ public class Enrollee {
 
     public void setStatus(EEnrollee status) {
         this.status = status;
+    }
+
+    public void setGrade(Grade grade) { // 422
+        if (grade.getStatus() == EGrade.FINISHED) throw new IllegalArgumentException("Cannot enroll a student in a finished grade");
     }
 
     private void updateStatusByAbsences() {
