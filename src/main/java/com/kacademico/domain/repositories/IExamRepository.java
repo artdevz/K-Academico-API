@@ -13,6 +13,6 @@ public interface IExamRepository {
     Exam save(Exam exam);
     void deleteById(UUID id);
 
-    Optional<Exam> findByIdWithGrade(UUID id);
+    Optional<Exam> findWithGradeById(UUID id);
 
 }

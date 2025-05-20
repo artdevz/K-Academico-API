@@ -4,11 +4,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-
 import org.springframework.stereotype.Repository;
 
 import com.kacademico.domain.models.Student;
 import com.kacademico.domain.repositories.IStudentRepository;
+import com.kacademico.infra.entities.StudentEntity;
+import com.kacademico.infra.mapper.StudentEntityMapper;
 import com.kacademico.infra.repositories.jpa.StudentJpaRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -21,17 +22,20 @@ public class StudentRepository implements IStudentRepository {
 
     @Override
     public List<Student> findAll() {
-        throw new UnsupportedOperationException("Unimplemented method 'findAll'");
+        return jpa.findAll().stream().map(entity -> StudentEntityMapper.toDomain(entity, false)).toList();
     }
 
     @Override
     public Optional<Student> findById(UUID id) {
-        throw new UnsupportedOperationException("Unimplemented method 'findById'");
+        return jpa.findById(id).map(entity -> StudentEntityMapper.toDomain(entity, true));
     }
 
     @Override
     public Student save(Student student) {
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
+        StudentEntity entity = StudentEntityMapper.toEntity(student);
+        StudentEntity saved = jpa.save(entity);
+        
+        return StudentEntityMapper.toDomain(saved, true);
     }
 
     @Override
@@ -41,17 +45,17 @@ public class StudentRepository implements IStudentRepository {
 
     @Override
     public Set<String> findAllEnrollmentsByPrefix(String prefix) {
-        throw new UnsupportedOperationException("Unimplemented method 'findAllEnrollmentsByPrefix'");
+        return jpa.findAllEnrollmentsByPrefix(prefix);
     }
 
     @Override
     public List<Student> findAllWithEnrollees() {
-        throw new UnsupportedOperationException("Unimplemented method 'findAllWithEnrollees'");
+        return jpa.findAllWithEnrollees().stream().map(entity -> StudentEntityMapper.toDomain(entity, true)).toList();
     }
 
     @Override
-    public Optional<Student> findByIdWithEnrollees(UUID id) {
-        throw new UnsupportedOperationException("Unimplemented method 'findByIdWithEnrollees'");
+    public Optional<Student> findWithEnrolleesById(UUID id) {
+        return jpa.findWithEnrolleesById(id).map(entity -> StudentEntityMapper.toDomain(entity, true));
     }
 
 }

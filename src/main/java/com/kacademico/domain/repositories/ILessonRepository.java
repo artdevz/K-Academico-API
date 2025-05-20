@@ -13,6 +13,6 @@ public interface ILessonRepository {
     Lesson save(Lesson lesson);
     void deleteById(UUID id);
 
-    Optional<Lesson> findByIdWithGrade(UUID id);
+    Optional<Lesson> findWithGradeById(UUID id);
 
 }

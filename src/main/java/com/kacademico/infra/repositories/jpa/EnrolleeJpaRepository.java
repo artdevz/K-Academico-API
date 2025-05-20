@@ -13,7 +13,7 @@ import com.kacademico.infra.entities.EnrolleeEntity;
 public interface EnrolleeJpaRepository extends JpaRepository<EnrolleeEntity, UUID> {
     
     @Query("SELECT e FROM Enrollee e LEFT JOIN FETCH e.evaluations LEFT JOIN FETCH e.attendances WHERE e.id = :id")
-    Optional<EnrolleeEntity> findByIdWithEvaluationsAndAttendances(@Param("id") UUID id);    
+    Optional<EnrolleeEntity> findWithEvaluationsAndAttendancesById(@Param("id") UUID id);    
 
     @Modifying
     @Query("UPDATE Enrollee e SET e.grade = NULL WHERE e.grade.id = :gradeId")

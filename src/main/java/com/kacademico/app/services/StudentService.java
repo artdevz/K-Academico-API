@@ -50,7 +50,7 @@ public class StudentService {
     @Async
     @Transactional
     public CompletableFuture<StudentDetailsDTO> readByIdAsync(UUID id) {
-        Student student = finder.findByIdOrThrow(studentR.findByIdWithEnrollees(id), "Student not Found");
+        Student student = finder.findByIdOrThrow(studentR.findWithEnrolleesById(id), "Student not Found");
         
         return CompletableFuture.completedFuture(new StudentDetailsDTO(
             responseMapper.toStudentResponseDTO(student),

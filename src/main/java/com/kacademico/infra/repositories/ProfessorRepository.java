@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
 
 import com.kacademico.domain.models.Professor;
 import com.kacademico.domain.repositories.IProfessorRepository;
+import com.kacademico.infra.entities.ProfessorEntity;
+import com.kacademico.infra.mapper.ProfessorEntityMapper;
 import com.kacademico.infra.repositories.jpa.ProfessorJpaRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -20,17 +22,20 @@ public class ProfessorRepository implements IProfessorRepository {
 
     @Override
     public List<Professor> findAll() {
-        throw new UnsupportedOperationException("Unimplemented method 'findAll'");
+        return jpa.findAll().stream().map(entity -> ProfessorEntityMapper.toDomain(entity, false)).toList();
     }
 
     @Override
     public Optional<Professor> findById(UUID id) {
-        throw new UnsupportedOperationException("Unimplemented method 'findById'");
+        return jpa.findById(id).map(entity -> ProfessorEntityMapper.toDomain(entity, true));
     }
 
     @Override
     public Professor save(Professor professor) {
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
+        ProfessorEntity entity = ProfessorEntityMapper.toEntity(professor);
+        ProfessorEntity saved = jpa.save(entity);
+        
+        return ProfessorEntityMapper.toDomain(saved, true);
     }
 
     @Override

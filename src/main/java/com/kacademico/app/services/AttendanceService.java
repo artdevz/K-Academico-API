@@ -37,7 +37,7 @@ public class AttendanceService {
         
     @Async
     public CompletableFuture<String> createAsync(AttendanceRequestDTO data) {
-        Enrollee enrollee = finder.findByIdOrThrow(enrolleeR.findByIdWithEvaluationsAndAttendances(data.enrollee()), "Enrollee not Found");
+        Enrollee enrollee = finder.findByIdOrThrow(enrolleeR.findWithEvaluationsAndAttendancesById(data.enrollee()), "Enrollee not Found");
         Lesson lesson = finder.findByIdOrThrow(lessonR.findById(data.lesson()), "Lesson not Found");
 
         ensureAttendanceNotExists(enrollee, lesson);

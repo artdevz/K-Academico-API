@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
 
 import com.kacademico.domain.models.Evaluation;
 import com.kacademico.domain.repositories.IEvaluationRepository;
+import com.kacademico.infra.entities.EvaluationEntity;
+import com.kacademico.infra.mapper.EvaluationEntityMapper;
 import com.kacademico.infra.repositories.jpa.EvaluationJpaRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -20,17 +22,20 @@ public class EvaluationRepository implements IEvaluationRepository {
 
     @Override
     public List<Evaluation> findAll() {
-        throw new UnsupportedOperationException("Unimplemented method 'findAll'");
+        return jpa.findAll().stream().map(EvaluationEntityMapper::toDomain).toList();
     }
 
     @Override
     public Optional<Evaluation> findById(UUID id) {
-        throw new UnsupportedOperationException("Unimplemented method 'findById'");
+        return jpa.findById(id).map(EvaluationEntityMapper::toDomain);
     }
 
     @Override
     public Evaluation save(Evaluation evaluation) {
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
+        EvaluationEntity entity = EvaluationEntityMapper.toEntity(evaluation);
+        EvaluationEntity saved = jpa.save(entity);
+        
+        return EvaluationEntityMapper.toDomain(saved);
     }
 
     @Override
@@ -40,7 +45,7 @@ public class EvaluationRepository implements IEvaluationRepository {
 
     @Override
     public boolean existsByEnrolleeIdAndExamId(UUID enrolleeId, UUID examId) {
-        throw new UnsupportedOperationException("Unimplemented method 'existsByEnrolleeIdAndExamId'");
+        return jpa.existsByEnrolleeIdAndExamId(enrolleeId, examId);
     }
 
 }

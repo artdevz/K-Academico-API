@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
 
 import com.kacademico.domain.models.Token;
 import com.kacademico.domain.repositories.ITokenRepository;
+import com.kacademico.infra.entities.TokenEntity;
+import com.kacademico.infra.mapper.TokenEntityMapper;
 import com.kacademico.infra.repositories.jpa.TokenJpaRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -20,17 +22,20 @@ public class TokenRepository implements ITokenRepository {
 
     @Override
     public List<Token> findAll() {
-        throw new UnsupportedOperationException("Unimplemented method 'findAll'");
+        return jpa.findAll().stream().map(TokenEntityMapper::toDomain).toList();
     }
 
     @Override
     public Optional<Token> findById(UUID id) {
-        throw new UnsupportedOperationException("Unimplemented method 'findById'");
+        return jpa.findById(id).map(TokenEntityMapper::toDomain);
     }
 
     @Override
     public Token save(Token token) {
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
+        TokenEntity entity = TokenEntityMapper.toEntity(token);
+        TokenEntity saved = jpa.save(entity);
+        
+        return TokenEntityMapper.toDomain(saved);
     }
 
     @Override
@@ -40,12 +45,12 @@ public class TokenRepository implements ITokenRepository {
 
     @Override
     public Optional<Token> findByToken(String token) {
-        throw new UnsupportedOperationException("Unimplemented method 'findByToken'");
+        return jpa.findByToken(token).map(TokenEntityMapper::toDomain);
     }
 
     @Override
     public void deleteByUserId(UUID userId) {
-        throw new UnsupportedOperationException("Unimplemented method 'deleteByUserId'");
+        jpa.deleteByUserId(userId);
     }
     
 }

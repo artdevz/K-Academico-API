@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
 
 import com.kacademico.domain.models.Lesson;
 import com.kacademico.domain.repositories.ILessonRepository;
+import com.kacademico.infra.entities.LessonEntity;
+import com.kacademico.infra.mapper.LessonEntityMapper;
 import com.kacademico.infra.repositories.jpa.LessonJpaRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -20,17 +22,20 @@ public class LessonRepository implements ILessonRepository {
 
     @Override
     public List<Lesson> findAll() {
-        throw new UnsupportedOperationException("Unimplemented method 'findAll'");
+        return jpa.findAll().stream().map(entity -> LessonEntityMapper.toDomain(entity, false)).toList();
     }
 
     @Override
     public Optional<Lesson> findById(UUID id) {
-        throw new UnsupportedOperationException("Unimplemented method 'findById'");
+        return jpa.findById(id).map(entity -> LessonEntityMapper.toDomain(entity, true));
     }
 
     @Override
     public Lesson save(Lesson lesson) {
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
+        LessonEntity entity = LessonEntityMapper.toEntity(lesson);
+        LessonEntity saved = jpa.save(entity);
+        
+        return LessonEntityMapper.toDomain(saved, true);
     }
 
     @Override
@@ -39,8 +44,8 @@ public class LessonRepository implements ILessonRepository {
     }
 
     @Override
-    public Optional<Lesson> findByIdWithGrade(UUID id) {
-        throw new UnsupportedOperationException("Unimplemented method 'findByIdWithGrade'");
+    public Optional<Lesson> findWithGradeById(UUID id) {
+        return jpa.findWithGradeById(id).map(entity -> LessonEntityMapper.toDomain(entity, true));
     }
 
 }

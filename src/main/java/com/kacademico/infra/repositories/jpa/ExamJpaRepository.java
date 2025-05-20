@@ -12,6 +12,6 @@ import com.kacademico.infra.entities.ExamEntity;
 public interface ExamJpaRepository extends JpaRepository<ExamEntity, UUID> {
     
     @Query("SELECT e FROM Exam e JOIN FETCH e.grade WHERE e.id = :id")
-    Optional<ExamEntity> findByIdWithGrade(@Param("id") UUID id);
+    Optional<ExamEntity> findWithGradeById(@Param("id") UUID id);
 
 }

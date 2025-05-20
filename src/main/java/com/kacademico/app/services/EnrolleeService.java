@@ -93,7 +93,7 @@ public class EnrolleeService {
 
     @Async
     public CompletableFuture<String> deleteAsync(UUID id) {
-            Enrollee enrollee = finder.findByIdOrThrow(enrolleeR.findByIdWithEvaluationsAndAttendances(id), "Enrollee not Found");
+            Enrollee enrollee = finder.findByIdOrThrow(enrolleeR.findWithEvaluationsAndAttendancesById(id), "Enrollee not Found");
             
             enrolleeR.deleteById(id);
             updateGrade(enrollee.getGrade());

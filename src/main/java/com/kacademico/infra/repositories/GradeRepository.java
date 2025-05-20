@@ -9,6 +9,8 @@ import org.springframework.stereotype.Repository;
 import com.kacademico.domain.enums.EGrade;
 import com.kacademico.domain.models.Grade;
 import com.kacademico.domain.repositories.IGradeRepository;
+import com.kacademico.infra.entities.GradeEntity;
+import com.kacademico.infra.mapper.GradeEntityMapper;
 import com.kacademico.infra.repositories.jpa.GradeJpaRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -21,17 +23,20 @@ public class GradeRepository implements IGradeRepository {
 
     @Override
     public List<Grade> findAll() {
-        throw new UnsupportedOperationException("Unimplemented method 'findAll'");
+        return jpa.findAll().stream().map(entity -> GradeEntityMapper.toDomain(entity, false)).toList();
     }
 
     @Override
     public Optional<Grade> findById(UUID id) {
-        throw new UnsupportedOperationException("Unimplemented method 'findById'");
+        return jpa.findById(id).map(entity -> GradeEntityMapper.toDomain(entity, true));
     }
 
     @Override
     public Grade save(Grade grade) {
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
+        GradeEntity entity = GradeEntityMapper.toEntity(grade);
+        GradeEntity saved = jpa.save(entity);
+        
+        return GradeEntityMapper.toDomain(saved, true);
     }
 
     @Override
@@ -41,12 +46,12 @@ public class GradeRepository implements IGradeRepository {
 
     @Override
     public Optional<Grade> findWithEnrolleesById(UUID id) {
-        throw new UnsupportedOperationException("Unimplemented method 'findWithEnrolleesById'");
+        return jpa.findWithEnrolleesById(id).map(entity -> GradeEntityMapper.toDomain(entity, true));
     }
 
     @Override
     public List<Grade> findByScheduleSemesterAndStatus(String semester, EGrade status) {
-        throw new UnsupportedOperationException("Unimplemented method 'findByScheduleSemesterAndStatus'");
+        return jpa.findByScheduleSemesterAndStatus(semester, status).stream().map(entity -> GradeEntityMapper.toDomain(entity, true)).toList();
     }
 
 }

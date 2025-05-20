@@ -20,6 +20,6 @@ public interface StudentJpaRepository extends JpaRepository<StudentEntity, UUID>
     List<StudentEntity> findAllWithEnrollees();
 
     @Query("SELECT s FROM Student s LEFT JOIN FETCH s.enrollees WHERE s.id = :id")
-    Optional<StudentEntity> findByIdWithEnrollees(@Param("id") UUID id);
+    Optional<StudentEntity> findWithEnrolleesById(@Param("id") UUID id);
 
 }

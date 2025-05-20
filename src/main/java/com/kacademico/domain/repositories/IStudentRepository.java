@@ -16,6 +16,6 @@ public interface IStudentRepository {
 
     Set<String> findAllEnrollmentsByPrefix(String prefix);
     List<Student> findAllWithEnrollees();
-    Optional<Student> findByIdWithEnrollees(UUID id);
+    Optional<Student> findWithEnrolleesById(UUID id);
 
 }

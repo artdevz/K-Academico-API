@@ -13,7 +13,7 @@ public interface IEnrolleeRepository {
     Enrollee save(Enrollee enrollee);
     void deleteById(UUID id);
     
-    Optional<Enrollee> findByIdWithEvaluationsAndAttendances(UUID id);    
+    Optional<Enrollee> findWithEvaluationsAndAttendancesById(UUID id);    
     void removeGradeFromEnrollees(UUID gradeId);
 
 }

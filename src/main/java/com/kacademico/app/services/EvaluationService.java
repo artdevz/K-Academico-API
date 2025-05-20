@@ -37,8 +37,8 @@ public class EvaluationService {
     
     @Async
     public CompletableFuture<String> createAsync(EvaluationRequestDTO data) {
-        Enrollee enrollee = finder.findByIdOrThrow(enrolleeR.findByIdWithEvaluationsAndAttendances(data.enrollee()), "Enrollee not Found");
-        Exam exam = finder.findByIdOrThrow(examR.findByIdWithGrade(data.exam()), "Exam not Found");
+        Enrollee enrollee = finder.findByIdOrThrow(enrolleeR.findWithEvaluationsAndAttendancesById(data.enrollee()), "Enrollee not Found");
+        Exam exam = finder.findByIdOrThrow(examR.findWithGradeById(data.exam()), "Exam not Found");
 
         ensureEvaluationNotExists(enrollee, exam);
         ensureSameGrade(enrollee, exam);

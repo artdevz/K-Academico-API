@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
 
 import com.kacademico.domain.models.Equivalence;
 import com.kacademico.domain.repositories.IEquivalenceRepository;
+import com.kacademico.infra.entities.EquivalenceEntity;
+import com.kacademico.infra.mapper.EquivalenceEntityMapper;
 import com.kacademico.infra.repositories.jpa.EquivalenceJpaRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -20,17 +22,20 @@ public class EquivalenceRepository implements IEquivalenceRepository {
 
     @Override
     public List<Equivalence> findAll() {
-        throw new UnsupportedOperationException("Unimplemented method 'findAll'");
+        return jpa.findAll().stream().map(entity -> EquivalenceEntityMapper.toDomain(entity, false)).toList();
     }
 
     @Override
     public Optional<Equivalence> findById(UUID id) {
-        throw new UnsupportedOperationException("Unimplemented method 'findById'");
+        return jpa.findById(id).map(entity -> EquivalenceEntityMapper.toDomain(entity, true));
     }
 
     @Override
     public Equivalence save(Equivalence equivalence) {
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
+        EquivalenceEntity entity = EquivalenceEntityMapper.toEntity(equivalence);
+        EquivalenceEntity saved = jpa.save(entity);
+        
+        return EquivalenceEntityMapper.toDomain(saved, true);
     }
 
     @Override

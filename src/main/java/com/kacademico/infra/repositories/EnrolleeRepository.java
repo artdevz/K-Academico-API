@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import com.kacademico.domain.models.Enrollee;
 import com.kacademico.domain.repositories.IEnrolleeRepository;
+import com.kacademico.infra.entities.EnrolleeEntity;
 import com.kacademico.infra.mapper.EnrolleEntityMapper;
 import com.kacademico.infra.repositories.jpa.EnrolleeJpaRepository;
 
@@ -26,27 +27,30 @@ public class EnrolleeRepository implements IEnrolleeRepository {
 
     @Override
     public Optional<Enrollee> findById(UUID id) {
-        throw new UnsupportedOperationException("Unimplemented method 'findById'");
+        return jpa.findById(id).map(entity -> EnrolleEntityMapper.toDomain(entity, true));
     }
 
     @Override
     public Enrollee save(Enrollee enrollee) {
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
+        EnrolleeEntity entity = EnrolleEntityMapper.toEntity(enrollee);
+        EnrolleeEntity saved = jpa.save(entity);
+        
+        return EnrolleEntityMapper.toDomain(saved, true);
     }
 
     @Override
     public void deleteById(UUID id) {
-        throw new UnsupportedOperationException("Unimplemented method 'deleteById'");
+        jpa.deleteById(id);
     }
 
     @Override
-    public Optional<Enrollee> findByIdWithEvaluationsAndAttendances(UUID id) {
-        throw new UnsupportedOperationException("Unimplemented method 'findByIdWithEvaluationsAndAttendances'");
+    public Optional<Enrollee> findWithEvaluationsAndAttendancesById(UUID id) {
+        return jpa.findWithEvaluationsAndAttendancesById(id).map(entity -> EnrolleEntityMapper.toDomain(entity, true));
     }
 
     @Override
     public void removeGradeFromEnrollees(UUID gradeId) {
-        throw new UnsupportedOperationException("Unimplemented method 'removeGradeFromEnrollees'");
+        jpa.removeGradeFromEnrollees(gradeId);
     }
 
 }
