@@ -50,7 +50,7 @@ public class StudentRepository implements IStudentRepository {
 
     @Override
     public List<Student> findAllWithEnrollees() {
-        return jpa.findAllWithEnrollees().stream().map(entity -> StudentEntityMapper.toDomain(entity, true)).toList();
+        return jpa.findAll().stream().map(entity -> StudentEntityMapper.toDomain(entity, true)).toList();
     }
 
     @Override

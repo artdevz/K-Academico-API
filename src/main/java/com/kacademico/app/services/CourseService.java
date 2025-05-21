@@ -6,6 +6,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.kacademico.app.dto.course.CourseDetailsDTO;
 import com.kacademico.app.dto.course.CourseRequestDTO;
@@ -47,10 +48,11 @@ public class CourseService {
         return CompletableFuture.completedFuture(response);
     }
 
+    @Transactional
     @Async
     public CompletableFuture<CourseDetailsDTO> readByIdAsync(UUID id) {
         Course course = finder.findByIdOrThrow(courseR.findWithSubjectsById(id), "Course not Found");
-        System.out.println("Course.subjects: " + course.getSubjects());
+
         return CompletableFuture.completedFuture(
             new CourseDetailsDTO(
                 responseMapper.toCourseResponseDTO(course),

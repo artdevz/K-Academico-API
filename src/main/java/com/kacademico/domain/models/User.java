@@ -5,6 +5,8 @@ import java.util.UUID;
 
 public class User {
 
+    private static final String EMAIL_REGEX = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$";
+    // private static final String PASSWORD_REGEX = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,32}$";
     private static final int MAX_NAME_LENGTH = 48;
     private static final int MIN_NAME_LENGTH = 3;
 
@@ -19,9 +21,9 @@ public class User {
 
     public User(UUID id, String name, String email, String password, Set<Role> roles) {
         this.id = id;
-        this.name = name;
-        this.email = email;
-        this.password = password;
+        setName(name);
+        setEmail(email);
+        setPassword(password);
         this.roles = roles;
     }
 
@@ -42,20 +44,18 @@ public class User {
     }
 
     public void setPassword(String password) {
-        validatePassword(password);
+        // validatePassword(password);
         this.password = password; 
     }
 
     public void setRoles(Set<Role> roles) { this.roles = roles; }
 
-    private void validateEmail(String email) {
-        String regex = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$";
-        if ( !(email.matches(regex)) ) throw new IllegalArgumentException("Must be a well-formed email address");
-    }
+    private void validateEmail(String email) { if ( !(email.matches(EMAIL_REGEX)) ) throw new IllegalArgumentException("Must be a well-formed email address"); }
 
+    /*
     private void validatePassword(String password) {
-        String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,32}$";
-        if ( !(password.matches(regex)) ) throw new IllegalArgumentException("The password must contain at least one lowercase letter, one uppercase letter, one number, one special character, and be between 8 and 32 characters");
+        if ( !(password.matches(PASSWORD_REGEX)) ) throw new IllegalArgumentException("The password must contain at least one lowercase letter, one uppercase letter, one number, one special character, and be between 8 and 32 characters");
     }
+    */
     
 }

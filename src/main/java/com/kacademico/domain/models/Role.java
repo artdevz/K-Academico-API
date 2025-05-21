@@ -30,7 +30,7 @@ public class Role {
     }
 
     public void setDesciption(String description) {
-        if (description.length() < MAX_DESCRIPTION_LENGTH) throw new IllegalArgumentException("Description cannot exceed " + MAX_DESCRIPTION_LENGTH + "characters");
+        if (description.length() > MAX_DESCRIPTION_LENGTH) throw new IllegalArgumentException("Role Description cannot exceed " + MAX_DESCRIPTION_LENGTH + "characters");
         this.description = description;
     }
 

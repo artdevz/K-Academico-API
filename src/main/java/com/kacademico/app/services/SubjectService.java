@@ -78,6 +78,7 @@ public class SubjectService {
         return CompletableFuture.completedFuture("Updated Subject");
     }
 
+    @Transactional
     @Async
     public CompletableFuture<String> deleteAsync(UUID id) {
         Subject subject = finder.findByIdOrThrow(subjectR.findById(id), "Subject not Found");
@@ -90,10 +91,20 @@ public class SubjectService {
 
     private void updateCourseDuration(Course course) {
         System.out.println("Attualizando");
+        System.out.println("Course Duration Antes: " + course.getDuration());
+        System.out.println("Course Subjects Size Antes: " + course.getSubjects().size());
+        for (Subject subject : course.getSubjects()) {
+            System.out.println("Subject: " + subject.getName());
+        }
         int duration = course.getSubjects().stream()
             .mapToInt(Subject::getDuration).sum();
         course.setDuration(duration);
         courseR.save(course);
+        System.out.println("Course Duration Dps: " + course.getDuration());
+        System.out.println("Course Subjects Size Dps: " + course.getSubjects().size());
+        for (Subject subject : course.getSubjects()) {
+            System.out.println("Subject: " + subject.getName());
+        }
         System.out.println("Atualizado");
     }
 

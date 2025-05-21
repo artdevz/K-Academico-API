@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Repository
 public class UserRepository implements IUserRepository {
-    
+
     private final UserJpaRepository jpa;
 
     @Override

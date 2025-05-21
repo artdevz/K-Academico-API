@@ -3,6 +3,8 @@ package com.kacademico.infra.mapper;
 import java.util.stream.Collectors;
 
 import com.kacademico.domain.models.Grade;
+import com.kacademico.infra.embeddables.ScheduleEmbeddable;
+import com.kacademico.infra.embeddables.TimetableEmbeddable;
 import com.kacademico.infra.entities.GradeEntity;
 
 public class GradeEntityMapper {
@@ -14,8 +16,8 @@ public class GradeEntityMapper {
             entity.getCapacity(),
             entity.getCurrentStudents(),
             entity.getStatus(),
-            entity.getSchedule(),
-            entity.getTimetables(),
+            entity.getSchedule().toDomain(),
+            entity.getTimetables().stream().map(TimetableEmbeddable::toDomain).toList(),
             SubjectEntityMapper.toDomain(entity.getSubject(), false),
             ProfessorEntityMapper.toDomain(entity.getProfessor(), false)
         );
@@ -36,8 +38,8 @@ public class GradeEntityMapper {
         entity.setCapacity(grade.getCapacity());
         entity.setCurrentStudents(grade.getCurrentStudents());
         entity.setStatus(grade.getStatus());
-        entity.setSchedule(grade.getSchedule());
-        entity.setTimetables(grade.getTimetables());
+        entity.setSchedule(ScheduleEmbeddable.fromDomain(grade.getSchedule()));
+        entity.setTimetables(grade.getTimetables().stream().map(TimetableEmbeddable::fromDomain).toList());
         entity.setSubject(SubjectEntityMapper.toEntity(grade.getSubject()));
         entity.setProfessor(ProfessorEntityMapper.toEntity(grade.getProfessor()));
 

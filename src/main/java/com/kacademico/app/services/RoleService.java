@@ -28,8 +28,8 @@ public class RoleService {
             data.description()
         );
 
-        roleR.save(role);
-        return CompletableFuture.completedFuture("Role successfully Created: " + role.getId());
+        Role saved = roleR.save(role);
+        return CompletableFuture.completedFuture("Role successfully Created: " + saved.getId());
     }
 
     @Async

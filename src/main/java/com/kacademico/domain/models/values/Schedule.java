@@ -2,25 +2,23 @@ package com.kacademico.domain.models.values;
 
 import java.util.Objects;
 
-import com.kacademico.shared.utils.Semester;
-
-import jakarta.persistence.Embeddable;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-@Getter
-@Setter
-@NoArgsConstructor
-@Embeddable
 public class Schedule {
     
-    @Semester
     private String semester;
-
     private String locate;
 
-    // private List<Timetable> timetable;
+    public Schedule() {}
+
+    public Schedule(String semester, String locate) {
+        setSemester(semester);
+        setLocate(locate);
+    }
+
+    public String getSemester() { return semester; }
+    public String getLocate() { return locate; }
+
+    public void setSemester(String semester) { this.semester = semester; }
+    public void setLocate(String locate) { this.locate = locate; }
 
     @Override
     public boolean equals(Object o) {
@@ -29,14 +27,11 @@ public class Schedule {
         Schedule that = (Schedule) o;
         return (
             Objects.equals(semester, that.semester) &&
-            Objects.equals(locate, that.locate) //&&
-            // Objects.equals(timetable, that.timetable)
+            Objects.equals(locate, that.locate)
         );
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(semester, locate);//, timetable);
-    }
+    public int hashCode() { return Objects.hash(semester, locate); }
 
 }

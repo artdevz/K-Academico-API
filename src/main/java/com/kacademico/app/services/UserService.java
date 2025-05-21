@@ -27,8 +27,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class UserService {
     
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
+    private final BCryptPasswordEncoder passwordEncoder;
     private final IUserRepository userR;
     private final EntityFinder finder;
     private final RequestMapper requestMapper;
@@ -39,8 +38,7 @@ public class UserService {
     public CompletableFuture<String> createInitialAdmin() {
         Role adminRole = roleR.findByName("ADMIN").orElseGet(() -> {
             Role role = new Role(null, "ADMIN", "All authorities in K-Academico System");
-            roleR.save(role);
-            return role;
+            return roleR.save(role);            
         });
         
         EnsureUniqueUtil.ensureUnique(() -> userR.findByEmail("admin@gmail.com"), () -> "An user with email " + "admin@gmail.com" + " already exists");
@@ -49,12 +47,13 @@ public class UserService {
             null,
             "K-Academico Admin",
             "admin@gmail.com",
-            passwordEncoder.encode("4bcdefG!"),
+            "4bcdefG!",
             Set.of(adminRole)
         );
-
-        userR.save(admin);
-        return CompletableFuture.completedFuture("Admin successfully Created: " + admin.getId());
+        
+        admin.setPassword(encodePassword(admin.getPassword()));
+        User saved = userR.save(admin);
+        return CompletableFuture.completedFuture("Admin successfully Created: " + saved.getId());
     }
 
     @Async
@@ -62,9 +61,9 @@ public class UserService {
         EnsureUniqueUtil.ensureUnique(() -> userR.findByEmail(data.email()), () -> "An user with email " + data.email() + " already exists");
 
         User user = requestMapper.toUser(data);
-        
-        userR.save(user);
-        return CompletableFuture.completedFuture("User successfully Created: " + user.getId());
+        user.setPassword(encodePassword(user.getPassword()));
+        User saved = userR.save(user);
+        return CompletableFuture.completedFuture("User successfully Created: " + saved.getId());
     }
 
     @Async
@@ -84,8 +83,9 @@ public class UserService {
         User user = finder.findByIdOrThrow(userR.findById(id), "User not Found");
         
         data.name().ifPresent(user::setName);
-        data.password().ifPresent(password -> user.setPassword(passwordEncoder.encode(password)));
-            
+        data.password().ifPresent(user::setPassword);
+
+        user.setPassword(encodePassword(user.getPassword()));
         userR.save(user);
         return CompletableFuture.completedFuture("Updated User");
     }
@@ -96,6 +96,12 @@ public class UserService {
         
         userR.deleteById(id);
         return CompletableFuture.completedFuture("Deleted User");
+    }
+
+    private String encodePassword(String password) {
+        if (password == null) return null;
+        if (password.startsWith("$2a$") || password.startsWith("$2b$") || password.startsWith("$2y$")) return password;  
+        return (passwordEncoder.encode(password));
     }
 
 }

@@ -3,6 +3,7 @@ package com.kacademico.infra.mapper;
 import java.util.stream.Collectors;
 
 import com.kacademico.domain.models.Student;
+import com.kacademico.infra.embeddables.EnrollmentEmbeddable;
 import com.kacademico.infra.entities.StudentEntity;
 
 public class StudentEntityMapper {
@@ -17,7 +18,7 @@ public class StudentEntityMapper {
             entity.getRoles().stream().map(RoleEntityMapper::toDomain).collect(Collectors.toSet()),
             entity.getCredits(),
             entity.getAverage(),
-            entity.getEnrollment(),
+            entity.getEnrollment().toDomain(),
             CourseEntityMapper.toDomain(entity.getCourse(), false)
         );
 
@@ -37,7 +38,7 @@ public class StudentEntityMapper {
         entity.setRoles(student.getRoles().stream().map(RoleEntityMapper::toEntity).collect(Collectors.toSet()));
         entity.setCredits(student.getCredits());
         entity.setAverage(student.getAverage());
-        entity.setEnrollment(student.getEnrollment());
+        entity.setEnrollment(EnrollmentEmbeddable.fromDomain(student.getEnrollment()));
         entity.setCourse(CourseEntityMapper.toEntity(student.getCourse()));
 
         return entity;

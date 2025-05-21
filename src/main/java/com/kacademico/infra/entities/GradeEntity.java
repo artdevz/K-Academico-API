@@ -7,8 +7,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.kacademico.domain.enums.EGrade;
-import com.kacademico.domain.models.values.Schedule;
-import com.kacademico.domain.models.values.Timetable;
+import com.kacademico.infra.embeddables.ScheduleEmbeddable;
+import com.kacademico.infra.embeddables.TimetableEmbeddable;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
@@ -48,11 +48,11 @@ public class GradeEntity {
     private EGrade status;
 
     @Embedded
-    private Schedule schedule;
+    private ScheduleEmbeddable schedule;
 
     @ElementCollection
     @CollectionTable(name = "grade_timetables", joinColumns = @JoinColumn(name = "grade_id"))
-    private List<Timetable> timetables = new ArrayList<>();
+    private List<TimetableEmbeddable> timetables = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "subject_id", nullable = false)

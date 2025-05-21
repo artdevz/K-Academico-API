@@ -11,7 +11,6 @@ public class AsyncResultHandler {
 
     public static <T> T await(CompletableFuture<T> future) {
         try {
-            System.out.println("Chegou em Try");
             return future.join();
         } 
         catch (CompletionException e) {

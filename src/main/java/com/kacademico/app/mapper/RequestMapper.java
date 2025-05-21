@@ -6,7 +6,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -57,7 +56,6 @@ import lombok.RequiredArgsConstructor;
 @Component
 public class RequestMapper {
 
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final EntityFinder finder;
 
     private final ICourseRepository courseR;
@@ -88,7 +86,7 @@ public class RequestMapper {
             null,
             data.name(),
             data.email(),
-            passwordEncoder.encode(data.password()),
+            data.password(),
             findRoles(data.roles())
         );
     }
@@ -125,7 +123,7 @@ public class RequestMapper {
             null,
             data.user().name(),
             data.user().email(),
-            passwordEncoder.encode(data.user().password()),
+            data.user().password(),
             findRoles(data.user().roles())
         );
     }

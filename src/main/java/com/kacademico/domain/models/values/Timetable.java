@@ -4,31 +4,25 @@ import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.Objects;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
-import jakarta.persistence.Embeddable;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Embeddable
 public class Timetable {
     
-    @Enumerated(EnumType.STRING)
     private DayOfWeek day;
-
-    @JsonFormat(pattern = "HH:mm")
     private LocalTime startTime;
-
-    @JsonFormat(pattern = "HH:mm")
     private LocalTime endTime;
+
+    public Timetable() {}
+
+    public Timetable(DayOfWeek day, LocalTime startTime, LocalTime endTime) {
+
+    }
+
+    public DayOfWeek getDay() { return day; }
+    public LocalTime getStartTime() { return startTime; }
+    public LocalTime getEndTime() { return endTime; }
+
+    public void setDay(DayOfWeek day) { this.day = day; }
+    public void setStartTime(LocalTime startTime) { this.startTime = startTime; }
+    public void setEndTime(LocalTime endTime) { this.endTime = endTime; }
 
     public boolean conflictWith(Timetable other) {
         if (!this.day.equals(other.day)) return false;
@@ -48,8 +42,6 @@ public class Timetable {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(day, startTime, endTime);
-    }
+    public int hashCode() { return Objects.hash(day, startTime, endTime); }
 
 }

@@ -3,7 +3,7 @@ package com.kacademico.infra.entities;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.kacademico.domain.models.values.Enrollment;
+import com.kacademico.infra.embeddables.EnrollmentEmbeddable;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Embedded;
@@ -34,7 +34,7 @@ public class StudentEntity extends UserEntity {
 
     @NotNull
     @Embedded
-    private Enrollment enrollment;
+    private EnrollmentEmbeddable enrollment;
 
     @ManyToOne
     @JoinColumn(name = "course_id")
