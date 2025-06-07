@@ -32,10 +32,8 @@ public class CourseRepository implements ICourseRepository {
     
     @Override
     public Course save(Course course) {
-        System.out.println("Salvando Course");
         CourseEntity entity = CourseEntityMapper.toEntity(course);
         CourseEntity saved = jpa.save(entity);
-        System.out.println("Salvo");
         return CourseEntityMapper.toDomain(saved, true);
     }
     

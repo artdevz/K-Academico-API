@@ -45,8 +45,8 @@ public class ResponseMapper {
             course.getId(),
             course.getName(),
             course.getCode(),
-            course.getDuration(),
-            course.getDescription()
+            course.getDescription(),
+            course.getWorkload()
         );
     }
 

@@ -4,7 +4,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record CourseRequestDTO(
-    @Size(min=8, max=128, message="Course name must be between 4 and 128 characters")
+    @Size(min=8, max=128, message="Course name must be between 8 and 128 characters")
     String name,
 
     @Pattern(regexp = "^\\d+$", message = "Course code must contain only numbers")
@@ -12,5 +12,8 @@ public record CourseRequestDTO(
     String code,
 
     @Size(max=255, message = "Description must be at most 255 characters")
-    String description
+    String description,
+
+    WorkloadDTO workload
+    
 ) {}

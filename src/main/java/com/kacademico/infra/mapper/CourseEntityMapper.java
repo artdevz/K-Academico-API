@@ -3,6 +3,7 @@ package com.kacademico.infra.mapper;
 import java.util.stream.Collectors;
 
 import com.kacademico.domain.models.Course;
+import com.kacademico.infra.embeddables.WorkloadEmbeddable;
 import com.kacademico.infra.entities.CourseEntity;
 
 public class CourseEntityMapper {
@@ -14,7 +15,7 @@ public class CourseEntityMapper {
             entity.getName(),
             entity.getCode(),
             entity.getDescription(),
-            entity.getDuration()
+            entity.getWorkload().toDomain()
         );
 
         if (details) {
@@ -32,7 +33,7 @@ public class CourseEntityMapper {
         entity.setName(course.getName());
         entity.setCode(course.getCode());
         entity.setDescription(course.getDescription());
-        entity.setDuration(course.getDuration());
+        entity.setWorkload(WorkloadEmbeddable.fromDomain(course.getWorkload()));
 
         return entity;
     }

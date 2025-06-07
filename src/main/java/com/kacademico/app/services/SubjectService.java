@@ -38,7 +38,8 @@ public class SubjectService {
         Subject subject = requestMapper.toSubject(data);
         
         Subject saved = subjectR.save(subject);
-        updateCourseDuration(subject.getCourse());
+        saved.getCourse().addSubject(saved);
+        updateCourseWorkload(saved.getCourse());
 
         return CompletableFuture.completedFuture("Subject successfully Created: " + saved.getId());
     }
@@ -66,8 +67,6 @@ public class SubjectService {
         data.isRequired().ifPresent(subject::setRequired);
         data.name().ifPresent(subject::setName);
         data.description().ifPresent(subject::setDescription);
-        // data.duration().ifPresent(subject::setDuration);
-        // data.semester().ifPresent(subject::setSemester);
 
         subjectR.save(subject);
         return CompletableFuture.completedFuture("Updated Subject");
@@ -79,28 +78,16 @@ public class SubjectService {
         Subject subject = finder.findByIdOrThrow(subjectR.findById(id), "Subject not Found");
 
         subjectR.deleteById(id);
-        updateCourseDuration(subject.getCourse());
+        subject.getCourse().removeSubject(subject);
+        updateCourseWorkload(subject.getCourse());
 
         return CompletableFuture.completedFuture("Deleted Subject");
     }
 
-    private void updateCourseDuration(Course course) {
-        System.out.println("Attualizando");
-        System.out.println("Course Duration Antes: " + course.getDuration());
-        System.out.println("Course Subjects Size Antes: " + course.getSubjects().size());
-        for (Subject subject : course.getSubjects()) {
-            System.out.println("Subject: " + subject.getName());
-        }
-        int duration = course.getSubjects().stream()
-            .mapToInt(Subject::getDuration).sum();
-        course.setDuration(duration);
+    private void updateCourseWorkload(Course course) {
+        int mandatoryHours = course.getSubjects().stream().filter(Subject::isRequired).mapToInt(Subject::getDuration).sum();
+        course.getWorkload().setMandatoryHours(mandatoryHours);
         courseR.save(course);
-        System.out.println("Course Duration Dps: " + course.getDuration());
-        System.out.println("Course Subjects Size Dps: " + course.getSubjects().size());
-        for (Subject subject : course.getSubjects()) {
-            System.out.println("Subject: " + subject.getName());
-        }
-        System.out.println("Atualizado");
     }
 
 }

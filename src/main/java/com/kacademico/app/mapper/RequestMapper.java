@@ -11,6 +11,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.kacademico.app.dto.attendance.AttendanceRequestDTO;
 import com.kacademico.app.dto.course.CourseRequestDTO;
+import com.kacademico.app.dto.course.WorkloadDTO;
 import com.kacademico.app.dto.enrollee.EnrolleeRequestDTO;
 import com.kacademico.app.dto.equivalence.EquivalenceRequestDTO;
 import com.kacademico.app.dto.evaluation.EvaluationRequestDTO;
@@ -39,8 +40,8 @@ import com.kacademico.domain.models.Role;
 import com.kacademico.domain.models.Student;
 import com.kacademico.domain.models.Subject;
 import com.kacademico.domain.models.User;
+import com.kacademico.domain.models.values.Workload;
 import com.kacademico.domain.repositories.IEnrolleeRepository;
-// import com.kacademico.domain.repositories.IEquivalenceRepository;
 import com.kacademico.domain.repositories.IExamRepository;
 import com.kacademico.domain.repositories.IGradeRepository;
 import com.kacademico.domain.repositories.ICourseRepository;
@@ -66,7 +67,6 @@ public class RequestMapper {
     private final IEnrolleeRepository enrolleeR;
     private final IExamRepository examR;
     private final ILessonRepository lessonR;
-    // private final IEquivalenceRepository equivalenceR;
     private final IRoleRepository roleR;
     
     private final EnrollmentGeneratorService enrollmentGS;
@@ -77,7 +77,16 @@ public class RequestMapper {
             data.name(),
             data.code(),
             data.description(),
-            0 // DEFAULT DURATION STARTER VALUE
+            toWorkload(data.workload())
+        );
+    }
+
+    public Workload toWorkload(WorkloadDTO data) {
+        return new Workload(
+            0, // Default Value, Será aumentado ou diminuido a medida que Subjects são criadas
+            data.electiveHours(),
+            data.complementaryHours(),
+            data.internshipHours()
         );
     }
 

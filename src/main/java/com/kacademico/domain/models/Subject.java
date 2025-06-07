@@ -34,7 +34,7 @@ public class Subject {
         setDuration(duration);
         setSemester(semester);
         setRequired(isRequired);
-        this.course = course;
+        setCourse(course);
     }
     
     public UUID getId() { return id; }
@@ -68,5 +68,6 @@ public class Subject {
     }
 
     public void setRequired(boolean isRequired) { this.isRequired = isRequired; }
+    public void setCourse(Course course) { this.course = course; }
 
 }
