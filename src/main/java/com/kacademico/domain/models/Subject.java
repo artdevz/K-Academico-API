@@ -70,4 +70,12 @@ public class Subject {
     public void setRequired(boolean isRequired) { this.isRequired = isRequired; }
     public void setCourse(Course course) { this.course = course; }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Subject subject = (Subject) o;
+        return id != null && id.equals(subject.id);
+    }
+
 }

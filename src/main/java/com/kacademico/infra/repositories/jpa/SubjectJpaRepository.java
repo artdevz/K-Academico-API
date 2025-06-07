@@ -10,7 +10,7 @@ import com.kacademico.infra.entities.SubjectEntity;
 
 public interface SubjectJpaRepository extends JpaRepository<SubjectEntity, UUID> {
     
-    @EntityGraph(attributePaths = {"course", "prerequisites", "prerequisites.subjects", "grades"})
+    @EntityGraph(attributePaths = {"course", "course.subjects", "prerequisites", "prerequisites.subjects", "grades"})
     Optional<SubjectEntity> findById(UUID id);
 
 }

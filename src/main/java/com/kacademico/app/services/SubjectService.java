@@ -38,8 +38,9 @@ public class SubjectService {
         Subject subject = requestMapper.toSubject(data);
         
         Subject saved = subjectR.save(subject);
-        saved.getCourse().addSubject(saved);
-        updateCourseWorkload(saved.getCourse());
+        Course subjectCourse = finder.findByIdOrThrow(courseR.findById(saved.getCourse().getId()), "Course not Found");
+        subjectCourse.addSubject(saved);
+        updateCourseWorkload(subjectCourse);
 
         return CompletableFuture.completedFuture("Subject successfully Created: " + saved.getId());
     }
@@ -78,8 +79,9 @@ public class SubjectService {
         Subject subject = finder.findByIdOrThrow(subjectR.findById(id), "Subject not Found");
 
         subjectR.deleteById(id);
-        subject.getCourse().removeSubject(subject);
-        updateCourseWorkload(subject.getCourse());
+        Course subjectCourse = finder.findByIdOrThrow(courseR.findById(subject.getCourse().getId()), "Course not Found");
+        subjectCourse.removeSubject(subject);
+        updateCourseWorkload(subjectCourse);
 
         return CompletableFuture.completedFuture("Deleted Subject");
     }

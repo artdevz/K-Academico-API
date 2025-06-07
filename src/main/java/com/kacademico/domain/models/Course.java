@@ -74,7 +74,10 @@ public class Course {
     }
 
     public void removeSubject(Subject subject) {
-        if (subjects != null && subjects.remove(subject)) subject.setCourse(null);
+        if (subjects != null) {
+            System.out.println(subjects.remove(subject));
+            subject.setCourse(null);
+        }
     }
 
 }
