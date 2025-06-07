@@ -15,6 +15,5 @@ public interface ICourseRepository {
 
     Optional<Course> findByCode(String code);
     Optional<Course> findByName(String name);
-    Optional<Course> findWithSubjectsById(UUID id);
 
 }

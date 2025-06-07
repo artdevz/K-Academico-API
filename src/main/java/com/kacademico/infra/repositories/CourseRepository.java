@@ -54,9 +54,4 @@ public class CourseRepository implements ICourseRepository {
         return jpa.findByName(name).map(entity -> CourseEntityMapper.toDomain(entity, true));
     }
 
-    @Override
-    public Optional<Course> findWithSubjectsById(UUID id) {
-        return jpa.findWithSubjectsById(id).map(entity -> CourseEntityMapper.toDomain(entity, true));
-    }
-
 }

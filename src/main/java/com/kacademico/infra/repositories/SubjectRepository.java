@@ -22,9 +22,7 @@ public class SubjectRepository implements ISubjectRepository {
 
     @Override
     public List<Subject> findAll() {
-        return jpa.findAll().stream()
-            .map(entity -> SubjectEntityMapper.toDomain(entity, false))
-            .toList();
+        return jpa.findAll().stream().map(entity -> SubjectEntityMapper.toDomain(entity, false)).toList();
     }
 
 	@Override

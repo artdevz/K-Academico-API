@@ -51,7 +51,7 @@ public class CourseService {
     @Transactional
     @Async
     public CompletableFuture<CourseDetailsDTO> readByIdAsync(UUID id) {
-        Course course = finder.findByIdOrThrow(courseR.findWithSubjectsById(id), "Course not Found");
+        Course course = finder.findByIdOrThrow(courseR.findById(id), "Course not Found");
 
         return CompletableFuture.completedFuture(
             new CourseDetailsDTO(

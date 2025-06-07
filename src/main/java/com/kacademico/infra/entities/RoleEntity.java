@@ -20,7 +20,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@Entity(name = "Role")
 @Table(name = "roles")
 public class RoleEntity implements GrantedAuthority {
     

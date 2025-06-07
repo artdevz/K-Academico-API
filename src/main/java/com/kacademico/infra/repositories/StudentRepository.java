@@ -48,14 +48,4 @@ public class StudentRepository implements IStudentRepository {
         return jpa.findAllEnrollmentsByPrefix(prefix);
     }
 
-    @Override
-    public List<Student> findAllWithEnrollees() {
-        return jpa.findAll().stream().map(entity -> StudentEntityMapper.toDomain(entity, true)).toList();
-    }
-
-    @Override
-    public Optional<Student> findWithEnrolleesById(UUID id) {
-        return jpa.findWithEnrolleesById(id).map(entity -> StudentEntityMapper.toDomain(entity, true));
-    }
-
 }

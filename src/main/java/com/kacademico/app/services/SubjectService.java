@@ -3,13 +3,11 @@ package com.kacademico.app.services;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.kacademico.app.dto.equivalence.EquivalenceResponseDTO;
 import com.kacademico.app.dto.subject.SubjectDetailsDTO;
 import com.kacademico.app.dto.subject.SubjectRequestDTO;
 import com.kacademico.app.dto.subject.SubjectResponseDTO;
@@ -56,10 +54,7 @@ public class SubjectService {
         return CompletableFuture.completedFuture(
             new SubjectDetailsDTO(
                 responseMapper.toSubjectResponseDTO(subject),
-                subject.getPrerequisites().stream().map(prerequisites -> new EquivalenceResponseDTO(
-                    prerequisites.getId(),
-                    prerequisites.getName()
-                )).collect(Collectors.toList())
+                subject.getPrerequisites().stream().map(responseMapper::toEquivalenceResponseDTO).toList()
             )
         );
     }

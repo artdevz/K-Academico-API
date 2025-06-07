@@ -5,6 +5,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.kacademico.app.dto.professor.ProfessorRequestDTO;
@@ -24,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class ProfessorService {
         
+    private final BCryptPasswordEncoder passwordEncoder;
     private final IProfessorRepository professorR;
     private final IUserRepository userR;
     private final RequestMapper requestMapper;
@@ -35,9 +37,10 @@ public class ProfessorService {
         EnsureUniqueUtil.ensureUnique(() -> userR.findByEmail(data.user().email()), () -> "An user with email " + data.user().email() + " already exists");
 
         Professor professor = requestMapper.toProfessor(data);
+        professor.setPassword(encodePassword(professor.getPassword()));
+        Professor saved = professorR.save(professor);
 
-        professorR.save(professor);
-        return CompletableFuture.completedFuture("Professor successfully Created: " + professor.getId());
+        return CompletableFuture.completedFuture("Professor successfully Created: " + saved.getId());
     }
 
     @Async
@@ -64,6 +67,12 @@ public class ProfessorService {
         
         professorR.deleteById(id);
         return CompletableFuture.completedFuture("Deleted Professor");
+    }
+
+    private String encodePassword(String password) {
+        if (password == null) return null;
+        if (password.startsWith("$2a$") || password.startsWith("$2b$") || password.startsWith("$2y$")) return password;  
+        return (passwordEncoder.encode(password));
     }
 
 }

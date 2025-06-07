@@ -21,7 +21,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@Entity(name = "Equivalence")
 @Table(name = "equivalences")
 public class EquivalenceEntity {
     

@@ -24,7 +24,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@Entity(name = "Student")
 @Table(name = "students")
 public class StudentEntity extends UserEntity {
     

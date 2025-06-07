@@ -99,7 +99,7 @@ public class SemesterService {
     }
 
     private void updateStudentsAvarage() {
-        studentR.findAllWithEnrollees().forEach(this::updateStudentAvarage);
+        studentR.findAll().forEach(this::updateStudentAvarage);
     }
 
     private void updateStudentAvarage(Student student) {

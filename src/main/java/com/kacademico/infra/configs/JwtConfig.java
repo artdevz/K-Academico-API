@@ -14,7 +14,7 @@ public class JwtConfig {
     private static final Logger log = LoggerFactory.getLogger(JwtConfig.class);
 
     public static final SignatureAlgorithm SIGNATURE_ALGORITHM = SignatureAlgorithm.HS256;
-    public static final long EXPIRATION_TIME_MS = 3600000L;
+    public static final long EXPIRATION_TIME_MS = 3600000L * 24; // TEMPORARIO
 
     @Value("${jwt.secret:DEFAULT_SECRET_KEY_WITH_32_BYTES}")
     private String secretKey;

@@ -15,7 +15,5 @@ public interface IStudentRepository {
     void deleteById(UUID id);
 
     Set<String> findAllEnrollmentsByPrefix(String prefix);
-    List<Student> findAllWithEnrollees();
-    Optional<Student> findWithEnrolleesById(UUID id);
 
 }
