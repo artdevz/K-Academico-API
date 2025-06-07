@@ -16,7 +16,6 @@ public class UserEntityMapper {
             entity.getPassword(),
             entity.getRoles().stream().map(RoleEntityMapper::toDomain).collect(Collectors.toSet())
         );
-
         return user;
     }
 

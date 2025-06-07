@@ -121,7 +121,7 @@ public class RequestMapper {
             data.user().password(),
             findRoles(data.user().roles()),
             0, // DEFAULT CREDITS STARTER VALUE
-            0, // DEFAULT AVERAGE STARTER VALUE
+            0f, // DEFAULT AVERAGE STARTER VALUE
             enrollmentGS.generate(finder.findByIdOrThrow(courseR.findById(data.course()), "Course not Found").getCode()),
             finder.findByIdOrThrow(courseR.findById(data.course()), "Course not Found")
         );

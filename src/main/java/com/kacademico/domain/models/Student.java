@@ -14,7 +14,7 @@ public class Student extends User {
     private static final int MIN_AVERAGE = 0;
     
     private int credits;
-    private float average;
+    private Float average;
 
     private Enrollment enrollment;
 
@@ -46,7 +46,6 @@ public class Student extends User {
     public void setAverage(float average) {
         if (average < MIN_AVERAGE || average > MAX_AVERAGE) throw new IllegalArgumentException("Average must be between " + MIN_AVERAGE + " and " + MAX_AVERAGE);
         this.average = average;
-        System.out.println("20");
     }
 
 }

@@ -20,7 +20,9 @@ import com.kacademico.domain.repositories.ICourseRepository;
 import com.kacademico.shared.utils.EnsureUniqueUtil;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class CourseService {
@@ -32,25 +34,32 @@ public class CourseService {
 
     @Async
     public CompletableFuture<String> createAsync(CourseRequestDTO data) {
+        log.info("[API] Iniciando criação do curso com código: {}", data.code());
+        
         EnsureUniqueUtil.ensureUnique(() -> courseR.findByCode(data.code()), () -> "A course with code " + data.code() + " already exists");        
         EnsureUniqueUtil.ensureUnique(() -> courseR.findByName(data.name()), () -> "A course with name " + data.name() + " already exists");
 
         Course course = requestMapper.toCourse(data);
         Course saved = courseR.save(course);
 
+        log.info("[API] Curso criado com sucesso. ID: {}", saved.getId());
         return CompletableFuture.completedFuture("Course successfully Created: " + saved.getId());
     }
 
     @Async
     public CompletableFuture<List<CourseResponseDTO>> readAllAsync() {
+        log.debug("[API] Buscando todos os cursos");
         List<Course> courses = courseR.findAll();
         List<CourseResponseDTO> response = responseMapper.toResponseDTOList(courses, responseMapper::toCourseResponseDTO);
+        
+        log.debug("[API] Encontrados {} cursos", response.size());
         return CompletableFuture.completedFuture(response);
     }
 
     @Transactional
     @Async
     public CompletableFuture<CourseDetailsDTO> readByIdAsync(UUID id) {
+        log.debug("[API] Buscando curso com ID: {}", id);
         Course course = finder.findByIdOrThrow(courseR.findById(id), "Course not Found");
 
         return CompletableFuture.completedFuture(
@@ -63,6 +72,7 @@ public class CourseService {
 
     @Async
     public CompletableFuture<String> updateAsync(UUID id, CourseUpdateDTO data) {
+        log.info("[API] Atualizando curso com ID: {}", id);
         Course course = finder.findByIdOrThrow(courseR.findById(id), "Course not Found");
 
         if (data.name().isPresent()) {
@@ -72,13 +82,16 @@ public class CourseService {
         data.description().ifPresent(course::setDescription);
 
         courseR.save(course);
+        log.info("[API] Curso atualizado com sucesso. ID: {}", id);
         return CompletableFuture.completedFuture("Updated Course");
     }
 
     @Async
     public CompletableFuture<String> deleteAsync(UUID id) {
+        log.warn("[API] Solicitada exclusão do curso com ID: {}", id);
         finder.findByIdOrThrow(courseR.findById(id), "Course not Found");        
         courseR.deleteById(id);
+        log.info("[API] Curso deletado com sucesso. ID: {}", id);
         return CompletableFuture.completedFuture("Deleted Course");
     }
 

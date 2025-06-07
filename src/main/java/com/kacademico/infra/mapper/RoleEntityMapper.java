@@ -12,7 +12,6 @@ public class RoleEntityMapper {
             entity.getName(),
             entity.getDescription()
         );
-
         return role;
     }
 

@@ -3,19 +3,16 @@ package com.kacademico.app.services;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.kacademico.app.dto.attendance.AttendanceResponseDTO;
 import com.kacademico.app.dto.enrollee.EnrolleeDetailsDTO;
 import com.kacademico.app.dto.enrollee.EnrolleeRequestDTO;
 import com.kacademico.app.dto.enrollee.EnrolleeResponseDTO;
 import com.kacademico.app.dto.enrollee.EnrolleeUpdateDTO;
-import com.kacademico.app.dto.evaluation.EvaluationResponseDTO;
 import com.kacademico.app.helpers.EntityFinder;
 import com.kacademico.app.mapper.RequestMapper;
 import com.kacademico.app.mapper.ResponseMapper;
@@ -28,7 +25,9 @@ import com.kacademico.domain.repositories.IStudentRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class EnrolleeService {
@@ -42,71 +41,75 @@ public class EnrolleeService {
 
     @Async
     public CompletableFuture<String> createAsync(EnrolleeRequestDTO data) {
+        log.info("[API] Criando matrícula para o estudante ID: {}", data.student());
         Enrollee enrollee = requestMapper.toEnrollee(data);
 
         ensureStudentIsUnique(enrollee.getStudent());
         
         enrolleeR.save(enrollee);
         updateGrade(enrollee.getGrade());
+        log.info("[API] Matrícula criada com sucesso: {}", enrollee.getId());
         return CompletableFuture.completedFuture("Enrollee successfully Created: " + enrollee.getId());
     }
 
     @Async
     public CompletableFuture<List<EnrolleeResponseDTO>> readAllAsync() {
-        return CompletableFuture.completedFuture(responseMapper.toResponseDTOList(enrolleeR.findAll(), responseMapper::toEnrolleeResponseDTO));
+        log.debug("[API] Buscando todas as matrículas");
+
+        List<EnrolleeResponseDTO> response = responseMapper.toResponseDTOList(enrolleeR.findAll(), responseMapper::toEnrolleeResponseDTO);
+        
+        log.debug("[API] Encontradas {} matrículas", response.size());
+        return CompletableFuture.completedFuture(response);
     }
 
     @Transactional
     @Async
     public CompletableFuture<EnrolleeDetailsDTO> readByIdAsync(UUID id) {
-            Enrollee enrollee = finder.findByIdOrThrow(enrolleeR.findById(id), "Enrollee not Found");
-            
-            return CompletableFuture.completedFuture(
-                new EnrolleeDetailsDTO(
-                    responseMapper.toEnrolleeResponseDTO(enrollee),
-                    enrollee.getEvaluations().stream().map(evaluation -> new EvaluationResponseDTO(
-                        evaluation.getId(),
-                        evaluation.getEnrollee().getId(),
-                        evaluation.getExam().getGrade().getId(),
-                        evaluation.getExam().getId(),
-                        evaluation.getScore()
-                    )).collect(Collectors.toList()),
-                    enrollee.getAttendances().stream().map(attendance -> new AttendanceResponseDTO(
-                        attendance.getId(),
-                        attendance.getEnrollee().getId(),
-                        attendance.getLesson().getId(),
-                        attendance.isAbsent()
-                    )).collect(Collectors.toList())
-                )
-            );
+        log.debug("[API] Buscando matrícula com ID: {}", id);
+        Enrollee enrollee = finder.findByIdOrThrow(enrolleeR.findById(id), "Enrollee not Found");
+        
+        log.debug("[API] Matrícula encontrada: {}", enrollee.getId());
+        return CompletableFuture.completedFuture(
+            new EnrolleeDetailsDTO(
+                responseMapper.toEnrolleeResponseDTO(enrollee),
+                responseMapper.toResponseDTOList(enrollee.getEvaluations().stream().toList(), responseMapper::toEvaluationResponseDTO),
+                responseMapper.toResponseDTOList(enrollee.getAttendances().stream().toList(), responseMapper::toAttendanceResponseDTO)
+            )
+        );
     }
 
     @Async
     public CompletableFuture<String> updateAsync(UUID id, EnrolleeUpdateDTO data) {
-            Enrollee enrollee = finder.findByIdOrThrow(enrolleeR.findById(id), "Enrollee not Found");
-                
-            enrolleeR.save(enrollee);
-            return CompletableFuture.completedFuture("Updated Enrollee");
+        log.info("[API] Atualizando matrícula com ID: {}", id);
+        Enrollee enrollee = finder.findByIdOrThrow(enrolleeR.findById(id), "Enrollee not Found");
+        
+        enrolleeR.save(enrollee);
+        log.info("[API] Matrícula atualizada com sucesso. ID: {}", id);
+        return CompletableFuture.completedFuture("Updated Enrollee");
     }
 
     @Async
     public CompletableFuture<String> deleteAsync(UUID id) {
-            Enrollee enrollee = finder.findByIdOrThrow(enrolleeR.findWithEvaluationsAndAttendancesById(id), "Enrollee not Found");
-            
-            enrolleeR.deleteById(id);
-            updateGrade(enrollee.getGrade());
-            return CompletableFuture.completedFuture("Deleted Enrollee");
+        log.warn("[API] Solicitada exclusão da matrícula com ID: {}", id);
+        Enrollee enrollee = finder.findByIdOrThrow(enrolleeR.findWithEvaluationsAndAttendancesById(id), "Enrollee not Found");
+        
+        enrolleeR.deleteById(id);
+        updateGrade(enrollee.getGrade());
+        log.info("[API] Matrícula deletada com sucesso. ID: {}", id);
+        return CompletableFuture.completedFuture("Deleted Enrollee");
     }
 
     private void ensureStudentIsUnique(Student student) {
-        if (studentR.findById(student.getId()).isPresent()) throw new ResponseStatusException(HttpStatus.CONFLICT, "Student already exists for this Grade");
+        if (studentR.findById(student.getId()).isPresent()) {
+            log.error("[API] Estudante já matriculado para esta Turma. Student ID: {}", student.getId());
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Student already exists for this Grade");
+        }
     }
 
     private void updateGrade(Grade grade) {
-        grade.setCurrentStudents( (int)grade.getEnrollees().stream().count());
-        System.out.println("Grade Current Students: " + grade.getCurrentStudents());
-        System.out.println("GradeEnrollees: " + (int)grade.getEnrollees().stream().count());
+        int count = (int) grade.getEnrollees().stream().count();
+        grade.setCurrentStudents(count);
+        log.info("[API] Atualizando Turma ID {}: Alunos atuais = {}", grade.getId(), count);
         gradeR.save(grade);
     }
-
 }

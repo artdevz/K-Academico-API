@@ -28,9 +28,9 @@ import lombok.Setter;
 @Table(name = "students")
 public class StudentEntity extends UserEntity {
     
-    private int credits;
+    private Integer credits;
 
-    private float average;
+    private Float average;
 
     @NotNull
     @Embedded

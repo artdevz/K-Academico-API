@@ -22,7 +22,9 @@ import com.kacademico.shared.utils.EnsureUniqueUtil;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class StudentService {
@@ -34,14 +36,17 @@ public class StudentService {
     private final ResponseMapper responseMapper;
     private final EntityFinder finder;
 
+    @Transactional
     @Async
     public CompletableFuture<String> createAsync(StudentRequestDTO data) {
+        log.info("[API] Iniciando criação de estudante com email: {}", data.user().email());
         EnsureUniqueUtil.ensureUnique(() -> userR.findByEmail(data.user().email()), () -> "An user with email " + data.user().email() + " already exists");
 
         Student student = requestMapper.toStudent(data);
         student.setPassword(encodePassword(student.getPassword()));
         Student saved = studentR.save(student);
 
+        log.info("[API] Estudante criado com sucesso. ID: {}", saved.getId());
         return CompletableFuture.completedFuture("Student successfully Created: " + saved.getId());
     }
 
@@ -53,8 +58,10 @@ public class StudentService {
     @Async
     @Transactional
     public CompletableFuture<StudentDetailsDTO> readByIdAsync(UUID id) {
+        log.debug("[API] Buscando estudante com ID: {}", id);
         Student student = finder.findByIdOrThrow(studentR.findById(id), "Student not Found");
         
+        log.debug("[API] Estudante encontrado: {}", student.getId());
         return CompletableFuture.completedFuture(new StudentDetailsDTO(
             responseMapper.toStudentResponseDTO(student),
             responseMapper.toResponseDTOList(student.getEnrollees(), responseMapper::toEnrolleeResponseDTO)
@@ -63,23 +70,32 @@ public class StudentService {
 
     @Async
     public CompletableFuture<String> updateAsync(UUID id, StudentUpdateDTO data) {
+        log.info("[API] Atualizando estudante com ID: {}", id);
         Student student = finder.findByIdOrThrow(studentR.findById(id), "Student not Found");
-            
+        
+        log.info("[API] Estudante atualizado com sucesso. ID: {}", id);
         studentR.save(student);
         return CompletableFuture.completedFuture("Updated Student");
     }
 
+    @Transactional
     @Async
     public CompletableFuture<String> deleteAsync(UUID id) {
+        log.warn("[API] Solicitada exclusão do estudante com ID: {}", id);
         finder.findByIdOrThrow(studentR.findById(id), "Student not Found"); 
         
+        log.info("[API] Estudante deletado com sucesso. ID: {}", id);
         studentR.deleteById(id);
         return CompletableFuture.completedFuture("Deleted Student");
     }
 
     private String encodePassword(String password) {
+        log.info("[API] Senha será encriptografada");
+
         if (password == null) return null;
         if (password.startsWith("$2a$") || password.startsWith("$2b$") || password.startsWith("$2y$")) return password;  
+ 
+        log.warn("[API] Encriptografando senha");
         return (passwordEncoder.encode(password));
     }
 
