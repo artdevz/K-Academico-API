@@ -17,7 +17,9 @@ import com.kacademico.domain.models.Exam;
 import com.kacademico.domain.repositories.IExamRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class ExamService {
@@ -29,35 +31,50 @@ public class ExamService {
 
     @Async
     public CompletableFuture<String> createAsync(ExamRequestDTO data) {
+        log.info("[API] Iniciando criação de avaliação para gradeId: {}", data.grade());
+        
         Exam exam = requestMapper.toExam(data);
-
-        examR.save(exam);
-        return CompletableFuture.completedFuture("Exam successfully Created: " + exam.getId());
+        Exam saved = examR.save(exam);
+        
+        log.info("[API] Avaliação criada com sucesso. ID: {}", saved.getId());
+        return CompletableFuture.completedFuture("Exam successfully Created: " + saved.getId());
     }
 
     @Async
     public CompletableFuture<List<ExamResponseDTO>> readAllAsync() {
-        return CompletableFuture.completedFuture(responseMapper.toResponseDTOList(examR.findAll(), responseMapper::toExamResponseDTO));
+        log.debug("[API] Buscando todas as avaliações");
+        List<ExamResponseDTO> response = responseMapper.toResponseDTOList(examR.findAll(), responseMapper::toExamResponseDTO);
+
+        log.debug("[API] Encontradas {} avaliações", response.size());
+        return CompletableFuture.completedFuture(response);
     }
 
     @Async
     public CompletableFuture<ExamResponseDTO> readByIdAsync(UUID id) {
-        return CompletableFuture.completedFuture(responseMapper.toExamResponseDTO(finder.findByIdOrThrow(examR.findById(id), "Exam not Found")));
+        log.debug("[API] Buscando avaliação com ID: {}", id);
+        Exam exam = finder.findByIdOrThrow(examR.findById(id), "Exam not Found");
+
+        log.debug("[API] Avaliação encontrada: {}", exam.getId());
+        return CompletableFuture.completedFuture(responseMapper.toExamResponseDTO(exam));
     }
 
     @Async
     public CompletableFuture<String> updateAsync(UUID id, ExamUpdateDTO data) {
+        log.info("[API] Atualizando avaliação com ID: {}", id);
         Exam exam = finder.findByIdOrThrow(examR.findById(id), "Exam not Found");
             
         examR.save(exam);
+        log.info("[API] Avaliação atualizada com sucesso. ID: {}", id);
         return CompletableFuture.completedFuture("Updated Exam");
     }
 
     @Async
     public CompletableFuture<String> deleteAsync(UUID id) {
+        log.warn("[API] Solicitada exclusão da avaliação com ID: {}", id);
         finder.findByIdOrThrow(examR.findById(id), "Exam not Found");
         
         examR.deleteById(id);
+        log.info("[API] Avaliação deletada com sucesso. ID: {}", id);
         return CompletableFuture.completedFuture("Deleted Exam");
     }
 

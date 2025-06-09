@@ -47,12 +47,11 @@ public class AttendanceService {
         ensureAttendanceNotExists(enrollee, lesson);
 
         Attendance attendance = requestMapper.toAttendance(data);
-        
-        attendanceR.save(attendance);
-        updateAbsences(attendance.getEnrollee());
+        Attendance saved = attendanceR.save(attendance);
+        updateAbsences(enrollee);
 
-        log.info("[API] Presença criada com sucesso. ID: {}", attendance.getId());
-        return CompletableFuture.completedFuture("Attendance successfully Created: " + attendance.getId());
+        log.info("[API] Presença criada com sucesso. ID: {}", saved.getId());
+        return CompletableFuture.completedFuture("Attendance successfully Created: " + saved.getId());
     }
 
     @Async

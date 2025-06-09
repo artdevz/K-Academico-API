@@ -46,10 +46,10 @@ public class EnrolleeService {
 
         ensureStudentIsUnique(enrollee.getStudent());
         
-        enrolleeR.save(enrollee);
-        updateGrade(enrollee.getGrade());
-        log.info("[API] Matrícula criada com sucesso: {}", enrollee.getId());
-        return CompletableFuture.completedFuture("Enrollee successfully Created: " + enrollee.getId());
+        Enrollee saved = enrolleeR.save(enrollee);
+        updateGrade(saved.getGrade());
+        log.info("[API] Matrícula criada com sucesso: {}", saved.getId());
+        return CompletableFuture.completedFuture("Enrollee successfully Created: " + saved.getId());
     }
 
     @Async

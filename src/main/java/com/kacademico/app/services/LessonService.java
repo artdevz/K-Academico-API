@@ -17,7 +17,9 @@ import com.kacademico.domain.models.Lesson;
 import com.kacademico.domain.repositories.ILessonRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class LessonService {
@@ -29,35 +31,50 @@ public class LessonService {
 
     @Async
     public CompletableFuture<String> createAsync(LessonRequestDTO data) {
+        log.info("[API] Iniciando a criação de aula para gradeId: {}", data.grade());
+
         Lesson lesson = requestMapper.toLesson(data);
+        Lesson saved = lessonR.save(lesson);
         
-        lessonR.save(lesson);
-        return CompletableFuture.completedFuture("Lesson successfully Created: " + lesson.getId());
+        log.info("[API] Aula criada com sucesso. ID: {}", saved.getId());
+        return CompletableFuture.completedFuture("Lesson successfully Created: " + saved.getId());
     }
 
     @Async
     public CompletableFuture<List<LessonResponseDTO>> readAllAsync() {
-        return CompletableFuture.completedFuture(responseMapper.toResponseDTOList(lessonR.findAll(), responseMapper::toLessonResponseDTO));
+        log.debug("[API] Buscando todas as aulas");
+        List<LessonResponseDTO> response = responseMapper.toResponseDTOList(lessonR.findAll(), responseMapper::toLessonResponseDTO);
+
+        log.debug("[API] Encontradas {} aulas", response.size());
+        return CompletableFuture.completedFuture(response);
     }
 
     @Async
     public CompletableFuture<LessonResponseDTO> readByIdAsync(UUID id) {
-        return CompletableFuture.completedFuture(responseMapper.toLessonResponseDTO(finder.findByIdOrThrow(lessonR.findById(id), "Lesson not Found")));
+        log.debug("[API] Buscando aula com ID: {}", id);
+        Lesson lesson = finder.findByIdOrThrow(lessonR.findById(id), "Lesson not Found");
+
+        log.debug("[API] Aula encontrada: {}", lesson.getId());
+        return CompletableFuture.completedFuture(responseMapper.toLessonResponseDTO(lesson));
     }
 
     @Async
     public CompletableFuture<String> updateAsync(UUID id, LessonUpdateDTO data) {
+        log.info("[API] Atualizando aula com ID: {}", id);
         Lesson lesson = finder.findByIdOrThrow(lessonR.findById(id), "Lesson not Found");
 
         lessonR.save(lesson);
+        log.info("[API] Aula atualizada com sucesso. ID: {}", id);
         return CompletableFuture.completedFuture("Updated Lesson");
     }
 
     @Async
     public CompletableFuture<String> deleteAsync(UUID id) {
+        log.info("[API] Solicitada exclusão da aula com ID: {}", id);
         finder.findByIdOrThrow(lessonR.findById(id), "Lesson not Found");
         
         lessonR.deleteById(id);
+        log.info("[API] Aula deletada com sucesso. ID: {}", id);
         return CompletableFuture.completedFuture("Deleted Lesson");
     }
 
