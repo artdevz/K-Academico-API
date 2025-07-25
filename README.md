@@ -1,1 +1,1 @@
-Desafio proposto de fazer um Q-Acadêmico.
+Um desafio individual de recriar uma API-Restful similar ao Q-Acadêmico.
